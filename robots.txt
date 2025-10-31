@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ankitrajmaurya.github.io/Portfolio/sitemap.xml
+
+

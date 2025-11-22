@@ -61,8 +61,13 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Serve static files
-app.use(express.static('public'));
+// Serve static files from current directory
+app.use(express.static(__dirname));
+
+// Handle 404 - catch all other routes
+app.use((req, res) => {
+    res.status(404).sendFile(__dirname + '/404.html');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

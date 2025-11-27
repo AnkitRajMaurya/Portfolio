@@ -1,11 +1,11 @@
-<h1 align="left">👋 Hi, I'm <a href="https://ankitrajmaurya.github.io/portfolio2.O" target="_blank"> Ankit Raj Maurya </a></h1>
+<h1 align="left">👋 Hi, I'm <a href="https://ankitrajmaurya.github.io/Portfolio/" target="_blank"> Ankit Raj Maurya </a></h1>
 <h3 align="center">
   <img src="https://readme-typing-svg.herokuapp.com?color=F70776&lines=Frontend+Developer+💻;UI/UX+Designer+🎨;Tech+Enthusiast+🚀" />
 </h3>
 
 - 👨‍💻 Frontend Developer from India  
 - 🌱 Currently working with **React.js**, **TailwindCSS**, and **Next.js**  
-- 🚀 Crafted my personal **[Portfolio Website](https://ankitrajmaurya.github.io/portfolio2.O)** showcasing my skills and projects  
+- 🚀 Crafted my personal **[Portfolio Website](https://ankitrajmaurya.github.io/Portfolio/)** showcasing my skills and projects  
 - 🎯 Focused on creating responsive, accessible, and aesthetic web experiences  
 - 📫 Reach me at: [ankitrajmaurya@gmail.com](mailto:ankitrajmaurya@gmail.com)
 
@@ -60,8 +60,8 @@
 
 <h3 align="left">🧩 About This Project:</h3>
 
-**Portfolio 2.O** is a modern, responsive portfolio website built to showcase my projects and skills with a clean and minimal UI.  
-It’s designed to leave a strong first impression through interactive sections, animations, and smooth navigation.
+**Portfolio** is a modern, responsive portfolio website built to showcase my projects and skills with a clean and minimal UI.  
+It's designed to leave a strong first impression through interactive sections, animations, and smooth navigation.
 
 ### ✨ Features
 - Responsive design for all devices  

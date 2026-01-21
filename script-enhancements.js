@@ -57,19 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
         fadeInObserver.observe(el);
     });
 
-    // Apply fade-in-left to about text
-    const fadeInLeftElements = document.querySelectorAll('.about-text');
-    fadeInLeftElements.forEach(el => {
-        el.classList.add('fade-in-left');
-        fadeInObserver.observe(el);
-    });
-
-    // Apply fade-in-right to about image
-    const fadeInRightElements = document.querySelectorAll('.about-image');
-    fadeInRightElements.forEach(el => {
-        el.classList.add('fade-in-right');
-        fadeInObserver.observe(el);
-    });
+    // About section - no animations, always visible
+    // (Animation logic removed as per user request)
 
     // ========================================
     // 3. ANIMATED SKILL PROGRESS BARS

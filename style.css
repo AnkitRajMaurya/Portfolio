@@ -3269,11 +3269,11 @@ ul {
   transform: translateX(0);
 }
 
-/* Ensure about-image is always visible even if animation fails */
-.about-image,
-.about-image.fade-in-right {
+/* About section - always visible, no animations */
+.about-text,
+.about-image {
   opacity: 1 !important;
-  transform: translateX(0) translateY(0) !important;
+  transform: none !important;
 }
 
 /* Stagger animation delays */

@@ -95,10 +95,23 @@
   scroll-behavior: smooth;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
 html,
 body {
   overflow-x: hidden;
   width: 100%;
+  max-width: 100%;
   position: relative;
 }
 
@@ -110,6 +123,8 @@ body {
   font-size: 16px;
   position: relative;
   transition: var(--transition);
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* Premium Light Glass Background with 3D Depth */
@@ -798,14 +813,22 @@ html {
 
 .container {
   max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 20px;
+  overflow-x: hidden;
 }
 
 section {
   padding: 6rem 0 2rem 0;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+section>* {
+  max-width: 100%;
 }
 
 /* Animated Section Backgrounds */
@@ -866,6 +889,12 @@ a:hover {
 img {
   max-width: 100%;
   height: auto;
+  display: block;
+}
+
+iframe {
+  max-width: 100%;
+  border: none;
 }
 
 ul {
@@ -3570,6 +3599,101 @@ a:focus-visible {
     --section-padding: 50px;
   }
 
+  /* CRITICAL: Fix horizontal overflow and viewport issues */
+  * {
+    max-width: 100vw;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  html,
+  body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    position: relative;
+  }
+
+  body {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Force all sections to stay within viewport */
+  section {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Fix container overflow */
+  .container {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Prevent all images and iframes from overflowing */
+  img,
+  iframe,
+  video {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+  }
+
+  /* Fix text overflow */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  span,
+  a,
+  li {
+    max-width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    hyphens: auto;
+  }
+
+  /* Fix navbar overflow */
+  .navbar {
+    padding: 0 1rem !important;
+    max-width: 100vw !important;
+  }
+
+  /* Fix blob animations that might cause overflow */
+  .blob {
+    max-width: 100vw !important;
+  }
+
+  /* CRITICAL: Remove gradient mask that causes blur/white line on sides */
+  .skills-grid,
+  .journey-container,
+  .featured-projects {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  /* Also remove the scroll hint arrows on mobile as they might overlap */
+  .skills-grid::before,
+  .skills-grid::after,
+  .journey-container::before,
+  .journey-container::after,
+  .featured-projects::before,
+  .featured-projects::after {
+    display: none !important;
+  }
+
   /* About Section - Ultra Mobile */
   .about-container {
     padding: 0 0.75rem !important;
@@ -3636,6 +3760,22 @@ a:focus-visible {
 
   .project-image a {
     aspect-ratio: 4 / 3 !important;
+    display: block !important;
+    min-height: 280px !important;
+    background: #f5f5f5 !important;
+  }
+
+  /* CRITICAL: Fix iframe visibility on mobile */
+  .project-image iframe {
+    display: block !important;
+    width: 100% !important;
+    min-height: 280px !important;
+    height: 280px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   /* Skills Section - Ultra Mobile */
@@ -3720,6 +3860,48 @@ a:focus-visible {
     --section-padding: 75px;
   }
 
+  /* Fix horizontal overflow for small mobile */
+  html,
+  body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  section {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  .container {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  img,
+  iframe,
+  video {
+    max-width: 100% !important;
+  }
+
+  /* Remove gradient mask that causes blur on sides */
+  .skills-grid,
+  .journey-container,
+  .featured-projects {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+
+  .skills-grid::before,
+  .skills-grid::after,
+  .journey-container::before,
+  .journey-container::after,
+  .featured-projects::before,
+  .featured-projects::after {
+    display: none !important;
+  }
+
   /* About Section - Small Mobile */
   .about-image-wrapper {
     max-width: 260px !important;
@@ -3732,6 +3914,17 @@ a:focus-visible {
   /* Featured Projects - Small Mobile */
   .project-title {
     font-size: clamp(18px, 5vw, 24px) !important;
+  }
+
+  /* Fix project iframe visibility */
+  .project-image iframe {
+    display: block !important;
+    width: 100% !important;
+    min-height: 300px !important;
+    height: 300px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    visibility: visible !important;
   }
 
   /* Skills Section - Small Mobile */

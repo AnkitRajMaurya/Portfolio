@@ -105,6 +105,8 @@ html {
   overflow-x: hidden;
   max-width: 100vw;
   position: relative;
+  scroll-padding-top: var(--header-height);
+  /* Account for fixed header in scroll navigation */
 }
 
 html,
@@ -125,6 +127,8 @@ body {
   transition: var(--transition);
   overflow-x: hidden;
   max-width: 100vw;
+  padding-top: 0;
+  /* Remove any default padding */
 }
 
 /* Premium Light Glass Background with 3D Depth */
@@ -1110,6 +1114,8 @@ ul {
   display: flex;
   align-items: center;
   padding: 100px 0;
+  padding-top: calc(var(--header-height) + 50px);
+  /* Add space for fixed header */
   position: relative;
 }
 
@@ -2689,7 +2695,6 @@ ul {
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
     gap: 1.5rem;
     padding: 1.5rem;
     -webkit-overflow-scrolling: touch;
@@ -2714,7 +2719,6 @@ ul {
   .skill-category {
     flex: 0 0 85vw;
     max-width: 85vw;
-    scroll-snap-align: center;
     margin-bottom: 0;
   }
 
@@ -2737,7 +2741,6 @@ ul {
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
     gap: 2rem;
     padding: 1.5rem;
     -webkit-overflow-scrolling: touch;
@@ -2762,7 +2765,6 @@ ul {
   .journey-column {
     flex: 0 0 85vw;
     max-width: 85vw;
-    scroll-snap-align: center;
   }
 
   /* Projects Section - Horizontal Scrolling */
@@ -2771,7 +2773,6 @@ ul {
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
     gap: 2rem;
     padding: 1.5rem;
     -webkit-overflow-scrolling: touch;
@@ -2796,7 +2797,6 @@ ul {
   .featured-project {
     flex: 0 0 85vw;
     max-width: 85vw;
-    scroll-snap-align: center;
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
@@ -2862,15 +2862,44 @@ ul {
     right: -100%;
     /* Hidden off-screen */
     width: 70%;
+    max-width: 300px;
     height: 100vh;
-    background-color: var(--bg-light-dark);
+    background: linear-gradient(135deg, rgba(10, 25, 47, 0.98) 0%, rgba(17, 34, 64, 0.98) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 4rem 2rem 2rem;
-    transition: right 0.4s ease-in-out;
+    transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+    border-left: 1px solid rgba(100, 255, 218, 0.1);
   }
 
   .nav-menu.active {
     right: 0;
     /* Slide in */
+  }
+
+  /* Mobile menu backdrop overlay */
+  .nav-menu.active::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   .nav-list {
@@ -2885,12 +2914,27 @@ ul {
   .nav-toggle,
   .nav-close {
     display: block;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    z-index: 10000;
+    padding: 0.5rem;
+    background: rgba(100, 255, 218, 0.1);
+    border-radius: 6px;
+  }
+
+  .nav-toggle:hover,
+  .nav-close:hover {
+    color: #fff;
+    background: var(--primary-color);
+    transform: scale(1.1);
   }
 
   .nav-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
   }
 
   .section-title {
@@ -3187,7 +3231,7 @@ ul {
   .skills-grid,
   .journey-container,
   .featured-projects {
-    scroll-behavior: smooth;
+    /* Allow natural free scrolling */
   }
 
   /* Visual hint with shadow edges */
@@ -3593,6 +3637,107 @@ a:focus-visible {
   animation: bounce-smooth 2s ease-in-out infinite;
 }
 
+/* === Tablets and Medium Devices (768px - 1023px) === */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    max-width: 720px;
+    padding: 0 1.5rem;
+  }
+
+  /* Home Section - Tablet */
+  .home-container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .hero-content {
+    order: 2;
+    max-width: 100%;
+  }
+
+  .hero-image {
+    order: 1;
+    margin-bottom: 2rem;
+  }
+
+  .hero-image-container {
+    max-width: 350px;
+    margin: 0 auto;
+  }
+
+  .cta-buttons {
+    justify-content: center;
+  }
+
+  .hero-socials {
+    justify-content: center;
+  }
+
+  /* About Section - Tablet */
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .about-image-wrapper {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .contact-item {
+    justify-content: center;
+  }
+
+  /* Skills Section - Tablet */
+  .skills-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  /* Journey Section - Tablet */
+  .journey-container {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .journey-column {
+    width: 100%;
+  }
+
+  /* Projects Section - Tablet */
+  .featured-project {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .featured-project .project-content,
+  .featured-project .project-image {
+    grid-column: auto;
+  }
+
+  .project-description {
+    text-align: left;
+  }
+
+  /* Contact Methods - Tablet */
+  .contact-methods {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Footer - Tablet */
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .footer-col:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
 /* === Extra Small Devices (< 480px) === */
 @media (max-width: 480px) {
   :root {
@@ -3948,7 +4093,136 @@ a:focus-visible {
   }
 }
 
-/* Fade In Up Animation */
+/* === Landscape Phone Orientation === */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --header-height: 3rem;
+  }
+
+  /* Reduce header height in landscape */
+  .header,
+  .navbar {
+    min-height: 3rem;
+    height: 3rem;
+  }
+
+  /* Optimize home section for landscape */
+  .home {
+    min-height: auto;
+    padding: 5rem 0 2rem;
+  }
+
+  .home-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .hero-content {
+    order: 1;
+  }
+
+  .hero-image {
+    order: 2;
+    margin-bottom: 0;
+  }
+
+  .hero-image-container {
+    max-width: 250px;
+  }
+
+  /* Reduce vertical section padding in landscape */
+  section {
+    padding: 2.5rem 0 1.5rem;
+  }
+
+  /* Optimize about section for landscape */
+  .about-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .about-image-wrapper {
+    max-width: 200px;
+  }
+
+  /* Reduce font sizes slightly */
+  .hero-content h1 {
+    font-size: clamp(24px, 6vw, 36px);
+    line-height: 1.2;
+  }
+
+  .section-title {
+    font-size: clamp(20px, 4vw, 28px);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Make CTA buttons inline in landscape */
+  .cta-buttons {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  /* Optimize modal and mobile menu for landscape */
+  .nav-menu {
+    width: 50%;
+    padding: 2rem 1.5rem 1rem;
+  }
+}
+
+/* === Touch Device Optimizations === */
+@media (hover: none) and (pointer: coarse) {
+
+  /* Enhance touch targets for mobile */
+  .btn,
+  .nav-link,
+  a,
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Remove hover effects on touch devices, make them always active */
+  .glass-card,
+  .skill-category,
+  .contact-method-card {
+    transform: none !important;
+  }
+
+  /* Simplify animations for better touch performance */
+  * {
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.1);
+  }
+
+  /* Make interactive elements more obvious on touch */
+  .btn::after {
+    opacity: 0.8;
+  }
+
+  /* Disable hover-only visual effects */
+  .hover-zoom:hover img,
+  .hero-image-container:hover,
+  .about-image-wrapper:hover {
+    transform: none;
+  }
+}
+
+/* === High DPI Displays (Retina) === */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
+  /* Optimize for retina displays */
+  .hero-image img,
+  .about-image img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* === Fade In Up Animation === */
 @keyframes fadeInUp {
   from {
     opacity: 0;

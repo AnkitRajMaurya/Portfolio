@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Nav Debug</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a192f;
+            color: white;
+            padding: 20px;
+        }
+
+        .debug-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .debug-info h2 {
+            color: #64ffda;
+            margin-bottom: 10px;
+        }
+
+        .debug-info p {
+            margin: 5px 0;
+            font-family: monospace;
+        }
+
+        .test-button {
+            background: #64ffda;
+            color: #0a192f;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+
+        .test-button:active {
+            transform: scale(0.95);
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: rgba(100, 255, 218, 0.2);
+            border: 1px solid #64ffda;
+        }
+
+        .error {
+            background: rgba(255, 100, 100, 0.2);
+            border: 1px solid #ff6464;
+        }
+
+        .info {
+            background: rgba(100, 150, 255, 0.2);
+            border: 1px solid #6496ff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔧 Mobile Navigation Debug Tool</h1>
+
+    <div class="debug-info">
+        <h2>Window Information</h2>
+        <p>Width: <span id="windowWidth"></span>px</p>
+        <p>Height: <span id="windowHeight"></span>px</p>
+        <p>User Agent: <span id="userAgent"></span></p>
+        <p>Touch Support: <span id="touchSupport"></span></p>
+    </div>
+
+    <div class="debug-info">
+        <h2>Navigation Elements Check</h2>
+        <p>nav-menu element: <span id="navMenuCheck"></span></p>
+        <p>nav-toggle element: <span id="navToggleCheck"></span></p>
+        <p>nav-close element: <span id="navCloseCheck"></span></p>
+        <p>nav-links count: <span id="navLinksCheck"></span></p>
+    </div>
+
+    <div class="debug-info">
+        <h2>Event Listeners Check</h2>
+        <div id="eventStatus"></div>
+    </div>
+
+    <button class="test-button" onclick="openPortfolio()">📱 Open Portfolio</button>
+    <button class="test-button" onclick="runTests()">🧪 Run Tests</button>
+
+    <div id="testResults"></div>
+
+    <div class="debug-info">
+        <h2>Instructions (हिंदी में)</h2>
+        <ol style="margin-left: 20px; line-height: 1.8;">
+            <li><strong>Portfolio खोलें</strong> - "Open Portfolio" button पर क्लिक करें</li>
+            <li><strong>Mobile view में देखें</strong> - अपने phone का browser काम में लें या desktop पर browser को
+                mobile size में resize करें (F12 → Device Toolbar)</li>
+            <li><strong>Hamburger menu ढूंढें</strong> - Top-right corner में तीन lines वाला icon (☰) दिखना चाहिए</li>
+            <li><strong>Menu खोलें</strong> - Hamburger icon पर tap/click करें</li>
+            <li><strong>Check करें</strong> - Menu right side से slide करके आना चाहिए</li>
+        </ol>
+    </div>
+
+    <script>
+        // Display window info
+        function updateWindowInfo() {
+            document.getElementById('windowWidth').textContent = window.innerWidth;
+            document.getElementById('windowHeight').textContent = window.innerHeight;
+            document.getElementById('userAgent').textContent = navigator.userAgent.substring(0, 50) + '...';
+            document.getElementById('touchSupport').textContent = 'ontouchstart' in window ? '✅ Yes' : '❌ No';
+        }
+
+        updateWindowInfo();
+        window.addEventListener('resize', updateWindowInfo);
+
+        function openPortfolio() {
+            window.open('index.html', '_blank');
+        }
+
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<h2>Test Results:</h2>';
+
+            // Test 1: Check window size
+            const isMobile = window.innerWidth <= 768;
+            resultsDiv.innerHTML += `
+                <div class="status ${isMobile ? 'success' : 'info'}">
+                    📏 Screen Size: ${isMobile ? 'Mobile view detected ✅' : 'Desktop view (resize to mobile) ℹ️'}
+                </div>
+            `;
+
+            // Test 2: Check if we can access portfolio elements (if opened)
+            try {
+                // This will only work if the page is index.html
+                const navMenu = window.parent.document.getElementById('nav-menu');
+                const navToggle = window.parent.document.getElementById('nav-toggle');
+
+                if (navMenu && navToggle) {
+                    resultsDiv.innerHTML += `<div class="status success">✅ Navigation elements found!</div>`;
+                } else {
+                    resultsDiv.innerHTML += `<div class="status info">ℹ️ Open portfolio page to test navigation</div>`;
+                }
+            } catch (e) {
+                resultsDiv.innerHTML += `<div class="status info">ℹ️ Please open the portfolio page using the button above</div>`;
+            }
+
+            // Test 3: CSS media query check
+            const mediaQuery = window.matchMedia('(max-width: 768px)');
+            resultsDiv.innerHTML += `
+                <div class="status ${mediaQuery.matches ? 'success' : 'info'}">
+                    📱 Mobile Media Query: ${mediaQuery.matches ? 'Active ✅' : 'Not active (desktop mode) ℹ️'}
+                </div>
+            `;
+        }
+
+        // Check if we're on the portfolio page
+        if (window.location.pathname.includes('index.html')) {
+            setTimeout(() => {
+                const navMenu = document.getElementById('nav-menu');
+                const navToggle = document.getElementById('nav-toggle');
+                const navClose = document.getElementById('nav-close');
+                const navLinks = document.querySelectorAll('.nav-link');
+
+                document.getElementById('navMenuCheck').textContent = navMenu ? '✅ Found' : '❌ Not found';
+                document.getElementById('navToggleCheck').textContent = navToggle ? '✅ Found' : '❌ Not found';
+                document.getElementById('navCloseCheck').textContent = navClose ? '✅ Found' : '❌ Not found';
+                document.getElementById('navLinksCheck').textContent = navLinks.length + ' links found';
+
+                const eventStatus = document.getElementById('eventStatus');
+                eventStatus.innerHTML = '<p>✅ Page loaded successfully</p>';
+
+                if (navToggle) {
+                    navToggle.addEventListener('click', function () {
+                        eventStatus.innerHTML += '<p class="success">✅ Toggle clicked!</p>';
+                    });
+                }
+
+                if (navClose) {
+                    navClose.addEventListener('click', function () {
+                        eventStatus.innerHTML += '<p class="success">✅ Close clicked!</p>';
+                    });
+                }
+            }, 1000);
+        } else {
+            document.getElementById('navMenuCheck').textContent = 'Open portfolio first';
+            document.getElementById('navToggleCheck').textContent = 'Open portfolio first';
+            document.getElementById('navCloseCheck').textContent = 'Open portfolio first';
+            document.getElementById('navLinksCheck').textContent = 'Open portfolio first';
+            document.getElementById('eventStatus').innerHTML = '<p class="info">ℹ️ Open the portfolio page to check elements</p>';
+        }
+    </script>
+</body>
+
+</html>

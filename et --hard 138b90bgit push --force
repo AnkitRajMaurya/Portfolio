@@ -1,0 +1,199 @@
+[33mcommit 1b76165a890ff34fc88904273104936a9bf34dfe[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Mon Feb 2 07:15:29 2026 +0530
+
+    Enhance mobile navigation menu and add debug tools
+    
+    Improved mobile navigation menu with better visibility, gradient background, blur, bouncy animation, and dark backdrop overlay. Added mobile-nav.js for menu toggle logic, included the script in index.html, and created mobile-nav-debug.html and mobile-nav-test.html for easier testing and troubleshooting. Updated style.css for improved mobile menu styles and touch optimizations.
+
+[33mcommit 9db06cb81387c1db545abcd1e1a0778410f58565[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Thu Jan 29 23:34:29 2026 +0530
+
+    Fix horizontal overflow and improve mobile responsiveness
+    
+    Added and adjusted CSS rules to prevent horizontal scrolling and content overflow across all viewports. Enhanced container, section, image, and iframe styles for better scaling and visibility on mobile devices. Removed problematic gradient masks and scroll hint arrows that caused visual issues on mobile. Improved word wrapping and layout constraints to ensure content stays within the viewport.
+
+[33mcommit 90b5f525d2da3c1d4ecd2eeb6c27005963f7710a[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Thu Jan 22 02:23:47 2026 +0530
+
+    Remove animations from about section
+    
+    Eliminated fade-in-left and fade-in-right animations for the about section's text and image. Updated CSS to ensure .about-text and .about-image are always visible without animation effects.
+
+[33mcommit 3228d9c9bc25329543880716c44eecf7d8014163[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Mon Jan 5 22:29:54 2026 +0530
+
+    Fix anchor links in 404 page popular links
+    
+    Removed unnecessary slashes from anchor hrefs in the popular links section of 404.html to ensure correct navigation to page sections.
+
+[33mcommit cc8ceac15ae48d980c78c076acf4eaecee7237d2[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Mon Jan 5 22:09:30 2026 +0530
+
+    Update 404 page links and improve mobile styles
+    
+    Changed 404.html internal links from root-relative to index.html-relative for better navigation. Enhanced style.css with improved responsive design for featured projects and about sections, and added new breakpoints for small and extra small devices to optimize mobile layout and readability.
+
+[33mcommit f3fa6d3468ff5a4cbef8d1b3419715986a62084c[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Mon Jan 5 00:55:23 2026 +0530
+
+    Revamp portfolio: new about image, enhancements, and UI updates
+    
+    Replaces the about section image with a new developer illustration, removes the old image, and updates index.html with improved structure, content, and accessibility. Adds script-enhancements.js for advanced animations and interactivity. Updates sitemap.xml and style.css to reflect new sections and design improvements.
+
+[33mcommit 7a473f4d10c39abb9c0d184554500666fe6517a6[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Jan 2 22:26:35 2026 +0530
+
+    Update external portfolio link in index.html
+    
+    Changed the external link from the portfolio page to the weather project page to direct users to the correct resource.
+
+[33mcommit dcdc3e9e2005842594a0872467c4bdb99e677533[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Jan 2 22:10:43 2026 +0530
+
+    Remove tempCodeRunnerFile.js
+    
+    Deleted temporary file tempCodeRunnerFile.js as it is not needed in the repository.
+
+[33mcommit 138b90bd0d635ea1c51b91d7058b922d4cde40f3[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 13:13:01 2025 +0530
+
+    delete unwanted
+    
+    e
+
+[33mcommit ffad1bd5382f7de7bd09cbee205c9b1f090f6f65[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 12:12:36 2025 +0530
+
+    Remove unused images and improve code formatting
+    
+    Deleted Portfolio.png and weather.webp from the img directory. Updated server.js and style.css to use consistent formatting and indentation, improving code readability and maintainability.
+
+[33mcommit 1011f4c323ec56be078d29a5c9bb33eba6342b54[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 12:01:01 2025 +0530
+
+    chore(seo): add richer SEO metadata, hreflang, og/tw tags and JSON-LD (WebPage, BreadcrumbList, Organization)
+
+[33mcommit ce66af14e60f17fff38efa995466720df048579b[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 00:48:02 2025 +0530
+
+    Update sitemap.xml
+
+[33mcommit 9acc7f2ef09cad8f9bf3a7ff3881aad48ec82007[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 00:45:18 2025 +0530
+
+    Update index.html
+
+[33mcommit dad3658ae570cad962a8e9bf2e5a156c6d85c00f[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 00:43:34 2025 +0530
+
+    refactor: remove all old portfolio URLs (nextportfolio, portfolio2.O)
+    
+    - Replace remaining nextportfolio links in Weather project card
+    - Update sitemap.xml with correct Portfolio URL
+    - Ensure all internal/external links point to https://ankitrajmaurya.github.io/Portfolio/
+
+[33mcommit f4cc846ed79d51af6df6ffd2c6d902b92c640451[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Fri Nov 28 00:40:26 2025 +0530
+
+    fix: update SEO and URLs to https://ankitrajmaurya.github.io/Portfolio/
+    
+    - Update canonical link and OG/Twitter meta tags with absolute Portfolio URL
+    - Convert social image paths to absolute URLs for proper link previews
+    - Improve meta description and keywords for better search visibility
+    - Update JSON-LD structured data (WebSite and Person schemas)
+    - Add .github/copilot-instructions.md for AI coding agents
+    - Update README.md with correct portfolio URL
+
+[33mcommit e990d5f1e86d5f6d7982ce2f444d09ef710214cc[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Sat Nov 22 22:13:35 2025 +0530
+
+    add active link of project
+
+[33mcommit 0ed8baa3c105b91a7b0aa1e73f1189e7004279d1[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Sat Nov 22 22:05:35 2025 +0530
+
+    fix that line of code
+
+[33mcommit 6295720a8990fc3b4bfc58cd76a8c9a0f8eb5836[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Sat Nov 22 22:03:15 2025 +0530
+
+    fix a line of bug
+
+[33mcommit c17795704558831e2541ecea08181305e0bdfce1[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Sat Nov 22 21:52:21 2025 +0530
+
+    add 404.html and gitignore
+
+[33mcommit 7a12d85ec5752030c03058c0c732eb277cff45a1[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Mon Nov 10 00:06:56 2025 +0530
+
+    change sitemap link
+
+[33mcommit 8689b576f1289bae5aa826a6cc49408d1c9ec712[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 15:10:11 2025 +0530
+
+    add file google verification
+
+[33mcommit 719b0b74adbd7e2b467f1bdeb1961ab02a57591a[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 15:06:10 2025 +0530
+
+    file name changed for verification
+
+[33mcommit 97717b9efd8e7808093aa65356146110d587046b[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 15:02:43 2025 +0530
+
+    change file name
+
+[33mcommit 9890004e89e894b9555d56a43ec7c8d57f06eea2[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 14:58:05 2025 +0530
+
+    Update index.html
+
+[33mcommit e2ed605bef4b9aeb8ce06cd30550ce01b6b0024d[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 14:46:08 2025 +0530
+
+    Update index.html
+
+[33mcommit 62039a3cd572ab6101792de0de6b85980406bf22[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 14:41:24 2025 +0530
+
+    Create google21165bda730acba3.html
+
+[33mcommit a26454f700e71a1232fa0eef507470dcb4c63d61[m
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 14:23:54 2025 +0530
+
+    change all links
+
+[33mcommit 3ce1dfc6fec907e34fe43b5fa45e6714efe15c0a[m
+Merge: 957d6f0 30e7fae
+Author: AnkitRajMaurya <ankit5242raj@gmail.com>
+Date:   Wed Nov 5 00:40:27 2025 +0530
+
+    Merge branch 'main' of https://github.com/AnkitR

@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/aquire');
+
 /* --- Global Styles --- */
 :root {
   /* Light Mode Colors - Premium Glass Theme */
@@ -785,7 +788,9 @@ section {
 
 h1,
 h2,
-h3 {
+h3,
+.nav-logo {
+  font-family: 'Aquire', sans-serif;
   font-weight: 600;
 }
 
@@ -3314,4 +3319,466 @@ section {
   .section-title {
     flex-wrap: wrap;
   }
+}
+
+/* ============================================================
+   SKILLS — Flat tag grid (replaces heavy category cards)
+   ============================================================ */
+.skills-flat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-outline);
+  border-radius: 28px;
+  box-shadow: var(--panel-shadow);
+}
+
+.skill-group {
+  padding: 1.25rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.44);
+  border: 1px solid var(--surface-outline);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="dark"] .skill-group {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.skill-group:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+
+.skill-group-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 0.9rem;
+  font-family: "Fira Code", monospace;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--surface-outline);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.skill-tag i {
+  color: var(--primary-color);
+  font-size: 0.88rem;
+}
+
+.skill-tag:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .skill-tag:hover {
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.18);
+}
+
+/* ============================================================
+   PROJECT PREVIEW — Lightweight placeholder (replaces iframes)
+   ============================================================ */
+.project-preview-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.project-image a.project-preview-link {
+  background: none;
+  padding-top: 0;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
+.project-image a.project-preview-link::before,
+.project-image a.project-preview-link::after {
+  display: none;
+}
+
+.project-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 200px;
+  padding: 2.5rem 1.5rem;
+  border-radius: 22px;
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-outline);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+[data-theme="dark"] .project-preview-placeholder {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.project-preview-placeholder:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 64px rgba(15, 23, 42, 0.16);
+  border-color: var(--primary-color);
+}
+
+.preview-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-alt));
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+}
+
+[data-theme="dark"] .preview-icon {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+}
+
+.preview-label {
+  font-family: "Fira Code", monospace;
+  font-size: 0.8rem;
+  color: var(--text-alt);
+  letter-spacing: 0.02em;
+}
+
+.preview-visit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-alt));
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+}
+
+.project-preview-placeholder:hover .preview-visit {
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.4);
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE & DESIGN — phones only
+   ============================================================ */
+@media (max-width: 640px) {
+  /* Disable expensive blobs on mobile */
+  .blob {
+    display: none;
+  }
+
+  /* Reduce section spacing */
+  section {
+    padding: clamp(3rem, 6vw, 5rem) 0;
+  }
+
+  /* Skills flat grid — single column on small phones */
+  .skills-flat-grid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  .skill-group {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  /* Projects — single column, no 12-column grid */
+  .featured-project {
+    grid-template-columns: 1fr !important;
+    padding: 1rem;
+    border-radius: 18px;
+    gap: 1rem;
+  }
+
+  .featured-project .project-content,
+  .featured-project .project-image {
+    grid-column: 1 / -1 !important;
+  }
+
+  .project-preview-placeholder {
+    min-height: 160px;
+    padding: 1.75rem 1rem;
+    border-radius: 16px;
+  }
+
+  .preview-icon {
+    width: 2.8rem;
+    height: 2.8rem;
+    font-size: 1.1rem;
+  }
+
+  .featured-projects {
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  /* Hero — tighter on phone */
+  .home {
+    padding-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .hero-content h1 {
+    font-size: clamp(2.2rem, 10vw, 3.4rem);
+  }
+
+  .hero-highlights {
+    gap: 0.5rem;
+  }
+
+  .hero-highlights span {
+    font-size: 0.78rem;
+    padding: 0.55rem 0.85rem;
+  }
+
+  /* About — simpler layout */
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  /* Journey — stack columns */
+  .journey-container {
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 20px;
+    gap: 1rem;
+  }
+
+  .journey-column {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  /* Contact */
+  .contact-content {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    border-radius: 20px;
+    gap: 1rem;
+  }
+
+  /* Footer */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .footer-col {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  /* Reduce navbar padding */
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  /* Nav menu overlay */
+  .nav-menu {
+    width: 80%;
+  }
+}
+
+/* Mobile Optimization - Disable Heavy Animations & Filters */
+@media screen and (max-width: 768px) {
+  body::before {
+    animation: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  .blob, .blob-1, .blob-2, .blob-3 {
+    display: none !important;
+    animation: none !important;
+  }
+  
+  .glass-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    transform: none !important;
+  }
+  
+  .glass-card:hover, .btn:hover, .skill-category:hover, .project-description:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+  }
+  
+  .liquid-border::before {
+    animation: none !important;
+    filter: none !important;
+  }
+  
+  .animated-shape {
+    display: none !important;
+  }
+  
+  .depth-effect, .transform-on-scroll {
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  .depth-effect:hover {
+    transform: none !important;
+  }
+
+  /* Project previews: hide iframe on mobile, show placeholder */
+  .project-iframe-wrapper,
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .project-preview-link.mobile-only,
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+/* ============================================
+   Project Preview: Desktop shows iframe, Mobile shows placeholder
+   ============================================ */
+
+/* Default: show iframe, hide mobile placeholder */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+.project-iframe-wrapper {
+  display: block;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.project-preview-link.mobile-only {
+  display: none !important;
+}
+
+.project-iframe-wrapper:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+/* Browser topbar with macOS-style dots */
+.iframe-topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.dot.r { background: #ff5f57; }
+.dot.y { background: #ffbd2e; }
+.dot.g { background: #28c840; }
+
+.iframe-url {
+  margin-left: 8px;
+  font-size: 0.72rem;
+  color: var(--text-alt);
+  font-family: 'Fira Code', monospace;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-iframe-wrapper iframe {
+  position: absolute;
+  top: 33px; /* account for topbar height */
+  left: 0;
+  width: 250%; /* Force a large desktop viewport for the iframe */
+  height: calc((100% - 33px) * 2.5);
+  border: none;
+  display: block;
+  transform-origin: top left;
+  transform: scale(0.4); /* Scale the 250% viewport down to 100% of container */
+  pointer-events: none;
+}
+
+/* Transparent overlay — clicking opens site in a new tab */
+.iframe-overlay-link {
+  position: absolute;
+  inset: 0;
+  top: 30px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.iframe-overlay-link:hover::after {
+  content: 'Open ↗';
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0.92;
 }

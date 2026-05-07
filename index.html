@@ -12,6 +12,8 @@
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="theme-color" content="#2563eb" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
 
     <!-- google-site-verification -->
     <meta
@@ -40,8 +42,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-    <link rel="preconnect" href="https://unpkg.com" crossorigin />
 
     <!-- Particles.js -->
     <script
@@ -65,11 +65,11 @@
     <!-- Meta tags for SEO -->
     <meta
       name="description"
-      content="Ankit Raj Maurya - Full Stack Developer specializing in MERN stack, Flutter, and modern web technologies. Build scalable web and mobile applications."
+      content="Ankit Raj Maurya - Full Stack Developer & Co-founder at Codex Monarch, specializing in MERN stack, Flutter, and modern web technologies. Build scalable web and mobile applications."
     />
     <meta
       name="keywords"
-      content="Ankit Raj Maurya, Full Stack Developer, MERN Stack, React, Node.js, Flutter, Web Developer, Software Engineer, JavaScript, Web Applications"
+      content="Ankit Raj Maurya, Full Stack Developer, Co-founder Codex Monarch, MERN Stack, React, Node.js, Flutter, Web Developer, Software Engineer, JavaScript, Web Applications"
     />
     <meta name="author" content="Ankit Raj Maurya" />
 
@@ -93,7 +93,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_IN" />
     <meta property="og:site_name" content="Ankit Raj Maurya — Portfolio" />
-    <meta property="og:updated_time" content="2025-11-28T00:00:00+00:00" />
+    <meta property="og:updated_time" content="2026-05-08T00:00:00+00:00" />
     <meta property="og:image:alt" content="Portrait & portfolio preview — Ankit Raj Maurya" />
 
     <!-- Twitter Card -->
@@ -115,7 +115,7 @@
     <meta name="twitter:site" content="@AnkitRajMaurya" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="img/pic.jpg" />
+    <link rel="icon" type="image/jpeg" href="img/pic.jpg" />
 
     <!-- Structured Data: WebSite -->
     <script type="application/ld+json">
@@ -138,9 +138,14 @@
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Ankit Raj Maurya",
-        "jobTitle": "Full Stack Developer",
+        "jobTitle": "Full Stack Developer & Co-founder at Codex Monarch",
         "url": "https://ankitrajmaurya.github.io/Portfolio/",
         "image": "https://ankitrajmaurya.github.io/Portfolio/img/pic.jpg",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Codex Monarch",
+          "url": "https://codex-monarch.vercel.app/"
+        },
         "sameAs": [
           "https://github.com/AnkitRajMaurya",
           "https://www.linkedin.com/in/AnkitRajMaurya",
@@ -281,17 +286,15 @@
             <h1>Ankit Raj Maurya</h1>
             <h2 class="title">From Problem to Production-Ready.</h2>
             <p class="hero-description">
-              A goal-oriented full-stack developer with expertise in building
+              A goal-oriented full-stack developer and Co-founder at Codex Monarch with expertise in building
               modern web and mobile applications. I specialize in creating
               clean, efficient, and user-friendly solutions using MERN stack,
               Flutter, and modern JavaScript.
             </p>
             <div class="hero-highlights">
-              <span><i class="fa-brands fa-react"></i> React & Next.js</span>
-              <span
-                ><i class="fa-solid fa-server"></i> Node & Express APIs</span
-              >
-              <span><i class="fa-solid fa-mobile-screen"></i> Flutter Apps</span>
+              <span><i class="fa-brands fa-react" style="margin-right: 0.4rem;"></i>React & Next.js</span>
+              <span><i class="fa-solid fa-server" style="margin-right: 0.4rem;"></i>Node & Express APIs</span>
+              <span><i class="fa-solid fa-mobile-screen" style="margin-right: 0.4rem;"></i>Flutter Apps</span>
             </div>
             <div class="cta-buttons">
               <a href="#projects" class="btn btn-primary"
@@ -351,7 +354,7 @@
               </p>
               <div class="about-description">
                 <p>
-                  Hello! I'm Ankit, a passionate full-stack developer based in
+                  Hello! I'm Ankit, a passionate full-stack developer and Co-founder at Codex Monarch based in
                   Muzaffarpur, Bihar. I specialize in building modern web and
                   mobile applications that combine clean code with great user
                   experiences.
@@ -411,103 +414,47 @@
           <p class="mono section-subtitle">
             <i class="fa-solid fa-screwdriver-wrench"></i> What I Work With
           </p>
-          <h2 class="section-title">
-            <i class="fa-solid fa-laptop-code"></i> Technical Skills
-          </h2>
-          <div class="skills-grid">
-            <div class="skill-category glass-card glass-hover liquid-border">
-              <h3><i class="fa-solid fa-terminal"></i> Programming Languages</h3>
-              <div class="skill-list">
-                <div class="skill-item">
-                  <i class="fa-brands fa-java"></i>
-                  <span>Java</span>
-                  <div class="skill-level" data-level="85"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-solid fa-code"></i>
-                  <span>C</span>
-                  <div class="skill-level" data-level="80"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-brands fa-js"></i>
-                  <span>JavaScript</span>
-                  <div class="skill-level" data-level="90"></div>
-                </div>
+          <h2 class="section-title">Technical Skills</h2>
+          <div class="skills-flat-grid">
+            <div class="skill-group">
+              <h3 class="skill-group-label"><i class="fa-solid fa-terminal"></i> Languages</h3>
+              <div class="skill-tags">
+                <span class="skill-tag"><i class="fa-brands fa-java"></i> Java</span>
+                <span class="skill-tag"><i class="fa-solid fa-c"></i> C</span>
+                <span class="skill-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
               </div>
             </div>
-            <div class="skill-category glass-card">
-              <h3><i class="fa-solid fa-object-group"></i> Frontend Development</h3>
-              <div class="skill-list">
-                <div class="skill-item">
-                  <i class="fa-brands fa-html5"></i>
-                  <span>HTML5</span>
-                  <div class="skill-level" data-level="95"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-brands fa-css3-alt"></i>
-                  <span>CSS3</span>
-                  <div class="skill-level" data-level="90"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-brands fa-react"></i>
-                  <span>React</span>
-                  <div class="skill-level" data-level="85"></div>
-                </div>
+            <div class="skill-group">
+              <h3 class="skill-group-label"><i class="fa-solid fa-object-group"></i> Frontend</h3>
+              <div class="skill-tags">
+                <span class="skill-tag"><i class="fa-brands fa-html5"></i> HTML5</span>
+                <span class="skill-tag"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
+                <span class="skill-tag"><i class="fa-brands fa-react"></i> React</span>
+                <span class="skill-tag"><i class="fa-solid fa-n"></i> Next.js</span>
               </div>
             </div>
-            <div class="skill-category glass-card">
-              <h3><i class="fa-solid fa-database"></i> Backend Development</h3>
-              <div class="skill-list">
-                <div class="skill-item">
-                  <i class="fa-brands fa-node-js"></i>
-                  <span>Node.js</span>
-                  <div class="skill-level" data-level="88"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-solid fa-database"></i>
-                  <span>MongoDB</span>
-                  <div class="skill-level" data-level="85"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-solid fa-server"></i>
-                  <span>Express.js</span>
-                  <div class="skill-level" data-level="82"></div>
-                </div>
+            <div class="skill-group">
+              <h3 class="skill-group-label"><i class="fa-solid fa-server"></i> Backend</h3>
+              <div class="skill-tags">
+                <span class="skill-tag"><i class="fa-brands fa-node-js"></i> Node.js</span>
+                <span class="skill-tag"><i class="fa-solid fa-database"></i> MongoDB</span>
+                <span class="skill-tag"><i class="fa-solid fa-server"></i> Express.js</span>
               </div>
             </div>
-            <div class="skill-category glass-card">
-              <h3><i class="fa-solid fa-mobile-screen-button"></i> Mobile Development</h3>
-              <div class="skill-list">
-                <div class="skill-item">
-                  <i class="fa-solid fa-mobile-screen"></i>
-                  <span>Flutter</span>
-                  <div class="skill-level" data-level="75"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-brands fa-android"></i>
-                  <span>Android</span>
-                  <div class="skill-level" data-level="70"></div>
-                </div>
+            <div class="skill-group">
+              <h3 class="skill-group-label"><i class="fa-solid fa-mobile-screen"></i> Mobile</h3>
+              <div class="skill-tags">
+                <span class="skill-tag"><i class="fa-solid fa-mobile-screen"></i> Flutter</span>
+                <span class="skill-tag"><i class="fa-brands fa-android"></i> Android</span>
               </div>
             </div>
-            <div class="skill-category glass-card">
-              <h3><i class="fa-solid fa-toolbox"></i> Tools & Technologies</h3>
-              <div class="skill-list">
-                <div class="skill-item">
-                  <i class="fa-brands fa-git-alt"></i>
-                  <span>Git</span>
-                  <div class="skill-level" data-level="88"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-brands fa-github"></i>
-                  <span>GitHub</span>
-                  <div class="skill-level" data-level="85"></div>
-                </div>
-                <div class="skill-item">
-                  <i class="fa-solid fa-code"></i>
-                  <span>VS Code</span>
-                  <div class="skill-level" data-level="92"></div>
-                </div>
+            <div class="skill-group">
+              <h3 class="skill-group-label"><i class="fa-solid fa-toolbox"></i> Tools</h3>
+              <div class="skill-tags">
+                <span class="skill-tag"><i class="fa-brands fa-git-alt"></i> Git</span>
+                <span class="skill-tag"><i class="fa-brands fa-github"></i> GitHub</span>
+                <span class="skill-tag"><i class="fa-solid fa-code"></i> VS Code</span>
+                <span class="skill-tag"><i class="fa-brands fa-figma"></i> Figma</span>
               </div>
             </div>
           </div>
@@ -526,6 +473,13 @@
             <div class="journey-column">
               <h3><i class="fa-solid fa-briefcase"></i> Experience</h3>
               <div class="timeline">
+                <div class="timeline-item">
+                  <h4><i class="fa-solid fa-crown"></i> Co-founder</h4>
+                  <span>Codex Monarch</span>
+                  <p class="timeline-duration">
+                    <i class="fa-regular fa-clock"></i> Present
+                  </p>
+                </div>
                 <div class="timeline-item">
                   <h4><i class="fa-solid fa-globe"></i> Web Developer Intern</h4>
                   <span>Tata Power Skill Development Institute</span>
@@ -586,35 +540,24 @@
                   <i class="fa-solid fa-star"></i> Featured Project
                 </p>
                 <h3 class="project-title">
-                  <i class="fa-solid fa-address-card"></i> Portfolio Website
+                  <i class="fa-solid fa-crown"></i> Codex Monarch
                 </h3>
-                <div
-                  class="project-description glass-morphism glass-hover depth-effect"
-                >
+                <div class="project-description">
                   <p>
-                    A modern and responsive portfolio website designed and
-                    developed to showcase my web development skills and
-                    projects. Built with a focus on clean code, performance, and
-                    user experience.
+                    A premier student-led technical community platform for national-level hackathons,
+                    open-source workshops, and collaborative engineering projects. Features time-gated
+                    coding arenas, event management, and a LeetCode-style IDE.
                   </p>
                 </div>
                 <ul class="project-tech-list">
-                  <li><i class="fa-brands fa-html5"></i> HTML5</li>
-                  <li><i class="fa-brands fa-css3-alt"></i> CSS3</li>
+                  <li><i class="fa-brands fa-node-js"></i> Node.js</li>
+                  <li><i class="fa-solid fa-database"></i> MongoDB</li>
                   <li><i class="fa-brands fa-js"></i> JavaScript</li>
-                  <li><i class="fa-solid fa-mobile-screen"></i> Responsive Design</li>
+                  <li><i class="fa-solid fa-server"></i> Express.js</li>
                 </ul>
                 <div class="project-links">
                   <a
-                    href="https://github.com/AnkitRajMaurya/Portfolio"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="GitHub Link"
-                  >
-                    <i class="fa-brands fa-github"></i>
-                  </a>
-                  <a
-                    href="#"
+                    href="https://codex-monarch.vercel.app/"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="External Link"
@@ -624,12 +567,13 @@
                 </div>
               </div>
               <div class="project-image">
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  <iframe
-                    src="https://ankitrajmaurya.github.io/Portfolio/"
-                    width="100%"
-                    height="100%"
-                  ></iframe>
+                <!-- Project preview link (no iframe) -->
+                <a href="https://codex-monarch.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
+                  <div class="project-preview-placeholder" data-url="https://codex-monarch.vercel.app/">
+                    <div class="preview-icon"><i class="fa-solid fa-crown"></i></div>
+                    <span class="preview-label">codex-monarch.vercel.app</span>
+                    <span class="preview-visit">Visit <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                  </div>
                 </a>
               </div>
             </article>
@@ -644,11 +588,14 @@
                 </h3>
                 <div class="project-description">
                   <p>
-                    A live demo of the Orbit UI showcase. Click the external link to open the app.
+                    A modern component library and UI showcase built with vanilla
+                    JavaScript. Clean, accessible, and lightweight design system
+                    ready for production use.
                   </p>
                 </div>
                 <ul class="project-tech-list">
-                  <li><i class="fa-solid fa-display"></i> Web UI</li>
+                  <li><i class="fa-brands fa-html5"></i> HTML5</li>
+                  <li><i class="fa-brands fa-css3-alt"></i> CSS3</li>
                   <li><i class="fa-brands fa-js"></i> JavaScript</li>
                 </ul>
                 <div class="project-links">
@@ -671,15 +618,17 @@
                 </div>
               </div>
               <div class="project-image">
-                <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer">
-                  <iframe
-                    src="https://orbitui-eta.vercel.app/"
-                    width="100%"
-                    height="100%"
-                  ></iframe>
+                <!-- Project preview link (no iframe) -->
+                <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
+                  <div class="project-preview-placeholder" data-url="https://orbitui-eta.vercel.app/">
+                    <div class="preview-icon"><i class="fa-solid fa-globe"></i></div>
+                    <span class="preview-label">orbitui-eta.vercel.app</span>
+                    <span class="preview-visit">Visit <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                  </div>
                 </a>
               </div>
             </article>
+
             <article class="featured-project">
               <div class="project-content">
                 <p class="mono project-overline">
@@ -722,12 +671,13 @@
                 </div>
               </div>
               <div class="project-image">
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  <iframe
-                    src="https://weather-project-lovat-five.vercel.app/"
-                    width="100%"
-                    height="100%"
-                  ></iframe>
+                <!-- Project preview link (no iframe) -->
+                <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
+                  <div class="project-preview-placeholder" data-url="https://weather-project-lovat-five.vercel.app/">
+                    <div class="preview-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
+                    <span class="preview-label">weather-project.vercel.app</span>
+                    <span class="preview-visit">Visit <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                  </div>
                 </a>
               </div>
             </article>

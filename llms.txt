@@ -1,0 +1,51 @@
+# Ankit Raj Maurya
+
+> Full Stack Developer & Co-founder at Codex Monarch — building scalable web and mobile applications with MERN stack, Flutter, and modern JavaScript. Based in Muzaffarpur, Bihar, India.
+
+## About
+
+Ankit Raj Maurya is a goal-oriented full-stack developer and entrepreneur based in Muzaffarpur, Bihar, India. He specializes in building modern web and mobile applications that combine clean, maintainable code with great user experiences. He is the co-founder of Codex Monarch, a premier student-led technical community platform for hackathons and engineering events.
+
+He completed his MATRIC (10th) from Bihar School Examination Board in 2024 and is currently pursuing a Diploma in Computer Science at NRI Institute of Research and Technology (2024–2027). He has industry experience as a Web Developer Intern at Tata Power Skill Development Institute and has worked as a freelance developer building websites and applications for clients.
+
+## Skills
+
+- **Languages**: Java, C, JavaScript
+- **Frontend**: HTML5, CSS3, React, Next.js
+- **Backend**: Node.js, Express.js, MongoDB
+- **Mobile**: Flutter, Android
+- **Tools**: Git, GitHub, VS Code, Figma
+
+## Experience
+
+- **Co-founder** at Codex Monarch (Present) — https://codex-monarch.vercel.app/
+- **Web Developer Intern** at Tata Power Skill Development Institute
+- **Freelancer** — built custom websites and mobile applications for clients
+
+## Education
+
+- **Diploma in Computer Science** — NRI Institute of Research and Technology (2024–2027, currently pursuing)
+- **MATRIC (10th)** — Bihar School Examination Board (completed 2024)
+
+## Projects
+
+- [Codex Monarch](https://codex-monarch.vercel.app/): A premier student-led technical community platform for national-level hackathons, open-source workshops, and collaborative engineering projects. Features time-gated coding arenas, event management, and a LeetCode-style IDE. Stack: Node.js, MongoDB, Express.js, JavaScript.
+- [Orbit UI](https://orbitui-eta.vercel.app/): A modern component library and UI showcase built with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use. Stack: HTML5, CSS3, JavaScript. GitHub: https://github.com/AnkitRajMaurya/ORBITUI
+- [Weather Application](https://weather-project-lovat-five.vercel.app/): A full-featured React weather application providing real-time weather data and forecasts via the OpenWeather API. Stack: React, OpenWeather API, CSS Modules, Axios. GitHub: https://github.com/AnkitRajMaurya/weather-project
+
+## Contact
+
+- **Email**: ankit5242raj1@outlook.com
+- **Location**: Muzaffarpur, Bihar, 843126, India
+- **GitHub**: https://github.com/AnkitRajMaurya
+- **LinkedIn**: https://www.linkedin.com/in/AnkitRajMaurya
+- **Instagram**: https://instagram.com/_ankit_raj_maurya
+
+## Links
+
+- [Portfolio](https://ankitrajmaurya.github.io/Portfolio/): Full portfolio website with projects, experience, skills, and contact information.
+- [GitHub Profile](https://github.com/AnkitRajMaurya): Open-source projects and code contributions.
+- [LinkedIn Profile](https://www.linkedin.com/in/AnkitRajMaurya): Professional profile, endorsements, and career history.
+- [Codex Monarch Platform](https://codex-monarch.vercel.app/): The flagship project — a technical community and hackathon platform.
+- [Orbit UI](https://orbitui-eta.vercel.app/): Open-source component library built with vanilla JS.
+- [CV / Resume](https://drive.google.com/file/d/1359Lhc3l75iBDmdHSWJDFBz4O8sG33MJ/view?usp=drivesdk): Downloadable resume/CV.

@@ -191,6 +191,7 @@ const ContactForm = {
   async submitForm() {
     const formData = new FormData(this.form);
     const data = Object.fromEntries(formData.entries());
+    const endpoint = (this.form.dataset.endpoint || "").trim();
 
     try {
       if (this.submitButton) {
@@ -199,17 +200,23 @@ const ContactForm = {
           'Sending Message <i class="fa-solid fa-spinner fa-spin"></i>';
       }
 
-      // Mock successful response since this is a static site without backend
-      // Replace this with Formspree URL later: fetch("https://formspree.io/f/your_id", ...)
-      const response = { ok: true };
+      if (endpoint) {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+          },
+          body: formData,
+        });
 
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+        if (!response.ok) {
+          throw new Error("Failed to send message");
+        }
 
-      if (response.ok) {
-        this.showSuccess();
+        this.showSuccess("Message sent successfully!");
       } else {
-        throw new Error("Failed to send message");
+        this.openMailClient(data);
+        this.showSuccess("Email draft opened. Please click send in your mail app.");
       }
     } catch (error) {
       this.showError(this.form, "Failed to send message. Please try again.");
@@ -221,11 +228,22 @@ const ContactForm = {
     }
   },
 
-  showSuccess() {
+  openMailClient(data) {
+    const name = (data.name || "").trim();
+    const email = (data.email || "").trim();
+    const message = (data.message || "").trim();
+    const subject = encodeURIComponent(`Portfolio Inquiry from ${name || "Visitor"}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+    );
+    window.location.href = `mailto:ankit5242raj1@outlook.com?subject=${subject}&body=${body}`;
+  },
+
+  showSuccess(messageText = "Message sent successfully!") {
     this.form.reset();
     const successMessage = document.createElement("div");
     successMessage.className = "success-message";
-    successMessage.textContent = "Message sent successfully!";
+    successMessage.textContent = messageText;
     this.form.appendChild(successMessage);
     setTimeout(() => successMessage.remove(), 5000);
   },
@@ -271,8 +289,6 @@ const PremiumEffects = {
     this.initParallax();
     this.initMagneticButtons();
     // Use global smooth scroll with header offset instead of duplicate
-    this.initLiquidGlass();
-    this.init3DDepth();
   },
 
   initParallax() {
@@ -322,94 +338,6 @@ const PremiumEffects = {
     });
   },
 
-  initLiquidGlass() {
-    // Add liquid glass effect to glass cards
-    const glassCards = document.querySelectorAll(".glass-card");
-    glassCards.forEach((card) => {
-      card.addEventListener("mousemove", (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Calculate rotation based on mouse position
-        const rotateX = (y - rect.height / 2) / 10;
-        const rotateY = (rect.width / 2 - x) / 10;
-
-        // Apply transform with perspective
-        card.style.transform = `
-                    perspective(1000px)
-                    rotateX(${rotateX}deg)
-                    rotateY(${rotateY}deg)
-                    scale3d(1.05, 1.05, 1.05)
-                `;
-
-        // Add gradient highlight
-        const gradient = `radial-gradient(
-                    circle at ${x}px ${y}px,
-                    rgba(255, 255, 255, 0.2) 0%,
-                    rgba(255, 255, 255, 0.1) 20%,
-                    rgba(255, 255, 255, 0) 50%
-                )`;
-
-        card.style.background = gradient;
-      });
-
-      card.addEventListener("mouseleave", () => {
-        card.style.transform =
-          "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)";
-        card.style.background = "";
-      });
-    });
-  },
-
-  init3DDepth() {
-    // Add 3D depth effect to elements with depth-effect class
-    const depthElements = document.querySelectorAll(".depth-effect");
-    depthElements.forEach((element) => {
-      element.addEventListener("mousemove", (e) => {
-        const rect = element.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Calculate depth based on mouse position
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const deltaX = (x - centerX) / centerX;
-        const deltaY = (y - centerY) / centerY;
-
-        element.style.transform = `
-                    perspective(1000px)
-                    translateZ(20px)
-                    rotateX(${deltaY * 10}deg)
-                    rotateY(${-deltaX * 10}deg)
-                `;
-      });
-
-      element.addEventListener("mouseleave", () => {
-        element.style.transform =
-          "perspective(1000px) translateZ(0) rotateX(0) rotateY(0)";
-      });
-    });
-
-    // Add smooth transition when elements come into view
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.style.transform = "translateY(0) rotateX(0)";
-            entry.target.style.opacity = "1";
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-      }
-    );
-
-    document.querySelectorAll(".transform-on-scroll").forEach((el) => {
-      observer.observe(el);
-    });
-  },
 };
 
 // Defer heavy effects to idle time wrapper

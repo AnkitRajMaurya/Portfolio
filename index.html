@@ -11,9 +11,13 @@
     <meta name="robots" content="index, follow" />
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="theme-color" content="#2563eb" />
+
+    <!-- DNS prefetch + Preconnect for all external origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
 
     <!-- google-site-verification -->
     <meta
@@ -21,35 +25,41 @@
       content="ByWyF5Jf0UPhacQQxX4AYm4Lzshfs0Z6-zBUB2PM5CQ"
     />
 
-    <!-- Preload critical fonts -->
+    <!-- Fonts — non-blocking async load (media="print" trick eliminates render-blocking) -->
     <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
-      as="style"
-    />
-    <link
-      rel="preload"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      as="style"
-    />
-
-    <!-- Fonts and Icons -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
+
+    <!-- Font Awesome — non-blocking async load -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      />
+    </noscript>
 
-    <!-- Particles.js -->
+    <!-- Particles.js — defer keeps it off the critical path -->
     <script
       src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"
       defer
     ></script>
 
-    <!-- GSAP for smooth animations -->
+    <!-- GSAP — desktop animations only, deferred -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
       defer
@@ -59,8 +69,9 @@
       defer
     ></script>
 
-    <!-- Custom styles -->
+    <!-- Critical styles — loaded synchronously (local, fast) -->
     <link rel="stylesheet" href="style.css" />
+
 
     <!-- Meta tags for SEO -->
     <meta
@@ -94,7 +105,9 @@
     <meta property="og:locale" content="en_IN" />
     <meta property="og:site_name" content="Ankit Raj Maurya — Portfolio" />
     <meta property="og:updated_time" content="2026-05-08T00:00:00+00:00" />
-    <meta property="og:image:alt" content="Portrait & portfolio preview — Ankit Raj Maurya" />
+    <meta property="og:image:alt" content="Portrait &amp; portfolio preview — Ankit Raj Maurya" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -117,17 +130,33 @@
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="img/pic.jpg" />
 
+    <!-- Additional SEO meta -->
+    <meta name="rating" content="general" />
+    <meta name="application-name" content="Ankit Raj Maurya Portfolio" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Social profile verification (rel=me) -->
+    <link rel="me" href="https://github.com/AnkitRajMaurya" />
+    <link rel="me" href="https://www.linkedin.com/in/AnkitRajMaurya" />
+    <link rel="me" href="https://instagram.com/_ankit_raj_maurya" />
+
+    <!-- LLMs.txt hint for AI crawlers -->
+    <link rel="llms-txt" href="https://ankitrajmaurya.github.io/Portfolio/llms.txt" />
+
     <!-- Structured Data: WebSite -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Ankit Raj Maurya Portfolio",
+        "alternateName": "Ankit Raj Maurya — Full Stack Developer",
         "url": "https://ankitrajmaurya.github.io/Portfolio/",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://ankitrajmaurya.github.io/Portfolio/?q={search_term_string}",
-          "query-input": "required name=search_term_string"
+        "description": "Portfolio of Ankit Raj Maurya — Full Stack Developer & Co-founder at Codex Monarch, specializing in MERN stack, Flutter, and modern web technologies.",
+        "inLanguage": "en",
+        "copyrightYear": "2026",
+        "author": {
+          "@type": "Person",
+          "name": "Ankit Raj Maurya"
         }
       }
     </script>
@@ -176,7 +205,7 @@
               "height": 630
             },
             "datePublished": "2024-01-01",
-            "dateModified": "2025-11-28",
+            "dateModified": "2026-05-08",
             "author": {
               "@type": "Person",
               "name": "Ankit Raj Maurya"
@@ -214,10 +243,69 @@
             ],
             "contactPoint": [{
               "@type": "ContactPoint",
-              "telephone": "+91 92XXXXXX73",
-              "contactType": "customer service",
-              "areaServed": "IN"
+              "email": "ankit5242raj1@outlook.com",
+              "contactType": "technical support",
+              "areaServed": "IN",
+              "availableLanguage": "English"
             }]
+          }
+        </script>
+
+        <!-- Structured Data: ItemList (Projects) -->
+        <script type="application/ld+json">
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Featured Projects by Ankit Raj Maurya",
+            "description": "A curated list of software projects built by Ankit Raj Maurya.",
+            "url": "https://ankitrajmaurya.github.io/Portfolio/#projects",
+            "numberOfItems": 3,
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Codex Monarch",
+                  "url": "https://codex-monarch.vercel.app/",
+                  "description": "A premier student-led technical community platform for national-level hackathons, open-source workshops, and collaborative engineering projects. Features time-gated coding arenas, event management, and a LeetCode-style IDE.",
+                  "applicationCategory": "WebApplication",
+                  "operatingSystem": "Web",
+                  "programmingLanguage": ["JavaScript", "Node.js", "Express.js"],
+                  "author": { "@type": "Person", "name": "Ankit Raj Maurya" }
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Orbit UI",
+                  "url": "https://orbitui-eta.vercel.app/",
+                  "sameAs": "https://github.com/AnkitRajMaurya/ORBITUI",
+                  "description": "A modern component library and UI showcase built with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use.",
+                  "applicationCategory": "WebApplication",
+                  "operatingSystem": "Web",
+                  "programmingLanguage": ["JavaScript", "HTML5", "CSS3"],
+                  "author": { "@type": "Person", "name": "Ankit Raj Maurya" }
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Weather Application",
+                  "url": "https://weather-project-lovat-five.vercel.app/",
+                  "sameAs": "https://github.com/AnkitRajMaurya/weather-project",
+                  "description": "A full-featured weather application providing real-time weather data using the OpenWeather API, including current conditions, forecasts, and location-based updates.",
+                  "applicationCategory": "WebApplication",
+                  "operatingSystem": "Web",
+                  "programmingLanguage": ["JavaScript", "React"],
+                  "author": { "@type": "Person", "name": "Ankit Raj Maurya" }
+                }
+              }
+            ]
           }
         </script>
   </head>
@@ -227,53 +315,35 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <!-- Theme toggle button -->
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-      <i class="fas fa-moon"></i>
-    </button>
-
     <!-- Scroll progress indicator -->
     <div class="scroll-progress"></div>
 
     <header class="header" id="header">
       <nav class="container navbar">
-        <a href="#home" class="nav-logo"
-          ><i class="fa-solid fa-code"></i> Ankit Raj.</a
-        >
+        <a href="#home" class="nav-logo">
+          <i class="fa-solid fa-code"></i> Ankit Raj.
+        </a>
+        
         <div class="nav-menu" id="nav-menu">
           <ul class="nav-list">
-            <li class="nav-item">
-              <a href="#about" class="nav-link"
-                ><i class="fa-solid fa-user"></i> About</a
-              >
-            </li>
-            <li class="nav-item">
-              <a href="#skills" class="nav-link"
-                ><i class="fa-solid fa-bolt"></i> Skills</a
-              >
-            </li>
-            <li class="nav-item">
-              <a href="#journey" class="nav-link"
-                ><i class="fa-solid fa-route"></i> Experience</a
-              >
-            </li>
-            <li class="nav-item">
-              <a href="#projects" class="nav-link"
-                ><i class="fa-solid fa-laptop-code"></i> Work</a
-              >
-            </li>
-            <li class="nav-item">
-              <a href="#contact" class="nav-link"
-                ><i class="fa-solid fa-paper-plane"></i> Contact</a
-              >
-            </li>
+            <li class="nav-item"><a href="#about" class="nav-link"><i class="fa-solid fa-user"></i> About</a></li>
+            <li class="nav-item"><a href="#skills" class="nav-link"><i class="fa-solid fa-bolt"></i> Skills</a></li>
+            <li class="nav-item"><a href="#journey" class="nav-link"><i class="fa-solid fa-route"></i> Experience</a></li>
+            <li class="nav-item"><a href="#projects" class="nav-link"><i class="fa-solid fa-laptop-code"></i> Work</a></li>
+            <li class="nav-item"><a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Contact</a></li>
           </ul>
           <div class="nav-close" id="nav-close">
             <i class="fa-solid fa-xmark"></i>
           </div>
         </div>
-        <div class="nav-toggle" id="nav-toggle">
-          <i class="fa-solid fa-bars"></i>
+
+        <div class="nav-actions">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="nav-toggle" id="nav-toggle">
+            <i class="fa-solid fa-bars"></i>
+          </div>
         </div>
       </nav>
     </header>
@@ -282,57 +352,53 @@
       <section class="home" id="home">
         <div class="container home-container">
           <div class="hero-content">
-            <p class="mono greeting"><i class="fa-solid fa-sparkles"></i> Hi, I'm</p>
-            <h1>Ankit Raj Maurya</h1>
-            <h2 class="title">From Problem to Production-Ready.</h2>
+            <div class="hero-status">
+              <span class="status-pill">Available for new opportunities</span>
+            </div>
+            <p class="mono greeting"><i class="fa-solid fa-hand-wave"></i> Hello, I'm</p>
+            <h1 class="gradient-text">Ankit Raj Maurya</h1>
+            <h2 class="title">Engineering Digital Experiences with Precision.</h2>
             <p class="hero-description">
-              A goal-oriented full-stack developer and Co-founder at Codex Monarch with expertise in building
-              modern web and mobile applications. I specialize in creating
-              clean, efficient, and user-friendly solutions using MERN stack,
-              Flutter, and modern JavaScript.
+              A results-driven <strong>Full-Stack Developer</strong> and <strong>Co-founder at Codex Monarch</strong> specializing in high-performance web and mobile solutions. I transform complex problems into seamless production-ready applications.
             </p>
             <div class="hero-highlights">
-              <span><i class="fa-brands fa-react" style="margin-right: 0.4rem;"></i>React & Next.js</span>
-              <span><i class="fa-solid fa-server" style="margin-right: 0.4rem;"></i>Node & Express APIs</span>
-              <span><i class="fa-solid fa-mobile-screen" style="margin-right: 0.4rem;"></i>Flutter Apps</span>
+              <span><i class="fa-brands fa-react"></i> React & Next.js</span>
+              <span><i class="fa-solid fa-server"></i> Node.js & MongoDB</span>
+              <span><i class="fa-solid fa-mobile-screen"></i> Flutter Hybrid</span>
             </div>
             <div class="cta-buttons">
-              <a href="#projects" class="btn btn-primary"
-                ><i class="fa-solid fa-diagram-project"></i> View Projects</a
-              >
-              <a href="#contact" class="btn btn-outline"
-                ><i class="fa-solid fa-comments"></i> Get in Touch</a
-              >
+              <a href="#projects" class="btn btn-primary">
+                <i class="fa-solid fa-rocket"></i> View Projects
+              </a>
+              <a href="#contact" class="btn btn-outline">
+                <i class="fa-solid fa-paper-plane"></i> Let's Talk
+              </a>
             </div>
             <div class="hero-socials">
-              <a
-                href="https://github.com/AnkitRajMaurya"
-                target="_blank"
-                rel="noopener noreferrer"
-                ><i class="fa-brands fa-github"></i
-              ></a>
-              <a
-                href="https://linkedin.com/in/AnkitRajMaurya"
-                target="_blank"
-                rel="noopener noreferrer"
-                ><i class="fa-brands fa-linkedin"></i
-              ></a>
-              <a
-                href="https://instagram.com/_ankit_raj_maurya"
-                target="_blank"
-                rel="noopener noreferrer"
-                ><i class="fa-brands fa-instagram"></i
-              ></a>
+              <a href="https://github.com/AnkitRajMaurya" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+              <a href="https://linkedin.com/in/AnkitRajMaurya" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+              <a href="https://instagram.com/_ankit_raj_maurya" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
             </div>
           </div>
           <div class="hero-image">
             <div class="hero-image-container">
+              <div class="glass-accent"></div>
               <img
                 src="img/pic.jpg"
                 alt="Ankit Raj Maurya"
                 fetchpriority="high"
                 decoding="async"
+                width="400"
+                height="400"
               />
+              <div class="hero-floating-card card-1">
+                <i class="fa-solid fa-code"></i>
+                <span>Real Projects Built</span>
+              </div>
+              <div class="hero-floating-card card-2">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Diploma CSE</span>
+              </div>
             </div>
           </div>
         </div>
@@ -347,61 +413,47 @@
             <i class="fa-solid fa-user-tie"></i> About Me
           </h2>
           <div class="about-content">
-            <div class="about-text">
-              <p class="about-slogan mono">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> From Problem to
-                Production-Ready Solutions
+            <div class="about-text glass-card">
+              <p class="about-slogan mono gradient-text">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Building Digital Ecosystems
               </p>
               <div class="about-description">
                 <p>
-                  Hello! I'm Ankit, a passionate full-stack developer and Co-founder at Codex Monarch based in
-                  Muzaffarpur, Bihar. I specialize in building modern web and
-                  mobile applications that combine clean code with great user
-                  experiences.
+                  Hello! I'm <strong>Ankit</strong>, a dedicated <strong>Full-Stack Developer</strong> and <strong>Co-founder at Codex Monarch</strong> based in Muzaffarpur, Bihar. I specialize in building highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.
                 </p>
                 <p>
-                  My expertise spans the entire development stack, from crafting
-                  responsive front-end interfaces using React and Next.js to
-                  building robust back-end systems with Node.js and MongoDB. I'm
-                  also skilled in mobile development using Flutter, allowing me
-                  to create cross-platform applications.
-                </p>
-                <p>
-                  As a goal-oriented developer, I focus on writing clean,
-                  maintainable code and creating scalable solutions that solve
-                  real-world problems. I'm constantly learning and staying
-                  updated with the latest technologies to deliver the best
-                  possible solutions.
+                  My toolkit spans the modern web landscape—from reactive <strong>Next.js</strong> frontends to robust <strong>Node.js</strong> microservices. As a developer, I thrive on solving complex architectural puzzles and turning abstract ideas into tangible software that people love to use.
                 </p>
               </div>
               <div class="about-contact">
                 <div class="contact-item">
                   <i class="fa-solid fa-envelope"></i>
-                  <a href="mailto:ankit5242raj1@outlook.com"
-                    >ankit5242raj1@outlook.com</a
-                  >
+                  <a href="mailto:ankit5242raj1@outlook.com">ankit5242raj1@outlook.com</a>
                 </div>
                 <div class="contact-item">
                   <i class="fa-solid fa-location-dot"></i>
                   <span>Muzaffarpur, Bihar, India</span>
                 </div>
               </div>
-              <a
-                href="https://drive.google.com/file/d/1359Lhc3l75iBDmdHSWJDFBz4O8sG33MJ/view?usp=drivesdk"
-                class="btn btn-primary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Download CV <i class="fa-solid fa-download"></i>
-              </a>
+              <div class="about-cta">
+                <a
+                  href="https://drive.google.com/file/d/1359Lhc3l75iBDmdHSWJDFBz4O8sG33MJ/view?usp=drivesdk"
+                  class="btn btn-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download CV <i class="fa-solid fa-download"></i>
+                </a>
+              </div>
             </div>
             <div class="about-image">
-              <div class="about-image-wrapper">
+              <div class="about-image-wrapper liquid-border">
                 <img
                   src="img/developer.png"
-                  alt="Developer illustration"
+                  alt="Developer Ankit"
                   loading="lazy"
                   decoding="async"
+                  class="depth-effect"
                 />
               </div>
             </div>
@@ -412,48 +464,50 @@
       <section class="skills" id="skills">
         <div class="container">
           <p class="mono section-subtitle">
-            <i class="fa-solid fa-screwdriver-wrench"></i> What I Work With
+            <i class="fa-solid fa-screwdriver-wrench"></i> Technical Arsenal
           </p>
-          <h2 class="section-title">Technical Skills</h2>
-          <div class="skills-flat-grid">
-            <div class="skill-group">
-              <h3 class="skill-group-label"><i class="fa-solid fa-terminal"></i> Languages</h3>
+          <h2 class="section-title">Skills & Technologies</h2>
+          <div class="skills-showcase">
+            <div class="skill-category glass-card">
+              <h3 class="skill-category-title"><i class="fa-solid fa-terminal"></i> Languages</h3>
               <div class="skill-tags">
                 <span class="skill-tag"><i class="fa-brands fa-java"></i> Java</span>
-                <span class="skill-tag"><i class="fa-solid fa-c"></i> C</span>
+                <span class="skill-tag"><i class="fa-solid fa-c"></i> C++</span>
                 <span class="skill-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                <span class="skill-tag"><i class="fa-brands fa-python"></i> Python</span>
               </div>
             </div>
-            <div class="skill-group">
-              <h3 class="skill-group-label"><i class="fa-solid fa-object-group"></i> Frontend</h3>
+            <div class="skill-category glass-card">
+              <h3 class="skill-category-title"><i class="fa-solid fa-layer-group"></i> Frontend</h3>
               <div class="skill-tags">
-                <span class="skill-tag"><i class="fa-brands fa-html5"></i> HTML5</span>
-                <span class="skill-tag"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
-                <span class="skill-tag"><i class="fa-brands fa-react"></i> React</span>
+                <span class="skill-tag"><i class="fa-brands fa-react"></i> React.js</span>
                 <span class="skill-tag"><i class="fa-solid fa-n"></i> Next.js</span>
+                <span class="skill-tag"><i class="fa-brands fa-html5"></i> HTML5</span>
+                <span class="skill-tag"><i class="fa-brands fa-css3-alt"></i> CSS3/SCSS</span>
               </div>
             </div>
-            <div class="skill-group">
-              <h3 class="skill-group-label"><i class="fa-solid fa-server"></i> Backend</h3>
+            <div class="skill-category glass-card">
+              <h3 class="skill-category-title"><i class="fa-solid fa-server"></i> Backend</h3>
               <div class="skill-tags">
                 <span class="skill-tag"><i class="fa-brands fa-node-js"></i> Node.js</span>
-                <span class="skill-tag"><i class="fa-solid fa-database"></i> MongoDB</span>
                 <span class="skill-tag"><i class="fa-solid fa-server"></i> Express.js</span>
+                <span class="skill-tag"><i class="fa-solid fa-database"></i> MongoDB</span>
+                <span class="skill-tag"><i class="fa-solid fa-cloud"></i> Firebase</span>
               </div>
             </div>
-            <div class="skill-group">
-              <h3 class="skill-group-label"><i class="fa-solid fa-mobile-screen"></i> Mobile</h3>
+            <div class="skill-category glass-card">
+              <h3 class="skill-category-title"><i class="fa-solid fa-mobile-screen"></i> Mobile</h3>
               <div class="skill-tags">
                 <span class="skill-tag"><i class="fa-solid fa-mobile-screen"></i> Flutter</span>
-                <span class="skill-tag"><i class="fa-brands fa-android"></i> Android</span>
+                <span class="skill-tag"><i class="fa-brands fa-android"></i> Android SDK</span>
               </div>
             </div>
-            <div class="skill-group">
-              <h3 class="skill-group-label"><i class="fa-solid fa-toolbox"></i> Tools</h3>
+            <div class="skill-category glass-card">
+              <h3 class="skill-category-title"><i class="fa-solid fa-toolbox"></i> Tools</h3>
               <div class="skill-tags">
                 <span class="skill-tag"><i class="fa-brands fa-git-alt"></i> Git</span>
                 <span class="skill-tag"><i class="fa-brands fa-github"></i> GitHub</span>
-                <span class="skill-tag"><i class="fa-solid fa-code"></i> VS Code</span>
+                <span class="skill-tag"><i class="fa-brands fa-docker"></i> Docker</span>
                 <span class="skill-tag"><i class="fa-brands fa-figma"></i> Figma</span>
               </div>
             </div>
@@ -464,59 +518,42 @@
       <section class="journey" id="journey">
         <div class="container">
           <p class="mono section-subtitle">
-            <i class="fa-solid fa-road"></i> Experience & Education
+            <i class="fa-solid fa-road"></i> Milestones
           </p>
-          <h2 class="section-title">
-            <i class="fa-solid fa-chart-line"></i> My Journey
-          </h2>
+          <h2 class="section-title">Experience & Education</h2>
           <div class="journey-container">
-            <div class="journey-column">
-              <h3><i class="fa-solid fa-briefcase"></i> Experience</h3>
+            <div class="journey-column glass-card">
+              <h3 class="column-title"><i class="fa-solid fa-briefcase"></i> Experience</h3>
               <div class="timeline">
                 <div class="timeline-item">
                   <h4><i class="fa-solid fa-crown"></i> Co-founder</h4>
-                  <span>Codex Monarch</span>
-                  <p class="timeline-duration">
-                    <i class="fa-regular fa-clock"></i> Present
-                  </p>
+                  <span class="location">Codex Monarch</span>
+                  <p class="timeline-duration"><i class="fa-regular fa-clock"></i> 2024 - Present</p>
                 </div>
                 <div class="timeline-item">
-                  <h4><i class="fa-solid fa-globe"></i> Web Developer Intern</h4>
-                  <span>Tata Power Skill Development Institute</span>
-                  <p class="timeline-duration">
-                    <i class="fa-regular fa-clock"></i> Internship
-                  </p>
+                  <h4><i class="fa-solid fa-code"></i> Web Developer Intern</h4>
+                  <span class="location">Tata Power (TPSDI)</span>
+                  <p class="timeline-duration"><i class="fa-regular fa-clock"></i> Internship</p>
                 </div>
                 <div class="timeline-item">
-                  <h4><i class="fa-solid fa-briefcase"></i> Freelancer</h4>
-                  <span>Built websites and apps for clients.</span>
-                  <p class="timeline-duration">
-                    <i class="fa-regular fa-clock"></i> Part-time
-                  </p>
+                  <h4><i class="fa-solid fa-user-ninja"></i> Freelance Developer</h4>
+                  <span class="location">Remote / Self-employed</span>
+                  <p class="timeline-duration"><i class="fa-regular fa-clock"></i> 2023 - 2024</p>
                 </div>
               </div>
             </div>
-            <div class="journey-column">
-              <h3><i class="fa-solid fa-user-graduate"></i> Education</h3>
+            <div class="journey-column glass-card">
+              <h3 class="column-title"><i class="fa-solid fa-user-graduate"></i> Education</h3>
               <div class="timeline">
                 <div class="timeline-item">
-                  <h4>
-                    <i class="fa-solid fa-graduation-cap"></i> Diploma in
-                    Computer Science
-                  </h4>
-                  <span>NRI Institute of Research and Technology</span>
-                  <p class="timeline-duration">
-                    <i class="fa-regular fa-calendar"></i> 2024 - 2027
-                    (pursuing)
-                  </p>
+                  <h4><i class="fa-solid fa-graduation-cap"></i> Diploma in CSE</h4>
+                  <span class="location">NRI Institute (NIRT)</span>
+                  <p class="timeline-duration"><i class="fa-regular fa-calendar"></i> 2024 - 2027 (Expected)</p>
                 </div>
                 <div class="timeline-item">
-                  <h4><i class="fa-solid fa-school"></i> MATRIC (10th)</h4>
-                  <span>Bihar School Examination Board</span>
-                  <p class="timeline-duration">
-                    <i class="fa-regular fa-calendar-check"></i> 2024
-                    (completed)
-                  </p>
+                  <h4><i class="fa-solid fa-school"></i> Matriculation</h4>
+                  <span class="location">BSEB, Bihar</span>
+                  <p class="timeline-duration"><i class="fa-regular fa-calendar-check"></i> 2024 (Completed)</p>
                 </div>
               </div>
             </div>
@@ -533,154 +570,101 @@
           <h2 class="section-title">
             <i class="fa-solid fa-rocket"></i> Featured Projects
           </h2>
-          <div class="featured-projects">
-            <article class="featured-project">
-              <div class="project-content">
-                <p class="mono project-overline">
-                  <i class="fa-solid fa-star"></i> Featured Project
-                </p>
-                <h3 class="project-title">
-                  <i class="fa-solid fa-crown"></i> Codex Monarch
-                </h3>
-                <div class="project-description">
-                  <p>
-                    A premier student-led technical community platform for national-level hackathons,
-                    open-source workshops, and collaborative engineering projects. Features time-gated
-                    coding arenas, event management, and a LeetCode-style IDE.
-                  </p>
+          <div class="projects-showcase">
+
+            <!-- Project Card 1: Codex Monarch -->
+            <article class="project-card">
+              <a href="https://codex-monarch.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
+                <div class="project-preview-placeholder project-card--monarch">
+                  <div class="preview-icon"><i class="fa-solid fa-crown"></i></div>
+                  <p class="mono">Experience Community Platform</p>
+                  <span class="project-card__badge">
+                    <i class="fa-solid fa-circle" style="font-size:0.45rem;color:#34d399"></i> Live
+                  </span>
                 </div>
-                <ul class="project-tech-list">
-                  <li><i class="fa-brands fa-node-js"></i> Node.js</li>
-                  <li><i class="fa-solid fa-database"></i> MongoDB</li>
-                  <li><i class="fa-brands fa-js"></i> JavaScript</li>
-                  <li><i class="fa-solid fa-server"></i> Express.js</li>
-                </ul>
-                <div class="project-links">
-                  <a
-                    href="https://codex-monarch.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="External Link"
-                  >
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <div class="project-card__body">
+                <h3 class="project-card__title">Codex Monarch</h3>
+                <p class="project-card__desc">
+                  A premier student-led technical community platform for national-level hackathons and collaborative engineering projects. Features time-gated coding arenas and a LeetCode-style IDE.
+                </p>
+                <div class="project-card__tech">
+                  <span><i class="fa-brands fa-node-js"></i> Node.js</span>
+                  <span><i class="fa-solid fa-database"></i> MongoDB</span>
+                  <span><i class="fa-brands fa-js"></i> JavaScript</span>
+                </div>
+                <div class="project-card__actions">
+                  <a href="https://codex-monarch.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-card__btn project-card__btn--primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Site
                   </a>
                 </div>
-              </div>
-              <div class="project-image">
-                <!-- Project preview link (no iframe) -->
-                <a href="https://codex-monarch.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
-                  <div class="project-preview-placeholder" data-url="https://codex-monarch.vercel.app/">
-                    <div class="preview-icon"><i class="fa-solid fa-crown"></i></div>
-                    <span class="preview-label">codex-monarch.vercel.app</span>
-                    <span class="preview-visit">Visit <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-                  </div>
-                </a>
               </div>
             </article>
 
-            <article class="featured-project">
-              <div class="project-content">
-                <p class="mono project-overline">
-                  <i class="fa-solid fa-star"></i> Featured Project
+            <!-- Project Card 2: Orbit UI -->
+            <article class="project-card">
+              <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
+                <div class="project-preview-placeholder project-card--orbit">
+                  <div class="preview-icon"><i class="fa-solid fa-globe"></i></div>
+                  <p class="mono">Modern Component Library</p>
+                  <span class="project-card__badge">
+                    <i class="fa-solid fa-circle" style="font-size:0.45rem;color:#34d399"></i> Live
+                  </span>
+                </div>
+              </a>
+              <div class="project-card__body">
+                <h3 class="project-card__title">Orbit UI</h3>
+                <p class="project-card__desc">
+                  A modern component library and UI showcase built with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use.
                 </p>
-                <h3 class="project-title">
-                  <i class="fa-solid fa-globe"></i> Orbit UI
-                </h3>
-                <div class="project-description">
-                  <p>
-                    A modern component library and UI showcase built with vanilla
-                    JavaScript. Clean, accessible, and lightweight design system
-                    ready for production use.
-                  </p>
+                <div class="project-card__tech">
+                  <span><i class="fa-brands fa-html5"></i> HTML5</span>
+                  <span><i class="fa-brands fa-css3-alt"></i> CSS3</span>
+                  <span><i class="fa-brands fa-js"></i> JavaScript</span>
                 </div>
-                <ul class="project-tech-list">
-                  <li><i class="fa-brands fa-html5"></i> HTML5</li>
-                  <li><i class="fa-brands fa-css3-alt"></i> CSS3</li>
-                  <li><i class="fa-brands fa-js"></i> JavaScript</li>
-                </ul>
-                <div class="project-links">
-                  <a
-                    href="https://github.com/AnkitRajMaurya/ORBITUI"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="GitHub Link"
-                  >
-                    <i class="fa-brands fa-github"></i>
+                <div class="project-card__actions">
+                  <a href="https://github.com/AnkitRajMaurya/ORBITUI" target="_blank" rel="noopener noreferrer" class="project-card__btn project-card__btn--ghost">
+                    <i class="fa-brands fa-github"></i> Source
                   </a>
-                  <a
-                    href="https://orbitui-eta.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="External Link"
-                  >
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-card__btn project-card__btn--primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo
                   </a>
                 </div>
-              </div>
-              <div class="project-image">
-                <!-- Project preview link (no iframe) -->
-                <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
-                  <div class="project-preview-placeholder" data-url="https://orbitui-eta.vercel.app/">
-                    <div class="preview-icon"><i class="fa-solid fa-globe"></i></div>
-                    <span class="preview-label">orbitui-eta.vercel.app</span>
-                    <span class="preview-visit">Visit <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-                  </div>
-                </a>
               </div>
             </article>
 
-            <article class="featured-project">
-              <div class="project-content">
-                <p class="mono project-overline">
-                  <i class="fa-solid fa-star"></i> Featured Project
+            <!-- Project Card 3: Weather App -->
+            <article class="project-card">
+              <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
+                <div class="project-preview-placeholder project-card--weather">
+                  <div class="preview-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
+                  <p class="mono">Real-time Weather Dashboard</p>
+                  <span class="project-card__badge">
+                    <i class="fa-solid fa-circle" style="font-size:0.45rem;color:#34d399"></i> Live
+                  </span>
+                </div>
+              </a>
+              <div class="project-card__body">
+                <h3 class="project-card__title">Weather Application</h3>
+                <p class="project-card__desc">
+                  A full-featured weather application providing real-time weather data using the OpenWeather API, including current conditions and forecasts.
                 </p>
-                <h3 class="project-title">
-                  <i class="fa-solid fa-cloud-sun-rain"></i> Weather Application
-                </h3>
-                <div class="project-description">
-                  <p>
-                    A full-featured weather application that provides real-time
-                    weather data using the OpenWeather API. Features include
-                    current weather conditions, forecasts, and location-based
-                    weather updates.
-                  </p>
+                <div class="project-card__tech">
+                  <span><i class="fa-brands fa-react"></i> React</span>
+                  <span><i class="fa-solid fa-cloud"></i> OpenWeather</span>
+                  <span><i class="fa-brands fa-css3-alt"></i> CSS Modules</span>
                 </div>
-                <ul class="project-tech-list">
-                  <li><i class="fa-brands fa-react"></i> React</li>
-                  <li><i class="fa-solid fa-cloud"></i> OpenWeather API</li>
-                  <li><i class="fa-brands fa-css3-alt"></i> CSS Modules</li>
-                  <li><i class="fa-solid fa-bolt"></i> Axios</li>
-                </ul>
-                <div class="project-links">
-                  <a
-                    href="https://github.com/AnkitRajMaurya/weather-project"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="GitHub Link"
-                  >
-                    <i class="fa-brands fa-github"></i>
+                <div class="project-card__actions">
+                  <a href="https://github.com/AnkitRajMaurya/weather-project" target="_blank" rel="noopener noreferrer" class="project-card__btn project-card__btn--ghost">
+                    <i class="fa-brands fa-github"></i> Source
                   </a>
-                  <a
-                    href="https://weather-project-lovat-five.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="External Link"
-                  >
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-card__btn project-card__btn--primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo
                   </a>
                 </div>
-              </div>
-              <div class="project-image">
-                <!-- Project preview link (no iframe) -->
-                <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link">
-                  <div class="project-preview-placeholder" data-url="https://weather-project-lovat-five.vercel.app/">
-                    <div class="preview-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
-                    <span class="preview-label">weather-project.vercel.app</span>
-                    <span class="preview-visit">Visit <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-                  </div>
-                </a>
               </div>
             </article>
+
           </div>
         </div>
       </section>
@@ -688,92 +672,59 @@
       <section class="contact" id="contact">
         <div class="container">
           <p class="mono section-subtitle">
-            <i class="fa-solid fa-handshake-angle"></i> What's Next?
+            <i class="fa-solid fa-paper-plane"></i> Let's Collaborate
           </p>
-          <h2 class="section-title">
-            <i class="fa-solid fa-envelope-open-text"></i> Get In Touch
-          </h2>
+          <h2 class="section-title">Get In Touch</h2>
+          
           <div class="contact-content">
-            <div class="contact-copy">
-              <p>
-                I'm currently open to new opportunities and collaborations.
-                Share your idea, project details, or just say hello using the
-                form below and I’ll get back to you as soon as possible.
+            <div class="contact-info">
+              <h3 class="contact-title">Let's Connect</h3>
+              <p class="contact-description">
+                Have a project idea, internship opportunity, or collaboration in mind?
+                Send me a message and I will get back to you soon.
               </p>
-              <div class="contact-direct">
-                <div class="contact-item">
+
+              <div class="contact-points">
+                <a href="mailto:ankit5242raj1@outlook.com" class="contact-point">
                   <i class="fa-solid fa-envelope"></i>
-                  <a href="mailto:ankit5242raj1@outlook.com"
-                    >ankit5242raj1@outlook.com</a
-                  >
-                </div>
-                <div class="contact-item">
+                  <span>Email: ankit5242raj1@outlook.com</span>
+                </a>
+                <div class="contact-point">
                   <i class="fa-solid fa-location-dot"></i>
-                  <span>Muzaffarpur, Bihar, India</span>
+                  <span>Location: Muzaffarpur, Bihar, India</span>
                 </div>
+              </div>
+
+              <div class="contact-social-links">
+                <a href="https://github.com/AnkitRajMaurya" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a href="https://linkedin.com/in/AnkitRajMaurya" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://instagram.com/_ankit_raj_maurya" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
               </div>
             </div>
-            <form class="contact-form" novalidate>
-              <div class="form-group">
-                <input
-                  type="text"
-                  id="contact-name"
-                  name="name"
-                  placeholder=" "
-                  autocomplete="name"
-                  required
-                />
-                <label for="contact-name">Your Name</label>
-              </div>
-              <div class="form-group">
-                <input
-                  type="email"
-                  id="contact-email"
-                  name="email"
-                  placeholder=" "
-                  autocomplete="email"
-                  required
-                />
-                <label for="contact-email">Email Address</label>
-              </div>
-              <div class="form-group">
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  placeholder=" "
-                  rows="6"
-                  required
-                ></textarea>
-                <label for="contact-message">Tell me about your project</label>
-              </div>
-              <div class="contact-cta">
-                <button type="submit" class="btn btn-primary">
-                  Send Message <i class="fa-solid fa-paper-plane"></i>
+            
+            <div class="contact-form-container glass-card">
+              <form action="#" method="POST" class="contact-form" data-endpoint="">
+                <div class="contact-form-head">
+                  <h3>Send a Message</h3>
+                  <p>Fill out the form and I will reply as soon as possible.</p>
+                </div>
+                <div class="form-group">
+                  <input type="text" id="name" name="name" placeholder=" " required />
+                  <label for="name">Your Name</label>
+                </div>
+                <div class="form-group">
+                  <input type="email" id="email" name="email" placeholder=" " required />
+                  <label for="email">Email Address</label>
+                </div>
+                <div class="form-group">
+                  <textarea id="message" name="message" placeholder=" " rows="5" required></textarea>
+                  <label for="message">Your Message</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">
+                  <span>Send Message</span>
+                  <i class="fa-solid fa-paper-plane"></i>
                 </button>
-              </div>
-            </form>
-            <div class="contact-social">
-              <a
-                href="https://github.com/AnkitRajMaurya"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i class="fa-brands fa-github"></i>
-              </a>
-              <a
-                href="https://linkedin.com/in/AnkitRajMaurya"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i class="fa-brands fa-linkedin"></i>
-              </a>
-              <a
-                href="https://instagram.com/_ankit_raj_maurya"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i class="fa-brands fa-instagram"></i>
-              </a>
+              </form>
             </div>
           </div>
         </div>
@@ -787,98 +738,52 @@
         <span class="footer-blob b3"></span>
       </div>
       <div class="container">
-          <div class="footer-grid">
+        <div class="footer-grid">
           <div class="footer-col">
             <h4 class="footer-title">
-              <i class="fa-solid fa-layer-group"></i> Ankit's Portfolio
+              <i class="fa-solid fa-code"></i> Ankit Raj.
             </h4>
             <p class="footer-text">
-              Thank you for visiting my personal portfolio website. Connect with
-              me over socials.
+              Building the future with clean code and innovative solutions. Let's create something extraordinary together.
             </p>
-            <p class="footer-tagline mono">Keep Rising 🚀</p>
-          </div>
-          <div class="footer-col">
-            <h4 class="footer-title">
-              <i class="fa-solid fa-compass"></i> Quick Links
-            </h4>
-            <ul class="footer-links">
-              <li><a href="#home"><i class="fa-solid fa-house"></i> Home</a></li>
-              <li><a href="#about"><i class="fa-solid fa-user"></i> About</a></li>
-              <li><a href="#skills"><i class="fa-solid fa-bolt"></i> Skills</a></li>
-              <li>
-                <a href="#journey"
-                  ><i class="fa-solid fa-route"></i> Education & Experience</a
-                >
-              </li>
-              <li>
-                <a href="#projects"
-                  ><i class="fa-solid fa-laptop-code"></i> Projects</a
-                >
-              </li>
-              <li>
-                <a href="#contact"
-                  ><i class="fa-solid fa-paper-plane"></i> Contact</a
-                >
-              </li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4 class="footer-title">
-              <i class="fa-solid fa-address-book"></i> Contact Info
-            </h4>
-            <ul class="footer-contact">
-              <li>
-                <i class="fa-solid fa-phone"></i><span>+91 92XXXXXX73</span>
-              </li>
-              <li>
-                <i class="fa-solid fa-envelope"></i
-                ><a href="mailto:ankit5242raj1@outlook.com"
-                  >ankit5242raj1@outlook.com</a
-                >
-              </li>
-              <li>
-                <i class="fa-solid fa-location-dot"></i
-                ><span>Muzaffarpur, Bihar, 843126</span>
-              </li>
-            </ul>
             <div class="footer-socials">
-              <a
-                href="https://github.com/AnkitRajMaurya"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-                ><i class="fa-brands fa-github"></i
-              ></a>
-              <a
-                href="https://linkedin.com/in/AnkitRajMaurya"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                ><i class="fa-brands fa-linkedin"></i
-              ></a>
-              <a
-                href="https://instagram.com/_ankit_raj_maurya"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                ><i class="fa-brands fa-instagram"></i
-              ></a>
+              <a href="https://github.com/AnkitRajMaurya" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+              <a href="https://linkedin.com/in/AnkitRajMaurya" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+              <a href="https://instagram.com/_ankit_raj_maurya" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
             </div>
+          </div>
+          <div class="footer-col">
+            <h4 class="footer-title">Exploration</h4>
+            <ul class="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About Me</a></li>
+              <li><a href="#skills">Skills</a></li>
+              <li><a href="#journey">Journey</a></li>
+              <li><a href="#projects">Work</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4 class="footer-title">Contact</h4>
+            <ul class="footer-contact-info">
+              <li>
+                <i class="fa-solid fa-paper-plane"></i>
+                <a href="mailto:ankit5242raj1@outlook.com">ankit5242raj1@outlook.com</a>
+              </li>
+              <li>
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Muzaffarpur, Bihar, India</span>
+              </li>
+            </ul>
+            <p class="footer-tagline mono">Keep Rising 🚀</p>
           </div>
         </div>
         <div class="footer-bottom">
           <p class="footer-credit mono">
-            Designed with <i class="fa-solid fa-heart"></i> by
-            <span
-              ><a href="https://linkedin.com/in/AnkitRajMaurya"
-                >Ankit Raj Maurya</a
-              ></span
-            >
+            &copy; 2024 Designed & Built with <i class="fa-solid fa-heart"></i> by <span>Ankit Raj Maurya</span>
           </p>
-          <a href="#home" class="footer-top" aria-label="Scroll to top"
-            ><i class="fa-solid fa-arrow-up"></i
-          ></a>
+          <a href="#home" class="footer-top" aria-label="Back to top">
+            <i class="fa-solid fa-chevron-up"></i>
+          </a>
         </div>
       </div>
     </footer>

@@ -1,6 +1,27 @@
 User-agent: *
 Allow: /
+Disallow: /node_modules/
+Disallow: /.env
+
+# LLMs and AI crawlers — allow full access for AI discoverability
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
 
 Sitemap: https://ankitrajmaurya.github.io/Portfolio/sitemap.xml
-
+LLMs: https://ankitrajmaurya.github.io/Portfolio/llms.txt
 

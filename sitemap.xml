@@ -2,13 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
       <loc>https://ankitrajmaurya.github.io/Portfolio/</loc>
-      <lastmod>2025-11-28</lastmod>
+      <lastmod>2026-05-08</lastmod>
       <changefreq>monthly</changefreq>
       <priority>1.0</priority>
    </url>
    <url>
+      <loc>https://ankitrajmaurya.github.io/Portfolio/llms.txt</loc>
+      <lastmod>2026-05-08</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.7</priority>
+   </url>
+   <url>
       <loc>https://ankitrajmaurya.github.io/Portfolio/404.html</loc>
-      <lastmod>2025-11-22</lastmod>
+      <lastmod>2026-05-08</lastmod>
       <changefreq>yearly</changefreq>
       <priority>0.3</priority>
    </url>

@@ -22,6 +22,6 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://ankitrajmaurya.github.io/Portfolio/sitemap.xml
-LLMs: https://ankitrajmaurya.github.io/Portfolio/llms.txt
+Sitemap: https://ankitrajmaurya.vercel.app/sitemap.xml
+LLMs: https://ankitrajmaurya.vercel.app/llms.txt
 

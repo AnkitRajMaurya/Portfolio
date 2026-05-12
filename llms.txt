@@ -43,7 +43,7 @@ He completed his MATRIC (10th) from Bihar School Examination Board in 2024 and i
 
 ## Links
 
-- [Portfolio](https://ankitrajmaurya.github.io/Portfolio/): Full portfolio website with projects, experience, skills, and contact information.
+- [Portfolio](https://ankitrajmaurya.vercel.app/): Full portfolio website with projects, experience, skills, and contact information.
 - [GitHub Profile](https://github.com/AnkitRajMaurya): Open-source projects and code contributions.
 - [LinkedIn Profile](https://www.linkedin.com/in/AnkitRajMaurya): Professional profile, endorsements, and career history.
 - [Codex Monarch Platform](https://codex-monarch.vercel.app/): The flagship project — a technical community and hackathon platform.

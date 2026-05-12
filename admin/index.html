@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Admin — Ankit Raj Maurya</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ─── LOGIN SCREEN ───────────────────────────────────────────────────── -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card glass">
+    <div class="login-logo">
+      <i class="fa-solid fa-code"></i>
+      <span>Admin Panel</span>
+    </div>
+    <h1>Welcome Back</h1>
+    <p class="login-sub">Sign in to manage your portfolio</p>
+    <form id="login-form" class="login-form">
+      <div class="field-group">
+        <label><i class="fa-solid fa-user"></i> Username</label>
+        <input type="text" id="login-username" placeholder="admin" autocomplete="username" required />
+      </div>
+      <div class="field-group">
+        <label><i class="fa-solid fa-lock"></i> Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+      </div>
+      <div id="login-error" class="alert alert-error hidden"></div>
+      <button type="submit" class="btn-login" id="login-btn">
+        <span>Sign In</span>
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ─── DASHBOARD ───────────────────────────────────────────────────────── -->
+<div id="dashboard" class="dashboard hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar glass" id="sidebar">
+    <div class="sidebar-logo">
+      <i class="fa-solid fa-code"></i>
+      <span>Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" data-section="overview">
+        <i class="fa-solid fa-chart-pie"></i> Overview
+      </button>
+      <button class="nav-btn" data-section="projects">
+        <i class="fa-solid fa-laptop-code"></i> Projects
+      </button>
+      <button class="nav-btn" data-section="skills">
+        <i class="fa-solid fa-bolt"></i> Skills
+      </button>
+      <button class="nav-btn" data-section="messages">
+        <i class="fa-solid fa-envelope"></i> Messages
+        <span class="badge" id="unread-badge" style="display:none"></span>
+      </button>
+      <button class="nav-btn" data-section="certificates">
+        <i class="fa-solid fa-trophy"></i> Certificates
+      </button>
+      <button class="nav-btn" data-section="content">
+        <i class="fa-solid fa-pen-to-square"></i> Content
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/" target="_blank" class="view-site-btn">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> View Site
+      </a>
+      <button class="logout-btn" id="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="dash-header glass">
+      <div class="dash-header-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <h2 id="section-title">Overview</h2>
+          <p id="section-sub" class="dash-sub">Dashboard summary</p>
+        </div>
+      </div>
+      <div class="dash-header-right">
+        <span class="admin-chip"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+      </div>
+    </header>
+
+    <!-- Sections -->
+    <div class="sections-wrap">
+
+      <!-- OVERVIEW -->
+      <section id="section-overview" class="section active">
+        <div class="stats-grid">
+          <div class="stat-card glass">
+            <i class="fa-solid fa-laptop-code"></i>
+            <div>
+              <span class="stat-num" id="stat-projects">—</span>
+              <span class="stat-label">Projects</span>
+            </div>
+          </div>
+          <div class="stat-card glass">
+            <i class="fa-solid fa-bolt"></i>
+            <div>
+              <span class="stat-num" id="stat-skills">—</span>
+              <span class="stat-label">Skills</span>
+            </div>
+          </div>
+          <div class="stat-card glass">
+            <i class="fa-solid fa-envelope"></i>
+            <div>
+              <span class="stat-num" id="stat-messages">—</span>
+              <span class="stat-label">Messages</span>
+            </div>
+          </div>
+          <div class="stat-card glass">
+            <i class="fa-solid fa-eye"></i>
+            <div>
+              <span class="stat-num" id="stat-unread">—</span>
+              <span class="stat-label">Unread</span>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card glass">
+          <i class="fa-solid fa-trophy"></i>
+          <div>
+            <span class="stat-num" id="stat-certs">—</span>
+            <span class="stat-label">Certificates</span>
+          </div>
+        </div>
+        <div class="quick-actions glass">
+          <h3><i class="fa-solid fa-zap"></i> Quick Actions</h3>
+          <div class="qa-buttons">
+            <button onclick="switchSection('projects');openProjectModal()" class="qa-btn">
+              <i class="fa-solid fa-plus"></i> Add Project
+            </button>
+            <button onclick="switchSection('skills');openSkillModal()" class="qa-btn">
+              <i class="fa-solid fa-plus"></i> Add Skill
+            </button>
+            <button onclick="switchSection('certificates');openCertModal()" class="qa-btn">
+              <i class="fa-solid fa-plus"></i> Add Certificate
+            </button>
+            <button onclick="switchSection('messages')" class="qa-btn">
+              <i class="fa-solid fa-envelope"></i> View Messages
+            </button>
+            <button onclick="switchSection('content')" class="qa-btn">
+              <i class="fa-solid fa-pen-to-square"></i> Edit Content
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="section-projects" class="section hidden">
+        <div class="section-actions">
+          <h3><i class="fa-solid fa-laptop-code"></i> All Projects</h3>
+          <button class="btn-primary" onclick="openProjectModal()">
+            <i class="fa-solid fa-plus"></i> Add Project
+          </button>
+        </div>
+        <div id="projects-list" class="card-list"></div>
+      </section>
+
+      <!-- SKILLS -->
+      <section id="section-skills" class="section hidden">
+        <div class="section-actions">
+          <h3><i class="fa-solid fa-bolt"></i> All Skills</h3>
+          <button class="btn-primary" onclick="openSkillModal()">
+            <i class="fa-solid fa-plus"></i> Add Skill
+          </button>
+        </div>
+        <div class="skill-tabs">
+          <button class="skill-tab active" data-cat="frontend">Frontend</button>
+          <button class="skill-tab" data-cat="backend">Backend</button>
+          <button class="skill-tab" data-cat="others">Others</button>
+        </div>
+        <div id="skills-list" class="skills-admin-grid"></div>
+      </section>
+
+      <!-- MESSAGES -->
+      <section id="section-messages" class="section hidden">
+        <div class="section-actions">
+          <h3><i class="fa-solid fa-envelope"></i> Contact Messages</h3>
+          <span id="messages-count" class="count-chip"></span>
+        </div>
+        <div id="messages-list" class="messages-list"></div>
+      </section>
+
+      <!-- CONTENT -->
+      <section id="section-content" class="section hidden">
+        <div class="section-actions">
+          <h3><i class="fa-solid fa-pen-to-square"></i> Portfolio Content</h3>
+        </div>
+        <form id="content-form" class="content-form glass">
+          <div class="content-grid">
+            <div class="field-group">
+              <label>Status Pill Text</label>
+              <input type="text" name="status_pill" placeholder="Available for new opportunities" />
+            </div>
+            <div class="field-group">
+              <label>Hero Tagline</label>
+              <input type="text" name="hero_tagline" placeholder="From Problem to Production-Ready." />
+            </div>
+            <div class="field-group full">
+              <label>Hero Description</label>
+              <textarea name="hero_description" rows="3"></textarea>
+            </div>
+            <div class="field-group">
+              <label>About Slogan</label>
+              <input type="text" name="about_slogan" placeholder="Building Digital Ecosystems" />
+            </div>
+            <div class="field-group full">
+              <label>About Description</label>
+              <textarea name="about_description" rows="4"></textarea>
+            </div>
+            <div class="field-group">
+              <label>Email</label>
+              <input type="email" name="email" />
+            </div>
+            <div class="field-group">
+              <label>Location</label>
+              <input type="text" name="location" />
+            </div>
+          </div>
+          <div id="content-alert" class="alert hidden"></div>
+          <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+          </button>
+        </form>
+      </section>
+
+      <!-- CERTIFICATES -->
+      <section id="section-certificates" class="section hidden">
+        <div class="section-actions">
+          <h3><i class="fa-solid fa-trophy"></i> Certificates & Awards</h3>
+          <button class="btn-primary" onclick="openCertModal()">
+            <i class="fa-solid fa-plus"></i> Add Certificate
+          </button>
+        </div>
+        <div id="certificates-list" class="card-list"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ─── PROJECT MODAL ───────────────────────────────────────────────────── -->
+<div id="project-modal" class="modal-overlay hidden">
+  <div class="modal glass">
+    <div class="modal-header">
+      <h3 id="project-modal-title">Add Project</h3>
+      <button class="modal-close" onclick="closeProjectModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="project-form" class="modal-form">
+      <input type="hidden" id="project-id" />
+      <div class="form-row">
+        <div class="field-group">
+          <label>Title *</label>
+          <input type="text" id="p-title" required />
+        </div>
+        <div class="field-group">
+          <label>Badge</label>
+          <input type="text" id="p-badge" value="Live" />
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Description</label>
+        <textarea id="p-description" rows="3"></textarea>
+      </div>
+      <div class="field-group">
+        <label><i class="fa-solid fa-image"></i> Image URL</label>
+        <input type="url" id="p-image" placeholder="https://... or leave blank for icon" />
+        <div id="img-preview" class="img-preview"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo URL</label>
+          <input type="url" id="p-demo" placeholder="https://..." />
+        </div>
+        <div class="field-group">
+          <label><i class="fa-brands fa-github"></i> GitHub URL</label>
+          <input type="url" id="p-github" placeholder="https://github.com/..." />
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Tech Tags (comma separated)</label>
+        <input type="text" id="p-tags" placeholder="React, Node.js, MongoDB" />
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Sort Order</label>
+          <input type="number" id="p-order" value="0" min="0" />
+        </div>
+        <div class="field-group">
+          <label>Visible</label>
+          <select id="p-visible">
+            <option value="1">Yes</option>
+            <option value="0">No (Hidden)</option>
+          </select>
+        </div>
+      </div>
+      <div id="project-alert" class="alert hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeProjectModal()">Cancel</button>
+        <button type="submit" class="btn-primary" id="project-submit-btn">
+          <i class="fa-solid fa-floppy-disk"></i> Save Project
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ─── SKILL MODAL ─────────────────────────────────────────────────────── -->
+<div id="skill-modal" class="modal-overlay hidden">
+  <div class="modal glass" style="max-width:480px">
+    <div class="modal-header">
+      <h3 id="skill-modal-title">Add Skill</h3>
+      <button class="modal-close" onclick="closeSkillModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="skill-form" class="modal-form">
+      <input type="hidden" id="skill-id" />
+      <div class="field-group">
+        <label>Skill Name *</label>
+        <input type="text" id="s-name" required placeholder="e.g. React.js" />
+      </div>
+      <div class="field-group">
+        <label>Font Awesome Icon Class</label>
+        <input type="text" id="s-icon" placeholder="e.g. fa-brands fa-react" />
+        <p class="field-hint">Find icons at <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com</a></p>
+      </div>
+      <div class="field-group">
+        <label>OR Custom Icon Image URL</label>
+        <input type="url" id="s-icon-url" placeholder="https://cdn.../react.svg" />
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Category</label>
+          <select id="s-category">
+            <option value="frontend">Frontend</option>
+            <option value="backend">Backend</option>
+            <option value="others">Others</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Sort Order</label>
+          <input type="number" id="s-order" value="0" min="0" />
+        </div>
+      </div>
+      <div id="skill-alert" class="alert hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeSkillModal()">Cancel</button>
+        <button type="submit" class="btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Save Skill
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ─── CONFIRM MODAL ───────────────────────────────────────────────────── -->
+<!-- ─── CERTIFICATE MODAL ──────────────────────────────────────────────── -->
+<div id="cert-modal" class="modal-overlay hidden">
+  <div class="modal glass" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="cert-modal-title">Add Certificate</h3>
+      <button class="modal-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="cert-form" class="modal-form">
+      <input type="hidden" id="cert-id" />
+      <div class="field-group">
+        <label>Title *</label>
+        <input type="text" id="c-title" required placeholder="e.g. AWS Cloud Practitioner" />
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Issuer</label>
+          <input type="text" id="c-issuer" placeholder="e.g. Amazon Web Services" />
+        </div>
+        <div class="field-group">
+          <label>Issue Date</label>
+          <input type="text" id="c-date" placeholder="e.g. Jan 2025" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Type</label>
+          <select id="c-type">
+            <option value="certificate">Certificate</option>
+            <option value="award">Award</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Sort Order</label>
+          <input type="number" id="c-order" value="0" min="0" />
+        </div>
+      </div>
+      <div class="field-group">
+        <label><i class="fa-solid fa-link"></i> Credential URL</label>
+        <input type="url" id="c-url" placeholder="https://verify.credential.net/..." />
+      </div>
+      <div class="field-group">
+        <label><i class="fa-solid fa-image"></i> Image URL (optional)</label>
+        <input type="url" id="c-image" placeholder="https://..." />
+      </div>
+      <div id="cert-alert" class="alert hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeCertModal()">Cancel</button>
+        <button type="submit" class="btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Save Certificate
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="confirm-modal" class="modal-overlay hidden">
+  <div class="modal glass" style="max-width:400px;text-align:center">
+    <div class="modal-header" style="justify-content:center">
+      <h3 style="color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete</h3>
+    </div>
+    <p id="confirm-msg" style="margin:1rem 0;color:var(--text-muted)"></p>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-danger" id="confirm-ok-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

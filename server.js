@@ -301,9 +301,19 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-initDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Portfolio: http://localhost:${PORT}`);
-    console.log(`🔐 Admin:     http://localhost:${PORT}/admin`);
-  });
-}).catch(err => { console.error("DB init failed:", err); process.exit(1); });
+
+// Export the Express app for Vercel
+module.exports = app;
+
+// Only listen if not running on Vercel
+if (process.env.VERCEL !== "1") {
+  initDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Portfolio: http://localhost:${PORT}`);
+      console.log(`🔐 Admin:     http://localhost:${PORT}/admin`);
+    });
+  }).catch(err => { console.error("DB init failed:", err); process.exit(1); });
+} else {
+  // Initialize DB asynchronously for Vercel (creates tables/data if they don't exist)
+  initDB().catch(err => console.error("DB init failed:", err));
+}

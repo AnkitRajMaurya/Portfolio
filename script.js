@@ -204,22 +204,25 @@ const ContactForm = {
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
+            "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: formData,
+          body: JSON.stringify(data),
         });
 
+        const result = await response.json().catch(() => ({}));
+
         if (!response.ok) {
-          throw new Error("Failed to send message");
+          throw new Error(result.error || "Failed to send message");
         }
 
-        this.showSuccess("Message sent successfully!");
+        this.showSuccess("Message sent successfully! I'll get back to you soon.");
       } else {
         this.openMailClient(data);
         this.showSuccess("Email draft opened. Please click send in your mail app.");
       }
     } catch (error) {
-      this.showError(this.form, "Failed to send message. Please try again.");
+      this.showError(this.form, error.message || "Failed to send message. Please try again.");
     } finally {
       if (this.submitButton) {
         this.submitButton.disabled = false;

@@ -2,6 +2,12 @@
 <html lang="en">
 
 <head>
+    <!-- Redirect to vercel domain if on github pages -->
+    <script>
+      if (window.location.hostname === "ankitrajmaurya.github.io") {
+        window.location.replace("https://ankitrajmaurya.vercel.app" + window.location.pathname + window.location.search + window.location.hash);
+      }
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>404 - Page Not Found | Ankit Raj Maurya</title>

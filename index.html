@@ -3,9 +3,10 @@
 
 <head>
   <!-- Redirect to vercel domain if on github pages -->
+  <meta http-equiv="refresh" content="0; url=https://ankitrajmaurya.vercel.app/">
   <script>
-    if (window.location.hostname === "ankitrajmaurya.github.io/Portfolio") {
-      window.location.replace("https://ankitrajmaurya.vercel.app" + window.location.pathname + window.location.search + window.location.hash);
+    if (window.location.hostname === "ankitrajmaurya.github.io") {
+      window.location.replace("https://ankitrajmaurya.vercel.app" + window.location.pathname.replace("/Portfolio", "") + window.location.search + window.location.hash);
     }
   </script>
   <meta charset="UTF-8" />

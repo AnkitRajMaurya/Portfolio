@@ -2,6 +2,16 @@
   "version": 2,
   "redirects": [
     {
+      "source": "/Portfolio",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/Portfolio/(.*)",
+      "destination": "/$1",
+      "permanent": true
+    },
+    {
       "source": "/admin",
       "destination": "/admin/",
       "permanent": true

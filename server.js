@@ -19,7 +19,10 @@ const contactLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 50 });
 app.use("/api/contact", contactLimiter);
 
-const JWT_SECRET = process.env.JWT_SECRET || "REDACTED";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is missing.");
+}
 
 function requireAdmin(req, res, next) {
   const auth = req.headers.authorization;
@@ -120,7 +123,15 @@ app.post("/api/contact", async (req, res) => {
 
 app.post("/api/admin/login", adminLimiter, (req, res) => {
   const { username, password } = req.body;
-  if (username !== (process.env.ADMIN_USERNAME || "admin") || password !== (process.env.ADMIN_PASSWORD || "REDACTED")) {
+  const expectedUser = process.env.ADMIN_USERNAME;
+  const expectedPass = process.env.ADMIN_PASSWORD;
+
+  if (!expectedUser || !expectedPass) {
+    console.error("ADMIN_USERNAME or ADMIN_PASSWORD is not set in environment variables!");
+    return res.status(500).json({ error: "Authentication system is not configured." });
+  }
+
+  if (username !== expectedUser || password !== expectedPass) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
   const token = jwt.sign({ username, role: "admin" }, JWT_SECRET, { expiresIn: "24h" });

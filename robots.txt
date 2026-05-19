@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /node_modules/
 Disallow: /.env
+Disallow: /admin/
+Disallow: /api/admin/
 
 # LLMs and AI crawlers — allow full access for AI discoverability
 User-agent: GPTBot

@@ -58,6 +58,11 @@ async function initDB() {
       visible INTEGER DEFAULT 1,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS admin_users (
+      username TEXT PRIMARY KEY,
+      password_hash TEXT NOT NULL
+    );
   `);
 
   // Add missing columns to older tables (ignores error if column already exists)
@@ -137,6 +142,17 @@ async function initDB() {
         ('location', 'Muzaffarpur, Bihar, India'),
         ('email', 'ankit5242raj1@outlook.com');
     `);
+  }
+
+  const users = await db.execute("SELECT COUNT(*) as c FROM admin_users");
+  if (users.rows[0].c === 0 && process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD) {
+    const bcrypt = require("bcryptjs");
+    const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+    await db.execute({
+      sql: "INSERT INTO admin_users (username, password_hash) VALUES (?, ?)",
+      args: [process.env.ADMIN_USERNAME, hash]
+    });
+    console.log("👤 Default admin user seeded");
   }
 
   console.log("✅ Turso DB initialized");

@@ -86,6 +86,10 @@ const SECTION_META = {
   content: {
     title: 'PAYLOAD',
     sub: 'root@content:~$ nano live-copy'
+  },
+  security: {
+    title: 'SECURITY',
+    sub: 'root@security:~$ passwd'
   }
 };
 
@@ -129,6 +133,7 @@ function bindCoreEvents() {
   document.getElementById('skill-form').addEventListener('submit', saveSkill);
   document.getElementById('cert-form').addEventListener('submit', saveCert);
   document.getElementById('content-form').addEventListener('submit', saveContent);
+  document.getElementById('password-change-form').addEventListener('submit', changePassword);
 
   document.getElementById('p-image').addEventListener('input', handleProjectImagePreview);
 
@@ -1376,3 +1381,42 @@ function initMatrixRain() {
   window.addEventListener('resize', resize);
   window.setInterval(draw, 52);
 }
+
+async function changePassword(event) {
+  event.preventDefault();
+  const currentPassword = document.getElementById('current-password').value;
+  const newPassword = document.getElementById('new-password').value;
+  const confirmNewPassword = document.getElementById('confirm-new-password').value;
+  const errorBox = document.getElementById('password-change-alert');
+  const button = document.getElementById('change-pass-btn');
+
+  if (newPassword !== confirmNewPassword) {
+    showAlert(errorBox, 'New passwords do not match.', 'error');
+    return;
+  }
+
+  setButtonState(button, true, '<i class="fa-solid fa-spinner fa-spin"></i><span>UPDATING SYSTEM KEY...</span>');
+  errorBox.classList.add('hidden');
+
+  try {
+    const response = await api('POST', '/api/admin/change-password', {
+      currentPassword,
+      newPassword
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showAlert(errorBox, data.error || 'Password update failed', 'error');
+      return;
+    }
+
+    showAlert(errorBox, 'Password updated successfully.', 'success');
+    document.getElementById('password-change-form').reset();
+  } catch (error) {
+    showAlert(errorBox, 'Failed to connect to authentication server.', 'error');
+  } finally {
+    setButtonState(button, false, '<i class="fa-solid fa-shield-halved"></i><span>UPDATE ACCESS KEY</span>');
+  }
+}
+

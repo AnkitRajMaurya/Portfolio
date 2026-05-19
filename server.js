@@ -121,21 +121,77 @@ app.post("/api/contact", async (req, res) => {
 //  ADMIN AUTH
 // ═══════════════════════════════════════════════════════════════════════
 
-app.post("/api/admin/login", adminLimiter, (req, res) => {
+app.post("/api/admin/login", adminLimiter, async (req, res) => {
   const { username, password } = req.body;
-  const expectedUser = process.env.ADMIN_USERNAME;
-  const expectedPass = process.env.ADMIN_PASSWORD;
-
-  if (!expectedUser || !expectedPass) {
-    console.error("ADMIN_USERNAME or ADMIN_PASSWORD is not set in environment variables!");
-    return res.status(500).json({ error: "Authentication system is not configured." });
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required." });
   }
 
-  if (username !== expectedUser || password !== expectedPass) {
-    return res.status(401).json({ error: "Invalid credentials" });
+  try {
+    const result = await db.execute({
+      sql: "SELECT * FROM admin_users WHERE username = ?",
+      args: [username]
+    });
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const user = result.rows[0];
+    const bcrypt = require("bcryptjs");
+    const match = await bcrypt.compare(password, user.password_hash);
+
+    if (!match) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ username, role: "admin" }, JWT_SECRET, { expiresIn: "24h" });
+    res.json({ token, username });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Authentication system failure." });
   }
-  const token = jwt.sign({ username, role: "admin" }, JWT_SECRET, { expiresIn: "24h" });
-  res.json({ token, username });
+});
+
+app.post("/api/admin/change-password", requireAdmin, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: "Current and new passwords are required." });
+  }
+
+  try {
+    const auth = req.headers.authorization;
+    const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
+    const username = decoded.username;
+
+    const result = await db.execute({
+      sql: "SELECT * FROM admin_users WHERE username = ?",
+      args: [username]
+    });
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const user = result.rows[0];
+    const bcrypt = require("bcryptjs");
+    const match = await bcrypt.compare(currentPassword, user.password_hash);
+
+    if (!match) {
+      return res.status(400).json({ error: "Incorrect current password" });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    await db.execute({
+      sql: "UPDATE admin_users SET password_hash = ? WHERE username = ?",
+      args: [newHash, username]
+    });
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════

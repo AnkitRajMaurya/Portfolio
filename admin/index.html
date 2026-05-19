@@ -174,6 +174,11 @@
         <span>PAYLOAD</span>
         <div class="nav-indicator"></div>
       </button>
+      <button class="nav-btn" data-section="security">
+        <i class="fa-solid fa-key"></i>
+        <span>SECURITY</span>
+        <div class="nav-indicator"></div>
+      </button>
     </nav>
     <div class="sidebar-footer">
       <a href="/" target="_blank" class="view-site-btn">
@@ -516,6 +521,31 @@
           </button>
         </div>
         <div id="certificates-list" class="card-list"></div>
+      <!-- SECURITY / PASSWORD CHANGE -->
+      <section id="section-security" class="section hidden">
+        <div class="section-actions">
+          <h3><i class="fa-solid fa-key"></i> SYSTEM SECURITY CREDENTIALS</h3>
+        </div>
+        <form id="password-change-form" class="content-form">
+          <div class="content-grid" style="grid-template-columns: 1fr; max-width: 500px;">
+            <div class="field-group">
+              <label><i class="fa-solid fa-lock"></i> CURRENT PASSWORD</label>
+              <input type="password" id="current-password" required placeholder="Enter current admin password..." />
+            </div>
+            <div class="field-group">
+              <label><i class="fa-solid fa-unlock-keyhole"></i> NEW PASSWORD</label>
+              <input type="password" id="new-password" required placeholder="Enter new admin password..." />
+            </div>
+            <div class="field-group">
+              <label><i class="fa-solid fa-check-double"></i> CONFIRM NEW PASSWORD</label>
+              <input type="password" id="confirm-new-password" required placeholder="Confirm new admin password..." />
+            </div>
+          </div>
+          <div id="password-change-alert" class="alert hidden" style="margin-top: 15px;"></div>
+          <button type="submit" class="btn-primary" id="change-pass-btn" style="margin-top: 15px;">
+            <i class="fa-solid fa-shield-halved"></i> UPDATE ACCESS KEY
+          </button>
+        </form>
       </section>
 
     </div>

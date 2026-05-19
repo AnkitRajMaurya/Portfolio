@@ -14,6 +14,20 @@ let threatOverlayTimer = null;
 let successOverlayTimer = null;
 let commandConsoleTimer = null;
 let commandConsoleIndex = 0;
+let systemMonitorTimer = null;
+let globalMapTimer = null;
+let soundEnabled = localStorage.getItem('admin_sound_enabled') !== '0';
+let audioContext = null;
+let commandAudioTick = 0;
+
+const MAP_NODE_STATES = {
+  delhi: ['MASKED', 'ROOT', 'CLEAR'],
+  frankfurt: ['LINKED', 'RELAY', 'STABLE'],
+  singapore: ['GREEN', 'SHIELD', 'SYNCED'],
+  tokyo: ['SYNCED', 'LOW LAT', 'TRACKED'],
+  newyork: ['PROBED', 'MIRROR', 'VECTOR'],
+  saopaulo: ['SHADOW', 'GHOST', 'EVADE']
+};
 
 const FAKE_COMMANDS = [
   {
@@ -77,24 +91,33 @@ const SECTION_META = {
 
 document.addEventListener('DOMContentLoaded', () => {
   bindCoreEvents();
+  syncSoundToggle();
   initMatrixRain();
   initFakeCommandConsole();
+  initSystemMonitor();
+  initGlobalMap();
   playBootSequence();
 });
 
 function bindCoreEvents() {
   document.getElementById('login-form').addEventListener('submit', handleLogin);
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
+  document.getElementById('sound-toggle').addEventListener('click', toggleSound);
   document.getElementById('sidebar-toggle').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
+    playUiClick();
   });
 
   document.querySelectorAll('.nav-btn').forEach((btn) => {
-    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+    btn.addEventListener('click', () => {
+      playUiClick();
+      switchSection(btn.dataset.section);
+    });
   });
 
   document.querySelectorAll('.skill-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
+      playUiClick();
       document.querySelectorAll('.skill-tab').forEach((item) => item.classList.remove('active'));
       tab.classList.add('active');
       currentSkillCat = tab.dataset.cat;
@@ -165,6 +188,7 @@ function playBootSequence() {
 
 async function handleLogin(event) {
   event.preventDefault();
+  await ensureAudioContext();
 
   const button = document.getElementById('login-btn');
   const errorBox = document.getElementById('login-error');
@@ -262,6 +286,99 @@ function setButtonState(button, busy, html) {
   button.innerHTML = html;
 }
 
+function syncSoundToggle() {
+  const button = document.getElementById('sound-toggle');
+  const label = document.getElementById('sound-toggle-label');
+
+  if (!button || !label) {
+    return;
+  }
+
+  button.classList.toggle('active', soundEnabled);
+  button.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+  button.querySelector('i').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+  label.textContent = soundEnabled ? 'SOUND ON' : 'MUTED';
+}
+
+async function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('admin_sound_enabled', soundEnabled ? '1' : '0');
+  syncSoundToggle();
+
+  if (soundEnabled) {
+    await ensureAudioContext();
+    playUiClick(680, 0.04, 'triangle');
+  }
+}
+
+async function ensureAudioContext() {
+  if (!soundEnabled) {
+    return null;
+  }
+
+  if (!audioContext) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioCtor) {
+      return null;
+    }
+
+    audioContext = new AudioCtor();
+  }
+
+  if (audioContext.state === 'suspended') {
+    await audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+function playTone(frequency = 440, duration = 0.05, type = 'sine', volume = 0.025) {
+  if (!soundEnabled || !audioContext || audioContext.state !== 'running') {
+    return;
+  }
+
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + duration + 0.01);
+}
+
+function playUiClick(frequency = 520, duration = 0.04, type = 'square') {
+  playTone(frequency, duration, type, 0.015);
+}
+
+function playSuccessSound() {
+  playTone(520, 0.05, 'triangle', 0.018);
+  window.setTimeout(() => playTone(720, 0.08, 'triangle', 0.02), 70);
+  window.setTimeout(() => playTone(920, 0.11, 'sine', 0.024), 150);
+}
+
+function playThreatSound() {
+  playTone(180, 0.11, 'sawtooth', 0.022);
+  window.setTimeout(() => playTone(140, 0.14, 'sawtooth', 0.02), 120);
+}
+
+function playCommandTone() {
+  commandAudioTick += 1;
+
+  if (commandAudioTick % 3 !== 0) {
+    return;
+  }
+
+  playTone(460 + (commandAudioTick % 4) * 35, 0.025, 'square', 0.008);
+}
+
 async function triggerSuccessOverlay() {
   const overlay = document.getElementById('success-overlay');
   const time = document.getElementById('success-time');
@@ -284,6 +401,7 @@ async function triggerSuccessOverlay() {
   overlay.setAttribute('aria-hidden', 'false');
   void overlay.offsetWidth;
   overlay.classList.add('success-show');
+  playSuccessSound();
 
   if (successOverlayTimer) {
     window.clearTimeout(successOverlayTimer);
@@ -348,6 +466,7 @@ function triggerThreatOverlay(reason) {
   void overlay.offsetWidth;
   overlay.classList.add('threat-show');
   loginCard.classList.add('shake-alert');
+  playThreatSound();
 
   if (threatOverlayTimer) {
     window.clearTimeout(threatOverlayTimer);
@@ -390,6 +509,70 @@ function initFakeCommandConsole() {
   queueFakeCommand();
 }
 
+function initSystemMonitor() {
+  updateSystemMonitor();
+
+  if (systemMonitorTimer) {
+    window.clearInterval(systemMonitorTimer);
+  }
+
+  systemMonitorTimer = window.setInterval(updateSystemMonitor, 2600);
+}
+
+function initGlobalMap() {
+  updateGlobalMap();
+
+  if (globalMapTimer) {
+    window.clearInterval(globalMapTimer);
+  }
+
+  globalMapTimer = window.setInterval(updateGlobalMap, 2200);
+}
+
+function updateSystemMonitor(snapshot = {}) {
+  const unread = snapshot.unread ?? 0;
+  const projects = snapshot.projects ?? allProjects.length ?? 0;
+  const skills = snapshot.skills ?? allSkills.length ?? 0;
+  const certs = snapshot.certs ?? allCerts.length ?? 0;
+
+  const decryption = clampValue(68 + (projects % 5) * 4 + Math.floor(Math.random() * 8), 58, 96);
+  const masking = clampValue(74 + (skills % 4) * 5 + Math.floor(Math.random() * 7), 62, 98);
+  const shield = clampValue(90 - unread * 5 + Math.floor(Math.random() * 4), 42, 99);
+  const temp = clampValue(38 + unread * 3 + (certs % 4) * 2 + Math.floor(Math.random() * 4), 34, 82);
+
+  setMonitorMetric('decryption', `${decryption}%`, decryption);
+  setMonitorMetric('masking', `${masking}%`, masking);
+  setMonitorMetric('shield', `${shield}%`, shield);
+  setMonitorMetric('temp', `${temp}C`, Math.min(100, temp + 12));
+}
+
+function updateGlobalMap() {
+  Object.entries(MAP_NODE_STATES).forEach(([key, states]) => {
+    const meta = document.getElementById(`map-${key}-meta`);
+    const node = meta ? meta.closest('.map-node') : null;
+
+    if (!meta || !node) {
+      return;
+    }
+
+    const nextState = states[Math.floor(Math.random() * states.length)];
+    meta.textContent = nextState;
+    node.classList.toggle('flash-alert', Math.random() > 0.8);
+  });
+}
+
+function setMonitorMetric(name, label, width) {
+  const value = document.getElementById(`monitor-${name}-value`);
+  const bar = document.getElementById(`monitor-${name}-bar`);
+
+  if (value) value.textContent = label;
+  if (bar) bar.style.width = `${width}%`;
+}
+
+function clampValue(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function queueFakeCommand() {
   const stream = document.getElementById('command-stream');
 
@@ -421,6 +604,7 @@ function queueFakeCommand() {
 
   const typeNext = () => {
     typed.textContent = preset.command.slice(0, index);
+    playCommandTone();
     index += 1;
 
     if (index <= preset.command.length) {
@@ -537,6 +721,12 @@ async function loadOverview() {
 
     updateUnreadBadge(unread);
     updateThreatLevel(unread, messages.length);
+    updateSystemMonitor({
+      projects: allProjects.length,
+      skills: allSkills.length,
+      unread,
+      certs: allCerts.length
+    });
     renderTraceFeed({
       projects: allProjects.length,
       skills: allSkills.length,
@@ -546,6 +736,12 @@ async function loadOverview() {
     });
   } catch (error) {
     updateUnreadBadge(0);
+    updateSystemMonitor({
+      projects: 0,
+      skills: 0,
+      unread: 0,
+      certs: 0
+    });
     renderTraceFeed({
       projects: 0,
       skills: 0,
@@ -725,6 +921,7 @@ function deleteProject(id, title) {
 
 async function saveProject(event) {
   event.preventDefault();
+  await ensureAudioContext();
 
   const id = document.getElementById('project-id').value;
   const alertBox = document.getElementById('project-alert');
@@ -844,6 +1041,7 @@ function deleteSkill(id, name) {
 
 async function saveSkill(event) {
   event.preventDefault();
+  await ensureAudioContext();
 
   const id = document.getElementById('skill-id').value;
   const alertBox = document.getElementById('skill-alert');
@@ -956,6 +1154,7 @@ async function loadContent() {
 
 async function saveContent(event) {
   event.preventDefault();
+  await ensureAudioContext();
 
   const alertBox = document.getElementById('content-alert');
   const form = event.target;
@@ -1063,6 +1262,7 @@ function deleteCert(id, title) {
 
 async function saveCert(event) {
   event.preventDefault();
+  await ensureAudioContext();
 
   const id = document.getElementById('cert-id').value;
   const alertBox = document.getElementById('cert-alert');

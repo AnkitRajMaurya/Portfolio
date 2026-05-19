@@ -200,6 +200,10 @@
       </div>
       <div class="dash-header-right">
         <div class="header-stats">
+          <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false">
+            <i class="fa-solid fa-volume-xmark"></i>
+            <span id="sound-toggle-label">MUTED</span>
+          </button>
           <span class="uptime-chip"><i class="fa-solid fa-clock"></i> <span id="uptime">00:00:00</span></span>
           <span class="admin-chip"><i class="fa-solid fa-user-secret"></i> ROOT</span>
         </div>
@@ -330,6 +334,97 @@
               </div>
             </div>
           </article>
+        </div>
+        <div class="system-monitor">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-sliders"></i> SYSTEM MONITOR</h3>
+            <span class="panel-chip">LIVE</span>
+          </div>
+          <div class="monitor-grid">
+            <div class="monitor-card">
+              <div class="monitor-head">
+                <span>DECRYPTION</span>
+                <strong id="monitor-decryption-value">72%</strong>
+              </div>
+              <div class="monitor-bar"><div id="monitor-decryption-bar" class="monitor-fill"></div></div>
+            </div>
+            <div class="monitor-card">
+              <div class="monitor-head">
+                <span>SIGNAL MASKING</span>
+                <strong id="monitor-masking-value">81%</strong>
+              </div>
+              <div class="monitor-bar"><div id="monitor-masking-bar" class="monitor-fill cyan"></div></div>
+            </div>
+            <div class="monitor-card">
+              <div class="monitor-head">
+                <span>PACKET SHIELD</span>
+                <strong id="monitor-shield-value">94%</strong>
+              </div>
+              <div class="monitor-bar"><div id="monitor-shield-bar" class="monitor-fill"></div></div>
+            </div>
+            <div class="monitor-card">
+              <div class="monitor-head">
+                <span>CORE TEMP</span>
+                <strong id="monitor-temp-value">41C</strong>
+              </div>
+              <div class="monitor-bar"><div id="monitor-temp-bar" class="monitor-fill warn"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="global-map-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-earth-asia"></i> GLOBAL SIGNAL MAP</h3>
+            <span class="panel-chip">TRACKED</span>
+          </div>
+          <div class="map-shell">
+            <div class="map-sweep"></div>
+            <svg class="map-svg" viewBox="0 0 900 420" aria-hidden="true">
+              <path d="M86 186l36-44 72-16 85 12 65-32 54 10 26 26-8 30 46 20 18 35-26 25-74 12-56 36-38-8-44 16-75-18-34-42-47-10-18-52z"></path>
+              <path d="M430 146l48-44 78-16 54 14 36-18 74 16 36 38-12 38 44 18 50 58-22 42-90 4-54 28-52-8-18-32-44-12-42-54-62-12-24-34z"></path>
+              <path d="M718 278l38-12 34 12 18 32-18 34-46 10-28-18-4-34z"></path>
+            </svg>
+
+            <div class="map-node map-node-delhi" data-node="DELHI">
+              <span class="map-node-dot"></span>
+              <span class="map-node-label">DELHI</span>
+              <span class="map-node-meta" id="map-delhi-meta">MASKED</span>
+            </div>
+            <div class="map-node map-node-frankfurt" data-node="FRANKFURT">
+              <span class="map-node-dot"></span>
+              <span class="map-node-label">FRANKFURT</span>
+              <span class="map-node-meta" id="map-frankfurt-meta">LINKED</span>
+            </div>
+            <div class="map-node map-node-singapore" data-node="SINGAPORE">
+              <span class="map-node-dot"></span>
+              <span class="map-node-label">SINGAPORE</span>
+              <span class="map-node-meta" id="map-singapore-meta">GREEN</span>
+            </div>
+            <div class="map-node map-node-tokyo" data-node="TOKYO">
+              <span class="map-node-dot"></span>
+              <span class="map-node-label">TOKYO</span>
+              <span class="map-node-meta" id="map-tokyo-meta">SYNCED</span>
+            </div>
+            <div class="map-node map-node-newyork" data-node="NEW YORK">
+              <span class="map-node-dot"></span>
+              <span class="map-node-label">NEW YORK</span>
+              <span class="map-node-meta" id="map-newyork-meta">PROBED</span>
+            </div>
+            <div class="map-node map-node-saopaulo" data-node="SAO PAULO">
+              <span class="map-node-dot"></span>
+              <span class="map-node-label">SAO PAULO</span>
+              <span class="map-node-meta" id="map-saopaulo-meta">SHADOW</span>
+            </div>
+
+            <span class="map-link link-delhi-frankfurt"></span>
+            <span class="map-link link-delhi-singapore"></span>
+            <span class="map-link link-frankfurt-newyork"></span>
+            <span class="map-link link-singapore-tokyo"></span>
+          </div>
+          <div class="map-legend">
+            <div class="map-legend-item"><span class="legend-dot active"></span> Active node</div>
+            <div class="map-legend-item"><span class="legend-dot relay"></span> Relay path</div>
+            <div class="map-legend-item"><span class="legend-dot ghost"></span> Ghost route</div>
+          </div>
         </div>
       </section>
 

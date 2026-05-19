@@ -2,86 +2,185 @@
 <html lang="en" data-theme="dark">
 <head>
   <!-- Redirect to vercel domain if on github pages -->
-  <meta http-equiv="refresh" content="0; url=https://ankitrajmaurya.vercel.app/admin/">
   <script>
-    if (window.location.hostname === "ankitrajmaurya.github.io") {
-      window.location.replace("https://ankitrajmaurya.vercel.app/admin/" + window.location.search + window.location.hash);
+    if (window.location.hostname === "ankitrajmaurya.github.io/Portfolio") {
+      window.location.replace("https://ankitrajmaurya.vercel.app" + window.location.pathname + window.location.search + window.location.hash);
     }
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio Admin — Ankit Raj Maurya</title>
+  <title>[ ROOT@SYSTEM ] - Control Panel</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
 
-<!-- ─── LOGIN SCREEN ───────────────────────────────────────────────────── -->
-<div id="login-screen" class="login-screen">
-  <div class="login-card glass">
-    <div class="login-logo">
-      <i class="fa-solid fa-code"></i>
-      <span>Admin Panel</span>
-    </div>
-    <h1>Welcome Back</h1>
-    <p class="login-sub">Sign in to manage your portfolio</p>
-    <form id="login-form" class="login-form">
-      <div class="field-group">
-        <label><i class="fa-solid fa-user"></i> Username</label>
-        <input type="text" id="login-username" placeholder="admin" autocomplete="username" required />
-      </div>
-      <div class="field-group">
-        <label><i class="fa-solid fa-lock"></i> Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
-      </div>
-      <div id="login-error" class="alert alert-error hidden"></div>
-      <button type="submit" class="btn-login" id="login-btn">
-        <span>Sign In</span>
-        <i class="fa-solid fa-arrow-right-to-bracket"></i>
-      </button>
-    </form>
+<!-- MATRIX RAIN CANVAS -->
+<canvas id="matrix-rain"></canvas>
+
+<!-- SCANLINE OVERLAY -->
+<div class="scanlines"></div>
+
+<!-- BOOT SEQUENCE -->
+<div id="boot-screen" class="boot-screen">
+  <div class="boot-terminal">
+    <div class="boot-lines" id="boot-lines"></div>
+    <div class="boot-cursor">[]</div>
   </div>
 </div>
 
-<!-- ─── DASHBOARD ───────────────────────────────────────────────────────── -->
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">root@darknet:~/auth</span>
+    </div>
+    <div class="login-body">
+      <div class="login-logo">
+        <div class="skull-icon">
+          <i class="fa-solid fa-skull-crossbones"></i>
+        </div>
+        <div class="glitch-text" data-text="ACCESS TERMINAL">ACCESS TERMINAL</div>
+      </div>
+      <p class="login-sub">[<span class="blink">!</span>] UNAUTHORIZED ACCESS WILL BE TRACED AND PROSECUTED</p>
+      <form id="login-form" class="login-form">
+        <div class="field-group">
+          <label><i class="fa-solid fa-terminal"></i> root@login:~$ username</label>
+          <input type="text" id="login-username" placeholder="enter_username" autocomplete="username" required />
+        </div>
+        <div class="field-group">
+          <label><i class="fa-solid fa-key"></i> root@login:~$ password</label>
+          <input type="password" id="login-password" placeholder="**********" autocomplete="current-password" required />
+        </div>
+        <div id="login-error" class="alert alert-error hidden"></div>
+        <button type="submit" class="btn-login" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>INITIATE ACCESS</span>
+          <div class="btn-glitch"></div>
+        </button>
+      </form>
+      <div class="login-footer-info">
+        <span><i class="fa-solid fa-shield-halved"></i> AES-256 ENCRYPTED</span>
+        <span><i class="fa-solid fa-satellite-dish"></i> TOR ROUTED</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="threat-overlay" class="threat-overlay hidden" aria-hidden="true">
+  <div class="threat-panel">
+    <div class="threat-kicker">INTRUSION DETECTED</div>
+    <h2 id="threat-title">UNAUTHORIZED ACCESS</h2>
+    <p id="threat-copy" class="threat-copy">Countermeasures active. Device signature captured.</p>
+    <div class="threat-grid">
+      <div class="threat-cell">
+        <span>ATTEMPT</span>
+        <strong id="threat-attempt">01</strong>
+      </div>
+      <div class="threat-cell">
+        <span>BROWSER</span>
+        <strong id="threat-browser">UNKNOWN</strong>
+      </div>
+      <div class="threat-cell">
+        <span>DEVICE</span>
+        <strong id="threat-device">UNKNOWN</strong>
+      </div>
+      <div class="threat-cell">
+        <span>TIME MARK</span>
+        <strong id="threat-time">00:00:00</strong>
+      </div>
+    </div>
+    <div class="threat-footer">
+      <span>[!] Session route burned</span>
+      <span id="threat-reason">Credential mismatch detected</span>
+    </div>
+  </div>
+</div>
+
+<div id="success-overlay" class="success-overlay hidden" aria-hidden="true">
+  <div class="success-panel">
+    <div class="success-kicker">AUTHENTICATION COMPLETE</div>
+    <h2 id="success-title">ACCESS GRANTED</h2>
+    <p id="success-copy" class="success-copy">Root credentials verified. Secure channel unlocked.</p>
+    <div class="success-grid">
+      <div class="success-cell">
+        <span>OPERATOR</span>
+        <strong id="success-operator">ROOT</strong>
+      </div>
+      <div class="success-cell">
+        <span>NODE</span>
+        <strong id="success-node">PRIMARY CORE</strong>
+      </div>
+      <div class="success-cell">
+        <span>STATUS</span>
+        <strong id="success-status">CHANNEL OPEN</strong>
+      </div>
+      <div class="success-cell">
+        <span>TIME MARK</span>
+        <strong id="success-time">00:00:00</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
 <div id="dashboard" class="dashboard hidden">
 
   <!-- Sidebar -->
-  <aside class="sidebar glass" id="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <i class="fa-solid fa-code"></i>
-      <span>Admin</span>
+      <i class="fa-solid fa-skull"></i>
+      <span>ROOT PANEL</span>
+    </div>
+    <div class="sidebar-status">
+      <div class="status-dot"></div>
+      <span>SYSTEM ACTIVE</span>
     </div>
     <nav class="sidebar-nav">
       <button class="nav-btn active" data-section="overview">
-        <i class="fa-solid fa-chart-pie"></i> Overview
+        <i class="fa-solid fa-satellite-dish"></i>
+        <span>OVERVIEW</span>
+        <div class="nav-indicator"></div>
       </button>
       <button class="nav-btn" data-section="projects">
-        <i class="fa-solid fa-laptop-code"></i> Projects
+        <i class="fa-solid fa-code"></i>
+        <span>PROJECTS</span>
+        <div class="nav-indicator"></div>
       </button>
       <button class="nav-btn" data-section="skills">
-        <i class="fa-solid fa-bolt"></i> Skills
+        <i class="fa-solid fa-microchip"></i>
+        <span>SKILLS</span>
+        <div class="nav-indicator"></div>
       </button>
       <button class="nav-btn" data-section="messages">
-        <i class="fa-solid fa-envelope"></i> Messages
+        <i class="fa-solid fa-tower-broadcast"></i>
+        <span>INTERCEPTS</span>
         <span class="badge" id="unread-badge" style="display:none"></span>
+        <div class="nav-indicator"></div>
       </button>
       <button class="nav-btn" data-section="certificates">
-        <i class="fa-solid fa-trophy"></i> Certificates
+        <i class="fa-solid fa-fingerprint"></i>
+        <span>CERTS</span>
+        <div class="nav-indicator"></div>
       </button>
       <button class="nav-btn" data-section="content">
-        <i class="fa-solid fa-pen-to-square"></i> Content
+        <i class="fa-solid fa-file-code"></i>
+        <span>PAYLOAD</span>
+        <div class="nav-indicator"></div>
       </button>
     </nav>
     <div class="sidebar-footer">
       <a href="/" target="_blank" class="view-site-btn">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i> View Site
+        <i class="fa-solid fa-globe"></i> SURFACE WEB
       </a>
       <button class="logout-btn" id="logout-btn">
-        <i class="fa-solid fa-right-from-bracket"></i> Logout
+        <i class="fa-solid fa-power-off"></i> KILL SESSION
       </button>
     </div>
   </aside>
@@ -89,18 +188,21 @@
   <!-- Main Content -->
   <main class="main-content">
     <!-- Header -->
-    <header class="dash-header glass">
+    <header class="dash-header">
       <div class="dash-header-left">
         <button class="sidebar-toggle" id="sidebar-toggle">
           <i class="fa-solid fa-bars"></i>
         </button>
         <div>
-          <h2 id="section-title">Overview</h2>
-          <p id="section-sub" class="dash-sub">Dashboard summary</p>
+          <h2 id="section-title" class="glitch-text-sm" data-text="OVERVIEW">OVERVIEW</h2>
+          <p id="section-sub" class="dash-sub">root@system:~$ status --all</p>
         </div>
       </div>
       <div class="dash-header-right">
-        <span class="admin-chip"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+        <div class="header-stats">
+          <span class="uptime-chip"><i class="fa-solid fa-clock"></i> <span id="uptime">00:00:00</span></span>
+          <span class="admin-chip"><i class="fa-solid fa-user-secret"></i> ROOT</span>
+        </div>
       </div>
     </header>
 
@@ -110,70 +212,114 @@
       <!-- OVERVIEW -->
       <section id="section-overview" class="section active">
         <div class="stats-grid">
-          <div class="stat-card glass">
-            <i class="fa-solid fa-laptop-code"></i>
+          <div class="stat-card">
+            <div class="stat-card-glow"></div>
+            <i class="fa-solid fa-code"></i>
             <div>
-              <span class="stat-num" id="stat-projects">—</span>
-              <span class="stat-label">Projects</span>
+              <span class="stat-num" id="stat-projects">--</span>
+              <span class="stat-label">PROJECTS</span>
             </div>
           </div>
-          <div class="stat-card glass">
-            <i class="fa-solid fa-bolt"></i>
+          <div class="stat-card">
+            <div class="stat-card-glow"></div>
+            <i class="fa-solid fa-microchip"></i>
             <div>
-              <span class="stat-num" id="stat-skills">—</span>
-              <span class="stat-label">Skills</span>
+              <span class="stat-num" id="stat-skills">--</span>
+              <span class="stat-label">EXPLOITS</span>
             </div>
           </div>
-          <div class="stat-card glass">
-            <i class="fa-solid fa-envelope"></i>
+          <div class="stat-card">
+            <div class="stat-card-glow"></div>
+            <i class="fa-solid fa-tower-broadcast"></i>
             <div>
-              <span class="stat-num" id="stat-messages">—</span>
-              <span class="stat-label">Messages</span>
+              <span class="stat-num" id="stat-messages">--</span>
+              <span class="stat-label">INTERCEPTS</span>
             </div>
           </div>
-          <div class="stat-card glass">
+          <div class="stat-card">
+            <div class="stat-card-glow"></div>
             <i class="fa-solid fa-eye"></i>
             <div>
-              <span class="stat-num" id="stat-unread">—</span>
-              <span class="stat-label">Unread</span>
+              <span class="stat-num" id="stat-unread">--</span>
+              <span class="stat-label">UNREAD</span>
             </div>
           </div>
         </div>
-        <div class="stat-card glass">
-          <i class="fa-solid fa-trophy"></i>
+        <div class="stat-card" style="margin-bottom:1.5rem">
+          <div class="stat-card-glow"></div>
+          <i class="fa-solid fa-fingerprint"></i>
           <div>
-            <span class="stat-num" id="stat-certs">—</span>
-            <span class="stat-label">Certificates</span>
+            <span class="stat-num" id="stat-certs">--</span>
+            <span class="stat-label">CERTIFICATES</span>
           </div>
         </div>
-        <div class="quick-actions glass">
-          <h3><i class="fa-solid fa-zap"></i> Quick Actions</h3>
+        <div class="quick-actions">
+          <h3><i class="fa-solid fa-bolt"></i> QUICK DEPLOY</h3>
           <div class="qa-buttons">
             <button onclick="switchSection('projects');openProjectModal()" class="qa-btn">
-              <i class="fa-solid fa-plus"></i> Add Project
+              <i class="fa-solid fa-plus"></i> Deploy Project
             </button>
             <button onclick="switchSection('skills');openSkillModal()" class="qa-btn">
-              <i class="fa-solid fa-plus"></i> Add Skill
+              <i class="fa-solid fa-plus"></i> Add Exploit
             </button>
             <button onclick="switchSection('certificates');openCertModal()" class="qa-btn">
-              <i class="fa-solid fa-plus"></i> Add Certificate
+              <i class="fa-solid fa-plus"></i> Add Cert
             </button>
             <button onclick="switchSection('messages')" class="qa-btn">
-              <i class="fa-solid fa-envelope"></i> View Messages
+              <i class="fa-solid fa-inbox"></i> View Intercepts
             </button>
             <button onclick="switchSection('content')" class="qa-btn">
-              <i class="fa-solid fa-pen-to-square"></i> Edit Content
+              <i class="fa-solid fa-file-pen"></i> Edit Payload
             </button>
           </div>
+        </div>
+        <div class="intel-grid">
+          <article class="intel-panel trace-panel">
+            <div class="panel-header">
+              <h3><i class="fa-solid fa-wave-square"></i> LIVE TRACE</h3>
+              <span class="panel-chip">REALTIME</span>
+            </div>
+            <div id="trace-feed" class="trace-feed"></div>
+          </article>
+          <article class="intel-panel network-panel">
+            <div class="panel-header">
+              <h3><i class="fa-solid fa-diagram-project"></i> NETWORK CORE</h3>
+              <span class="panel-chip">ARMED</span>
+            </div>
+            <div class="network-shell">
+              <div class="network-ring ring-outer"></div>
+              <div class="network-ring ring-middle"></div>
+              <div class="network-ring ring-inner"></div>
+              <div class="network-core-node">ROOT</div>
+              <div class="network-node node-api">API</div>
+              <div class="network-node node-db">DB</div>
+              <div class="network-node node-ui">UI</div>
+              <div class="network-node node-msg">MSG</div>
+            </div>
+            <div class="network-meta">
+              <div class="network-meta-card">
+                <span>FIREWALL</span>
+                <strong>ACTIVE</strong>
+              </div>
+              <div class="network-meta-card">
+                <span>ENCRYPTION</span>
+                <strong>AES-256</strong>
+              </div>
+              <div class="network-meta-card">
+                <span>THREAT LVL</span>
+                <strong id="threat-level">LOW</strong>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
       <!-- PROJECTS -->
       <section id="section-projects" class="section hidden">
         <div class="section-actions">
-          <h3><i class="fa-solid fa-laptop-code"></i> All Projects</h3>
+          <h3><i class="fa-solid fa-code"></i> ALL PROJECTS</h3>
           <button class="btn-primary" onclick="openProjectModal()">
-            <i class="fa-solid fa-plus"></i> Add Project
+            <i class="fa-solid fa-plus"></i> DEPLOY NEW
           </button>
         </div>
         <div id="projects-list" class="card-list"></div>
@@ -182,15 +328,15 @@
       <!-- SKILLS -->
       <section id="section-skills" class="section hidden">
         <div class="section-actions">
-          <h3><i class="fa-solid fa-bolt"></i> All Skills</h3>
+          <h3><i class="fa-solid fa-microchip"></i> EXPLOIT DATABASE</h3>
           <button class="btn-primary" onclick="openSkillModal()">
-            <i class="fa-solid fa-plus"></i> Add Skill
+            <i class="fa-solid fa-plus"></i> ADD EXPLOIT
           </button>
         </div>
         <div class="skill-tabs">
-          <button class="skill-tab active" data-cat="frontend">Frontend</button>
-          <button class="skill-tab" data-cat="backend">Backend</button>
-          <button class="skill-tab" data-cat="others">Others</button>
+          <button class="skill-tab active" data-cat="frontend">FRONTEND</button>
+          <button class="skill-tab" data-cat="backend">BACKEND</button>
+          <button class="skill-tab" data-cat="others">MISC</button>
         </div>
         <div id="skills-list" class="skills-admin-grid"></div>
       </section>
@@ -198,7 +344,7 @@
       <!-- MESSAGES -->
       <section id="section-messages" class="section hidden">
         <div class="section-actions">
-          <h3><i class="fa-solid fa-envelope"></i> Contact Messages</h3>
+          <h3><i class="fa-solid fa-tower-broadcast"></i> INTERCEPTED TRANSMISSIONS</h3>
           <span id="messages-count" class="count-chip"></span>
         </div>
         <div id="messages-list" class="messages-list"></div>
@@ -207,9 +353,9 @@
       <!-- CONTENT -->
       <section id="section-content" class="section hidden">
         <div class="section-actions">
-          <h3><i class="fa-solid fa-pen-to-square"></i> Portfolio Content</h3>
+          <h3><i class="fa-solid fa-file-code"></i> PAYLOAD EDITOR</h3>
         </div>
-        <form id="content-form" class="content-form glass">
+        <form id="content-form" class="content-form">
           <div class="content-grid">
             <div class="field-group">
               <label>Status Pill Text</label>
@@ -242,7 +388,7 @@
           </div>
           <div id="content-alert" class="alert hidden"></div>
           <button type="submit" class="btn-primary">
-            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            <i class="fa-solid fa-upload"></i> INJECT PAYLOAD
           </button>
         </form>
       </section>
@@ -250,9 +396,9 @@
       <!-- CERTIFICATES -->
       <section id="section-certificates" class="section hidden">
         <div class="section-actions">
-          <h3><i class="fa-solid fa-trophy"></i> Certificates & Awards</h3>
+          <h3><i class="fa-solid fa-fingerprint"></i> CERTIFICATES & CREDENTIALS</h3>
           <button class="btn-primary" onclick="openCertModal()">
-            <i class="fa-solid fa-plus"></i> Add Certificate
+            <i class="fa-solid fa-plus"></i> ADD CERT
           </button>
         </div>
         <div id="certificates-list" class="card-list"></div>
@@ -262,184 +408,217 @@
   </main>
 </div>
 
-<!-- ─── PROJECT MODAL ───────────────────────────────────────────────────── -->
+<!-- PROJECT MODAL -->
 <div id="project-modal" class="modal-overlay hidden">
-  <div class="modal glass">
-    <div class="modal-header">
-      <h3 id="project-modal-title">Add Project</h3>
-      <button class="modal-close" onclick="closeProjectModal()"><i class="fa-solid fa-xmark"></i></button>
+  <div class="modal">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title" id="project-modal-bar-title">root@projects:~/new</span>
     </div>
-    <form id="project-form" class="modal-form">
-      <input type="hidden" id="project-id" />
-      <div class="form-row">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h3 id="project-modal-title">Deploy Project</h3>
+        <button class="modal-close" onclick="closeProjectModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="project-form" class="modal-form">
+        <input type="hidden" id="project-id" />
+        <div class="form-row">
+          <div class="field-group">
+            <label>Title *</label>
+            <input type="text" id="p-title" required />
+          </div>
+          <div class="field-group">
+            <label>Badge</label>
+            <input type="text" id="p-badge" value="Live" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Description</label>
+          <textarea id="p-description" rows="3"></textarea>
+        </div>
+        <div class="field-group">
+          <label><i class="fa-solid fa-image"></i> Image URL</label>
+          <input type="url" id="p-image" placeholder="https://... or leave blank for icon" />
+          <div id="img-preview" class="img-preview"></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo URL</label>
+            <input type="url" id="p-demo" placeholder="https://..." />
+          </div>
+          <div class="field-group">
+            <label><i class="fa-brands fa-github"></i> GitHub URL</label>
+            <input type="url" id="p-github" placeholder="https://github.com/..." />
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Tech Tags (comma separated)</label>
+          <input type="text" id="p-tags" placeholder="React, Node.js, MongoDB" />
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Sort Order</label>
+            <input type="number" id="p-order" value="0" min="0" />
+          </div>
+          <div class="field-group">
+            <label>Visible</label>
+            <select id="p-visible">
+              <option value="1">Yes</option>
+              <option value="0">No (Hidden)</option>
+            </select>
+          </div>
+        </div>
+        <div id="project-alert" class="alert hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" onclick="closeProjectModal()">ABORT</button>
+          <button type="submit" class="btn-primary" id="project-submit-btn">
+            <i class="fa-solid fa-upload"></i> DEPLOY
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- SKILL MODAL -->
+<div id="skill-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:520px">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">root@exploits:~/add</span>
+    </div>
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h3 id="skill-modal-title">Add Exploit</h3>
+        <button class="modal-close" onclick="closeSkillModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="skill-form" class="modal-form">
+        <input type="hidden" id="skill-id" />
+        <div class="field-group">
+          <label>Skill Name *</label>
+          <input type="text" id="s-name" required placeholder="e.g. React.js" />
+        </div>
+        <div class="field-group">
+          <label>Font Awesome Icon Class</label>
+          <input type="text" id="s-icon" placeholder="e.g. fa-brands fa-react" />
+          <p class="field-hint">Find icons at <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com</a></p>
+        </div>
+        <div class="field-group">
+          <label>OR Custom Icon Image URL</label>
+          <input type="url" id="s-icon-url" placeholder="https://cdn.../react.svg" />
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Category</label>
+            <select id="s-category">
+              <option value="frontend">Frontend</option>
+              <option value="backend">Backend</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Sort Order</label>
+            <input type="number" id="s-order" value="0" min="0" />
+          </div>
+        </div>
+        <div id="skill-alert" class="alert hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" onclick="closeSkillModal()">ABORT</button>
+          <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-upload"></i> INJECT
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATE MODAL -->
+<div id="cert-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:560px">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">root@certs:~/add</span>
+    </div>
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h3 id="cert-modal-title">Add Certificate</h3>
+        <button class="modal-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="cert-form" class="modal-form">
+        <input type="hidden" id="cert-id" />
         <div class="field-group">
           <label>Title *</label>
-          <input type="text" id="p-title" required />
+          <input type="text" id="c-title" required placeholder="e.g. AWS Cloud Practitioner" />
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Issuer</label>
+            <input type="text" id="c-issuer" placeholder="e.g. Amazon Web Services" />
+          </div>
+          <div class="field-group">
+            <label>Issue Date</label>
+            <input type="text" id="c-date" placeholder="e.g. Jan 2025" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Type</label>
+            <select id="c-type">
+              <option value="certificate">Certificate</option>
+              <option value="award">Award</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Sort Order</label>
+            <input type="number" id="c-order" value="0" min="0" />
+          </div>
         </div>
         <div class="field-group">
-          <label>Badge</label>
-          <input type="text" id="p-badge" value="Live" />
-        </div>
-      </div>
-      <div class="field-group">
-        <label>Description</label>
-        <textarea id="p-description" rows="3"></textarea>
-      </div>
-      <div class="field-group">
-        <label><i class="fa-solid fa-image"></i> Image URL</label>
-        <input type="url" id="p-image" placeholder="https://... or leave blank for icon" />
-        <div id="img-preview" class="img-preview"></div>
-      </div>
-      <div class="form-row">
-        <div class="field-group">
-          <label><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo URL</label>
-          <input type="url" id="p-demo" placeholder="https://..." />
+          <label><i class="fa-solid fa-link"></i> Credential URL</label>
+          <input type="url" id="c-url" placeholder="https://verify.credential.net/..." />
         </div>
         <div class="field-group">
-          <label><i class="fa-brands fa-github"></i> GitHub URL</label>
-          <input type="url" id="p-github" placeholder="https://github.com/..." />
+          <label><i class="fa-solid fa-image"></i> Image URL (optional)</label>
+          <input type="url" id="c-image" placeholder="https://..." />
         </div>
-      </div>
-      <div class="field-group">
-        <label>Tech Tags (comma separated)</label>
-        <input type="text" id="p-tags" placeholder="React, Node.js, MongoDB" />
-      </div>
-      <div class="form-row">
-        <div class="field-group">
-          <label>Sort Order</label>
-          <input type="number" id="p-order" value="0" min="0" />
+        <div id="cert-alert" class="alert hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" onclick="closeCertModal()">ABORT</button>
+          <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-upload"></i> INJECT
+          </button>
         </div>
-        <div class="field-group">
-          <label>Visible</label>
-          <select id="p-visible">
-            <option value="1">Yes</option>
-            <option value="0">No (Hidden)</option>
-          </select>
-        </div>
-      </div>
-      <div id="project-alert" class="alert hidden"></div>
-      <div class="modal-actions">
-        <button type="button" class="btn-ghost" onclick="closeProjectModal()">Cancel</button>
-        <button type="submit" class="btn-primary" id="project-submit-btn">
-          <i class="fa-solid fa-floppy-disk"></i> Save Project
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ─── SKILL MODAL ─────────────────────────────────────────────────────── -->
-<div id="skill-modal" class="modal-overlay hidden">
-  <div class="modal glass" style="max-width:480px">
-    <div class="modal-header">
-      <h3 id="skill-modal-title">Add Skill</h3>
-      <button class="modal-close" onclick="closeSkillModal()"><i class="fa-solid fa-xmark"></i></button>
+      </form>
     </div>
-    <form id="skill-form" class="modal-form">
-      <input type="hidden" id="skill-id" />
-      <div class="field-group">
-        <label>Skill Name *</label>
-        <input type="text" id="s-name" required placeholder="e.g. React.js" />
-      </div>
-      <div class="field-group">
-        <label>Font Awesome Icon Class</label>
-        <input type="text" id="s-icon" placeholder="e.g. fa-brands fa-react" />
-        <p class="field-hint">Find icons at <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com</a></p>
-      </div>
-      <div class="field-group">
-        <label>OR Custom Icon Image URL</label>
-        <input type="url" id="s-icon-url" placeholder="https://cdn.../react.svg" />
-      </div>
-      <div class="form-row">
-        <div class="field-group">
-          <label>Category</label>
-          <select id="s-category">
-            <option value="frontend">Frontend</option>
-            <option value="backend">Backend</option>
-            <option value="others">Others</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>Sort Order</label>
-          <input type="number" id="s-order" value="0" min="0" />
-        </div>
-      </div>
-      <div id="skill-alert" class="alert hidden"></div>
-      <div class="modal-actions">
-        <button type="button" class="btn-ghost" onclick="closeSkillModal()">Cancel</button>
-        <button type="submit" class="btn-primary">
-          <i class="fa-solid fa-floppy-disk"></i> Save Skill
-        </button>
-      </div>
-    </form>
   </div>
 </div>
 
-<!-- ─── CONFIRM MODAL ───────────────────────────────────────────────────── -->
-<!-- ─── CERTIFICATE MODAL ──────────────────────────────────────────────── -->
-<div id="cert-modal" class="modal-overlay hidden">
-  <div class="modal glass" style="max-width:520px">
-    <div class="modal-header">
-      <h3 id="cert-modal-title">Add Certificate</h3>
-      <button class="modal-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <form id="cert-form" class="modal-form">
-      <input type="hidden" id="cert-id" />
-      <div class="field-group">
-        <label>Title *</label>
-        <input type="text" id="c-title" required placeholder="e.g. AWS Cloud Practitioner" />
-      </div>
-      <div class="form-row">
-        <div class="field-group">
-          <label>Issuer</label>
-          <input type="text" id="c-issuer" placeholder="e.g. Amazon Web Services" />
-        </div>
-        <div class="field-group">
-          <label>Issue Date</label>
-          <input type="text" id="c-date" placeholder="e.g. Jan 2025" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field-group">
-          <label>Type</label>
-          <select id="c-type">
-            <option value="certificate">Certificate</option>
-            <option value="award">Award</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>Sort Order</label>
-          <input type="number" id="c-order" value="0" min="0" />
-        </div>
-      </div>
-      <div class="field-group">
-        <label><i class="fa-solid fa-link"></i> Credential URL</label>
-        <input type="url" id="c-url" placeholder="https://verify.credential.net/..." />
-      </div>
-      <div class="field-group">
-        <label><i class="fa-solid fa-image"></i> Image URL (optional)</label>
-        <input type="url" id="c-image" placeholder="https://..." />
-      </div>
-      <div id="cert-alert" class="alert hidden"></div>
-      <div class="modal-actions">
-        <button type="button" class="btn-ghost" onclick="closeCertModal()">Cancel</button>
-        <button type="submit" class="btn-primary">
-          <i class="fa-solid fa-floppy-disk"></i> Save Certificate
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
+<!-- CONFIRM MODAL -->
 <div id="confirm-modal" class="modal-overlay hidden">
-  <div class="modal glass" style="max-width:400px;text-align:center">
-    <div class="modal-header" style="justify-content:center">
-      <h3 style="color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete</h3>
+  <div class="modal" style="max-width:420px;text-align:center">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">root@system:~/confirm</span>
     </div>
-    <p id="confirm-msg" style="margin:1rem 0;color:var(--text-muted)"></p>
-    <div class="modal-actions" style="justify-content:center">
-      <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
-      <button class="btn-danger" id="confirm-ok-btn">Delete</button>
+    <div class="modal-inner">
+      <div class="confirm-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="confirm-title">[!] CONFIRM TERMINATION</h3>
+      <p id="confirm-msg" class="confirm-msg"></p>
+      <div class="modal-actions" style="justify-content:center">
+        <button class="btn-ghost" onclick="closeConfirm()">ABORT</button>
+        <button class="btn-danger" id="confirm-ok-btn">TERMINATE</button>
+      </div>
     </div>
   </div>
 </div>

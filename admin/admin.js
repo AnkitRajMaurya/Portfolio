@@ -1,148 +1,395 @@
-// ─── State ──────────────────────────────────────────────────────────────────
 let token = localStorage.getItem('admin_token') || '';
 let currentSkillCat = 'frontend';
 let allSkills = [];
 let allProjects = [];
 let allCerts = [];
 let confirmCallback = null;
+let uptimeStartedAt = Date.now();
+let uptimeTimer = null;
+let matrixContext = null;
+let matrixColumns = [];
+let matrixChars = '01ABCDEF<>[]{}#$%&*+=?-';
+let failedLoginAttempts = 0;
+let threatOverlayTimer = null;
+let successOverlayTimer = null;
 
-// ─── Init ────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  if (token) {
-    showDashboard();
-    loadOverview();
+const SECTION_META = {
+  overview: {
+    title: 'OVERVIEW',
+    sub: 'root@system:~$ status --all'
+  },
+  projects: {
+    title: 'PROJECTS',
+    sub: 'root@projects:~$ ls --classified'
+  },
+  skills: {
+    title: 'SKILLS',
+    sub: 'root@skills:~$ cat exploit-db'
+  },
+  messages: {
+    title: 'INTERCEPTS',
+    sub: 'root@signals:~$ read --unread'
+  },
+  certificates: {
+    title: 'CERTS',
+    sub: 'root@certs:~$ verify --chain'
+  },
+  content: {
+    title: 'PAYLOAD',
+    sub: 'root@content:~$ nano live-copy'
   }
+};
 
-  // Login
-  document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('login-btn');
-    const err = document.getElementById('login-error');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
-    btn.disabled = true;
-    err.classList.add('hidden');
+document.addEventListener('DOMContentLoaded', () => {
+  bindCoreEvents();
+  initMatrixRain();
+  playBootSequence();
+});
 
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: document.getElementById('login-username').value,
-          password: document.getElementById('login-password').value
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        token = data.token;
-        localStorage.setItem('admin_token', token);
-        showDashboard();
-        loadOverview();
-      } else {
-        showAlert(err, data.error || 'Invalid credentials', 'error');
-      }
-    } catch {
-      showAlert(err, 'Connection error', 'error');
-    }
-    btn.innerHTML = '<span>Sign In</span><i class="fa-solid fa-arrow-right-to-bracket"></i>';
-    btn.disabled = false;
-  });
-
-  // Logout
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    token = '';
-    localStorage.removeItem('admin_token');
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('login-screen').classList.remove('hidden');
-  });
-
-  // Sidebar nav
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchSection(btn.dataset.section));
-  });
-
-  // Sidebar toggle (mobile)
+function bindCoreEvents() {
+  document.getElementById('login-form').addEventListener('submit', handleLogin);
+  document.getElementById('logout-btn').addEventListener('click', handleLogout);
   document.getElementById('sidebar-toggle').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
   });
 
-  // Skill tabs
-  document.querySelectorAll('.skill-tab').forEach(tab => {
+  document.querySelectorAll('.nav-btn').forEach((btn) => {
+    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+  });
+
+  document.querySelectorAll('.skill-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.skill-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.skill-tab').forEach((item) => item.classList.remove('active'));
       tab.classList.add('active');
       currentSkillCat = tab.dataset.cat;
       renderSkills();
     });
   });
 
-  // Project form
   document.getElementById('project-form').addEventListener('submit', saveProject);
   document.getElementById('skill-form').addEventListener('submit', saveSkill);
   document.getElementById('cert-form').addEventListener('submit', saveCert);
   document.getElementById('content-form').addEventListener('submit', saveContent);
 
-  // Image preview
-  document.getElementById('p-image').addEventListener('input', (e) => {
-    const preview = document.getElementById('img-preview');
-    if (e.target.value) {
-      preview.innerHTML = `<img src="${e.target.value}" onerror="this.parentElement.innerHTML=''" />`;
-    } else {
-      preview.innerHTML = '';
-    }
-  });
+  document.getElementById('p-image').addEventListener('input', handleProjectImagePreview);
 
-  // Close modals on overlay click
-  document.getElementById('project-modal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeProjectModal();
+  [
+    ['project-modal', closeProjectModal],
+    ['skill-modal', closeSkillModal],
+    ['cert-modal', closeCertModal],
+    ['confirm-modal', closeConfirm]
+  ].forEach(([id, closeHandler]) => {
+    document.getElementById(id).addEventListener('click', (event) => {
+      if (event.target === event.currentTarget) {
+        closeHandler();
+      }
+    });
   });
-  document.getElementById('skill-modal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeSkillModal();
-  });
-  document.getElementById('confirm-modal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeConfirm();
-  });
-  document.getElementById('cert-modal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeCertModal();
-  });
-});
-
-// ─── Auth helper ─────────────────────────────────────────────────────────────
-async function api(method, url, body) {
-  const opts = {
-    method,
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(url, opts);
-  if (res.status === 401) {
-    token = '';
-    localStorage.removeItem('admin_token');
-    location.reload();
-  }
-  return res;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function showAlert(el, msg, type = 'error') {
-  el.textContent = msg;
-  el.className = `alert alert-${type}`;
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 4000);
+function playBootSequence() {
+  const bootLines = document.getElementById('boot-lines');
+  const bootScreen = document.getElementById('boot-screen');
+  const lines = [
+    '[BOOT] Starting secure shell daemon...',
+    '[OK] Loading encrypted session modules...',
+    '[OK] Establishing dark relay tunnel...',
+    '[OK] Syncing project, skill, and message nodes...',
+    '[WARN] Motion sensors armed. Silent mode engaged.',
+    '[DONE] Root panel online.'
+  ];
+
+  bootLines.innerHTML = '';
+
+  lines.forEach((line, index) => {
+    window.setTimeout(() => {
+      const row = document.createElement('div');
+      row.className = 'boot-line';
+      row.textContent = line;
+      bootLines.appendChild(row);
+    }, index * 240);
+  });
+
+  window.setTimeout(() => {
+    bootScreen.classList.add('fade-out');
+
+    if (token) {
+      showDashboard();
+      loadOverview();
+    } else {
+      showLoginScreen();
+      document.getElementById('login-username').focus();
+    }
+
+    window.setTimeout(() => {
+      bootScreen.classList.add('hidden');
+    }, 520);
+  }, lines.length * 240 + 520);
+}
+
+async function handleLogin(event) {
+  event.preventDefault();
+
+  const button = document.getElementById('login-btn');
+  const errorBox = document.getElementById('login-error');
+
+  setButtonState(button, true, '<i class="fa-solid fa-spinner fa-spin"></i><span>BYPASSING AUTH</span>');
+  errorBox.classList.add('hidden');
+
+  try {
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('login-username').value,
+        password: document.getElementById('login-password').value
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      failedLoginAttempts += 1;
+      triggerThreatOverlay(data.error || 'Access denied');
+      showAlert(errorBox, data.error || 'Access denied. Countermeasures active.', 'error');
+      return;
+    }
+
+    token = data.token;
+    localStorage.setItem('admin_token', token);
+    failedLoginAttempts = 0;
+    await triggerSuccessOverlay();
+    showDashboard();
+    loadOverview();
+  } catch (error) {
+    showAlert(errorBox, 'Connection tunnel failed', 'error');
+  } finally {
+    setButtonState(
+      button,
+      false,
+      '<i class="fa-solid fa-right-to-bracket"></i><span>INITIATE ACCESS</span><div class="btn-glitch"></div>'
+    );
+  }
+}
+
+function handleLogout() {
+  token = '';
+  localStorage.removeItem('admin_token');
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('login-form').reset();
+  document.getElementById('threat-overlay').classList.add('hidden');
+  document.getElementById('success-overlay').classList.add('hidden');
+  document.body.classList.remove('threat-mode');
+
+  if (uptimeTimer) {
+    window.clearInterval(uptimeTimer);
+    uptimeTimer = null;
+  }
+
+  document.getElementById('login-username').focus();
+}
+
+async function api(method, url, body) {
+  const options = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, options);
+
+  if (response.status === 401) {
+    handleLogout();
+    location.reload();
+  }
+
+  return response;
+}
+
+function showAlert(element, message, type = 'error') {
+  element.textContent = message;
+  element.className = `alert alert-${type}`;
+  element.classList.remove('hidden');
+  window.setTimeout(() => element.classList.add('hidden'), 4000);
+}
+
+function setButtonState(button, busy, html) {
+  button.disabled = busy;
+  button.innerHTML = html;
+}
+
+async function triggerSuccessOverlay() {
+  const overlay = document.getElementById('success-overlay');
+  const time = document.getElementById('success-time');
+  const operator = document.getElementById('success-operator');
+  const node = document.getElementById('success-node');
+  const status = document.getElementById('success-status');
+
+  operator.textContent = 'ROOT';
+  node.textContent = 'PRIMARY CORE';
+  status.textContent = 'ACCESS GRANTED';
+  time.textContent = new Date().toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
+  overlay.classList.remove('hidden');
+  overlay.classList.remove('success-show');
+  overlay.setAttribute('aria-hidden', 'false');
+  void overlay.offsetWidth;
+  overlay.classList.add('success-show');
+
+  if (successOverlayTimer) {
+    window.clearTimeout(successOverlayTimer);
+  }
+
+  await new Promise((resolve) => {
+    successOverlayTimer = window.setTimeout(() => {
+      overlay.classList.add('hidden');
+      overlay.classList.remove('success-show');
+      overlay.setAttribute('aria-hidden', 'true');
+      resolve();
+    }, 1450);
+  });
+}
+
+function triggerThreatOverlay(reason) {
+  const overlay = document.getElementById('threat-overlay');
+  const title = document.getElementById('threat-title');
+  const copy = document.getElementById('threat-copy');
+  const attempt = document.getElementById('threat-attempt');
+  const browser = document.getElementById('threat-browser');
+  const device = document.getElementById('threat-device');
+  const time = document.getElementById('threat-time');
+  const reasonEl = document.getElementById('threat-reason');
+  const loginCard = document.querySelector('.login-card');
+
+  const responses = [
+    {
+      title: 'UNAUTHORIZED ACCESS',
+      copy: 'Credential mismatch detected. Device signature mirrored into the countermeasure stack.'
+    },
+    {
+      title: 'TRACE ESCALATED',
+      copy: 'Repeated auth failure detected. Session fingerprint locked and route beacon intensified.'
+    },
+    {
+      title: 'LOCKDOWN ACTIVE',
+      copy: 'Brute-force profile suspected. Shadow archive armed and operator alert chain primed.'
+    }
+  ];
+
+  const profile = responses[Math.min(failedLoginAttempts - 1, responses.length - 1)];
+
+  title.textContent = profile.title;
+  copy.textContent = profile.copy;
+  attempt.textContent = String(failedLoginAttempts).padStart(2, '0');
+  browser.textContent = detectBrowserLabel();
+  device.textContent = `${navigator.platform || 'UNKNOWN'} | ${navigator.language || 'EN'}`;
+  time.textContent = new Date().toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  reasonEl.textContent = String(reason || 'Credential mismatch detected').toUpperCase();
+
+  overlay.classList.remove('hidden');
+  overlay.classList.remove('threat-show');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('threat-mode');
+  loginCard.classList.remove('shake-alert');
+  void overlay.offsetWidth;
+  overlay.classList.add('threat-show');
+  loginCard.classList.add('shake-alert');
+
+  if (threatOverlayTimer) {
+    window.clearTimeout(threatOverlayTimer);
+  }
+
+  threatOverlayTimer = window.setTimeout(() => {
+    overlay.classList.add('hidden');
+    overlay.classList.remove('threat-show');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('threat-mode');
+    loginCard.classList.remove('shake-alert');
+  }, 3600);
+}
+
+function detectBrowserLabel() {
+  const agent = navigator.userAgent || '';
+
+  if (agent.includes('Edg/')) return 'EDGE';
+  if (agent.includes('Chrome/')) return 'CHROME';
+  if (agent.includes('Firefox/')) return 'FIREFOX';
+  if (agent.includes('Safari/') && !agent.includes('Chrome/')) return 'SAFARI';
+
+  return 'UNKNOWN';
+}
+
+function showLoginScreen() {
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
 }
 
 function showDashboard() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('threat-overlay').classList.add('hidden');
+  document.getElementById('success-overlay').classList.add('hidden');
+  document.body.classList.remove('threat-mode');
+  uptimeStartedAt = Date.now();
+  startUptimeClock();
+}
+
+function startUptimeClock() {
+  if (uptimeTimer) {
+    window.clearInterval(uptimeTimer);
+  }
+
+  const uptimeElement = document.getElementById('uptime');
+
+  const update = () => {
+    const elapsedSeconds = Math.floor((Date.now() - uptimeStartedAt) / 1000);
+    const hours = String(Math.floor(elapsedSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((elapsedSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(elapsedSeconds % 60).padStart(2, '0');
+    uptimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+  };
+
+  update();
+  uptimeTimer = window.setInterval(update, 1000);
 }
 
 function switchSection(name) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
-  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-  document.getElementById('section-' + name).classList.remove('hidden');
-  const titles = { overview:'Overview', projects:'Projects', skills:'Skills', messages:'Messages', certificates:'Certificates', content:'Content' };
-  const subs = { overview:'Dashboard summary', projects:'Manage your projects', skills:'Manage tech skills', messages:'Contact form submissions', certificates:'Manage certificates & awards', content:'Edit portfolio text' };
-  document.getElementById('section-title').textContent = titles[name] || name;
-  document.getElementById('section-sub').textContent = subs[name] || '';
+  document.querySelectorAll('.nav-btn').forEach((button) => {
+    button.classList.toggle('active', button.dataset.section === name);
+  });
+
+  document.querySelectorAll('.section').forEach((section) => {
+    section.classList.add('hidden');
+  });
+
+  document.getElementById(`section-${name}`).classList.remove('hidden');
+
+  const meta = SECTION_META[name] || {
+    title: name.toUpperCase(),
+    sub: 'root@system:~$ idle'
+  };
+
+  syncSectionHeading(meta.title, meta.sub);
+  document.getElementById('sidebar').classList.remove('open');
 
   if (name === 'projects') loadProjects();
   if (name === 'skills') loadSkills();
@@ -151,84 +398,204 @@ function switchSection(name) {
   if (name === 'content') loadContent();
 }
 
-// ─── Overview ────────────────────────────────────────────────────────────────
+function syncSectionHeading(title, subtitle) {
+  const titleEl = document.getElementById('section-title');
+  titleEl.textContent = title;
+  titleEl.dataset.text = title;
+  titleEl.classList.remove('glitch-pulse');
+  void titleEl.offsetWidth;
+  titleEl.classList.add('glitch-pulse');
+  document.getElementById('section-sub').textContent = subtitle;
+}
+
 async function loadOverview() {
-  const [pRes, sRes, mRes, cRes] = await Promise.all([
-    api('GET', '/api/admin/projects'),
-    api('GET', '/api/admin/skills'),
-    api('GET', '/api/admin/messages'),
-    api('GET', '/api/admin/certificates')
-  ]);
-  const projects = await pRes.json();
-  const skills = await sRes.json();
-  const messages = await mRes.json();
-  const certs = await cRes.json();
-  const unread = messages.filter(m => !m.read).length;
+  try {
+    const [projectResponse, skillResponse, messageResponse, certResponse] = await Promise.all([
+      api('GET', '/api/admin/projects'),
+      api('GET', '/api/admin/skills'),
+      api('GET', '/api/admin/messages'),
+      api('GET', '/api/admin/certificates')
+    ]);
 
-  document.getElementById('stat-projects').textContent = projects.length;
-  document.getElementById('stat-skills').textContent = skills.length;
-  document.getElementById('stat-messages').textContent = messages.length;
-  document.getElementById('stat-unread').textContent = unread;
-  document.getElementById('stat-certs').textContent = certs.length;
+    allProjects = await projectResponse.json();
+    allSkills = await skillResponse.json();
+    const messages = await messageResponse.json();
+    allCerts = await certResponse.json();
 
-  if (unread > 0) {
-    const badge = document.getElementById('unread-badge');
-    badge.textContent = unread;
-    badge.style.display = 'inline';
+    const unread = messages.filter((message) => !isMessageRead(message)).length;
+
+    document.getElementById('stat-projects').textContent = allProjects.length;
+    document.getElementById('stat-skills').textContent = allSkills.length;
+    document.getElementById('stat-messages').textContent = messages.length;
+    document.getElementById('stat-unread').textContent = unread;
+    document.getElementById('stat-certs').textContent = allCerts.length;
+
+    updateUnreadBadge(unread);
+    updateThreatLevel(unread, messages.length);
+    renderTraceFeed({
+      projects: allProjects.length,
+      skills: allSkills.length,
+      messages: messages.length,
+      certs: allCerts.length,
+      unread
+    });
+  } catch (error) {
+    updateUnreadBadge(0);
+    renderTraceFeed({
+      projects: 0,
+      skills: 0,
+      messages: 0,
+      certs: 0,
+      unread: 0,
+      failed: true
+    });
   }
 }
 
-// ─── Projects ────────────────────────────────────────────────────────────────
+function updateUnreadBadge(unread) {
+  const badge = document.getElementById('unread-badge');
+
+  if (unread > 0) {
+    badge.textContent = unread;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.textContent = '';
+    badge.style.display = 'none';
+  }
+}
+
+function updateThreatLevel(unread, messageCount) {
+  const threat = document.getElementById('threat-level');
+
+  if (unread >= 5) {
+    threat.textContent = 'HIGH';
+    threat.style.color = '#ffb8c4';
+    return;
+  }
+
+  if (unread > 0 || messageCount > 12) {
+    threat.textContent = 'WATCH';
+    threat.style.color = '#fff0b5';
+    return;
+  }
+
+  threat.textContent = 'LOW';
+  threat.style.color = '#c8ffe4';
+}
+
+function renderTraceFeed(stats) {
+  const feed = document.getElementById('trace-feed');
+  const time = new Date().toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
+  const lines = stats.failed
+    ? [
+        { severity: 'alert', text: 'Admin endpoints unreachable. Recheck tunnel and auth chain.' },
+        { severity: 'watch', text: 'Telemetry stream paused until data sync returns.' },
+        { severity: 'stable', text: 'UI shell still active. Local controls remain available.' }
+      ]
+    : [
+        { severity: stats.projects > 0 ? 'stable' : 'watch', text: `${stats.projects} project payloads indexed in secure storage.` },
+        { severity: stats.skills > 0 ? 'stable' : 'watch', text: `${stats.skills} exploit entries available in the skill database.` },
+        { severity: stats.unread > 0 ? 'alert' : 'stable', text: `${stats.unread} unread intercepts flagged out of ${stats.messages} total signals.` },
+        { severity: stats.certs > 0 ? 'stable' : 'watch', text: `${stats.certs} certificates verified through credential chain.` }
+      ];
+
+  feed.innerHTML = lines
+    .map((line) => {
+      return `
+        <div class="trace-line">
+          <span class="trace-time">${time}</span>
+          <span class="trace-text">${escapeHtml(line.text)}</span>
+          <span class="trace-severity ${line.severity}">${line.severity}</span>
+        </div>
+      `;
+    })
+    .join('');
+}
+
 async function loadProjects() {
-  const res = await api('GET', '/api/admin/projects');
-  allProjects = await res.json();
+  const response = await api('GET', '/api/admin/projects');
+  allProjects = await response.json();
   renderProjects();
 }
 
 function renderProjects() {
   const list = document.getElementById('projects-list');
-  if (!allProjects.length) { list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem">No projects yet.</p>'; return; }
 
-  list.innerHTML = allProjects.map(p => {
-    const tags = Array.isArray(p.tech_tags) ? p.tech_tags : (p.tech_tags || '').split(',');
-    const tagsHtml = tags.filter(Boolean).map(t => `<span class="tag">${t.trim()}</span>`).join('');
-    const imgHtml = p.image_url
-      ? `<div class="admin-card-img"><img src="${p.image_url}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-image\\'></i>'" /></div>`
-      : `<div class="admin-card-img"><i class="fa-solid fa-laptop-code"></i></div>`;
-    return `
-    <div class="admin-card">
-      ${imgHtml}
-      <div class="admin-card-body">
-        <div class="admin-card-title">${p.title}</div>
-        <div class="admin-card-desc">${p.description || ''}</div>
-        <div class="admin-card-tags">${tagsHtml}
-          <span class="visibility-badge ${p.visible ? 'vis-yes' : 'vis-no'}">${p.visible ? 'Visible' : 'Hidden'}</span>
+  if (!allProjects.length) {
+    list.innerHTML = buildEmptyState('fa-solid fa-code', 'No deployed project payloads yet.');
+    return;
+  }
+
+  list.innerHTML = allProjects
+    .map((project) => {
+      const tags = Array.isArray(project.tech_tags)
+        ? project.tech_tags
+        : String(project.tech_tags || '')
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean);
+
+      const tagsHtml = tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
+      const imageHtml = project.image_url
+        ? `<div class="admin-card-img"><img src="${project.image_url}" onerror="this.parentElement.innerHTML='&lt;i class=&quot;fa-solid fa-image&quot;&gt;&lt;/i&gt;'" /></div>`
+        : '<div class="admin-card-img"><i class="fa-solid fa-laptop-code"></i></div>';
+
+      return `
+        <div class="admin-card">
+          ${imageHtml}
+          <div class="admin-card-body">
+            <div class="admin-card-title">${escapeHtml(project.title)}</div>
+            <div class="admin-card-desc">${escapeHtml(project.description || 'No mission notes attached.')}</div>
+            <div class="admin-card-tags">
+              ${tagsHtml}
+              <span class="visibility-badge ${project.visible ? 'vis-yes' : 'vis-no'}">
+                ${project.visible ? 'ACTIVE' : 'HIDDEN'}
+              </span>
+            </div>
+          </div>
+          <div class="admin-card-actions">
+            <button class="btn-icon" onclick="editProject(${project.id})" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn-icon danger" onclick="deleteProject(${project.id}, '${escapeJs(project.title)}')" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="admin-card-actions">
-        <button class="btn-icon" onclick="editProject(${p.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn-icon danger" onclick="deleteProject(${p.id},'${p.title.replace(/'/g,"\\'")}') " title="Delete"><i class="fa-solid fa-trash"></i></button>
-      </div>
-    </div>`;
-  }).join('');
+      `;
+    })
+    .join('');
 }
 
-function openProjectModal(data) {
-  document.getElementById('project-modal-title').textContent = data ? 'Edit Project' : 'Add Project';
-  document.getElementById('project-id').value = data ? data.id : '';
-  document.getElementById('p-title').value = data ? data.title : '';
-  document.getElementById('p-badge').value = data ? (data.badge || 'Live') : 'Live';
-  document.getElementById('p-description').value = data ? (data.description || '') : '';
-  document.getElementById('p-image').value = data ? (data.image_url || '') : '';
-  document.getElementById('p-demo').value = data ? (data.demo_url || '') : '';
-  document.getElementById('p-github').value = data ? (data.github_url || '') : '';
-  const tags = data ? (Array.isArray(data.tech_tags) ? data.tech_tags.join(', ') : (data.tech_tags || '')) : '';
-  document.getElementById('p-tags').value = tags;
-  document.getElementById('p-order').value = data ? (data.sort_order || 0) : 0;
-  document.getElementById('p-visible').value = data ? (data.visible ? '1' : '0') : '1';
-  const preview = document.getElementById('img-preview');
-  preview.innerHTML = (data && data.image_url) ? `<img src="${data.image_url}" />` : '';
+function openProjectModal(project) {
+  document.getElementById('project-modal-title').textContent = project ? 'Edit Project Payload' : 'Deploy Project';
+  document.getElementById('project-modal-bar-title').textContent = project ? 'root@projects:~/edit' : 'root@projects:~/new';
+  document.getElementById('project-submit-btn').innerHTML = project
+    ? '<i class="fa-solid fa-floppy-disk"></i> UPDATE'
+    : '<i class="fa-solid fa-upload"></i> DEPLOY';
+
+  document.getElementById('project-id').value = project ? project.id : '';
+  document.getElementById('p-title').value = project ? project.title : '';
+  document.getElementById('p-badge').value = project ? project.badge || 'Live' : 'Live';
+  document.getElementById('p-description').value = project ? project.description || '' : '';
+  document.getElementById('p-image').value = project ? project.image_url || '' : '';
+  document.getElementById('p-demo').value = project ? project.demo_url || '' : '';
+  document.getElementById('p-github').value = project ? project.github_url || '' : '';
+  document.getElementById('p-tags').value = project
+    ? Array.isArray(project.tech_tags)
+      ? project.tech_tags.join(', ')
+      : project.tech_tags || ''
+    : '';
+  document.getElementById('p-order').value = project ? project.sort_order || 0 : 0;
+  document.getElementById('p-visible').value = project ? (project.visible ? '1' : '0') : '1';
   document.getElementById('project-alert').classList.add('hidden');
+  handleProjectImagePreview({ target: document.getElementById('p-image') });
   document.getElementById('project-modal').classList.remove('hidden');
 }
 
@@ -237,86 +604,116 @@ function closeProjectModal() {
 }
 
 function editProject(id) {
-  const p = allProjects.find(x => x.id === id);
-  if (p) openProjectModal(p);
+  const project = allProjects.find((item) => item.id === id);
+  if (project) {
+    openProjectModal(project);
+  }
 }
 
 function deleteProject(id, title) {
-  openConfirm(`Delete project "${title}"? This cannot be undone.`, async () => {
+  openConfirm(`Terminate project payload "${title}"? This action cannot be reversed.`, async () => {
     await api('DELETE', `/api/admin/projects/${id}`);
-    loadProjects();
-    loadOverview();
+    await loadProjects();
+    await loadOverview();
   });
 }
 
-async function saveProject(e) {
-  e.preventDefault();
-  const id = document.getElementById('project-id').value;
-  const alert = document.getElementById('project-alert');
-  const tags = document.getElementById('p-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+async function saveProject(event) {
+  event.preventDefault();
 
+  const id = document.getElementById('project-id').value;
+  const alertBox = document.getElementById('project-alert');
   const payload = {
     title: document.getElementById('p-title').value,
     description: document.getElementById('p-description').value,
     image_url: document.getElementById('p-image').value,
     demo_url: document.getElementById('p-demo').value,
     github_url: document.getElementById('p-github').value,
-    tech_tags: tags,
+    tech_tags: document
+      .getElementById('p-tags')
+      .value.split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean),
     badge: document.getElementById('p-badge').value,
-    sort_order: parseInt(document.getElementById('p-order').value) || 0,
+    sort_order: Number.parseInt(document.getElementById('p-order').value, 10) || 0,
     visible: document.getElementById('p-visible').value === '1'
   };
 
-  const res = id
+  const response = id
     ? await api('PUT', `/api/admin/projects/${id}`, payload)
     : await api('POST', '/api/admin/projects', payload);
-  const data = await res.json();
 
-  if (res.ok) {
-    closeProjectModal();
-    loadProjects();
-    loadOverview();
-  } else {
-    showAlert(alert, data.error || 'Save failed', 'error');
+  const data = await response.json();
+
+  if (!response.ok) {
+    showAlert(alertBox, data.error || 'Project deployment failed', 'error');
+    return;
   }
+
+  closeProjectModal();
+  await loadProjects();
+  await loadOverview();
 }
 
-// ─── Skills ──────────────────────────────────────────────────────────────────
+function handleProjectImagePreview(event) {
+  const preview = document.getElementById('img-preview');
+  const value = event.target.value.trim();
+
+  if (!value) {
+    preview.innerHTML = '';
+    return;
+  }
+
+  preview.innerHTML = `<img src="${value}" alt="Project preview" onerror="this.parentElement.innerHTML=''" />`;
+}
+
 async function loadSkills() {
-  const res = await api('GET', '/api/admin/skills');
-  allSkills = await res.json();
+  const response = await api('GET', '/api/admin/skills');
+  allSkills = await response.json();
   renderSkills();
 }
 
 function renderSkills() {
   const list = document.getElementById('skills-list');
-  const filtered = allSkills.filter(s => s.category === currentSkillCat);
-  if (!filtered.length) { list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;grid-column:1/-1">No skills in this category yet.</p>'; return; }
+  const filtered = allSkills.filter((skill) => skill.category === currentSkillCat);
 
-  list.innerHTML = filtered.map(s => {
-    const iconHtml = s.icon_url
-      ? `<img src="${s.icon_url}" />`
-      : `<i class="${s.icon_class || 'fa-solid fa-star'}"></i>`;
-    return `
-    <div class="skill-admin-card">
-      <div class="skill-admin-icon">${iconHtml}</div>
-      <span class="skill-admin-name">${s.name}</span>
-      <div class="skill-admin-actions">
-        <button class="btn-icon" onclick="editSkill(${s.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn-icon danger" onclick="deleteSkill(${s.id},'${s.name.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
-      </div>
-    </div>`;
-  }).join('');
+  if (!filtered.length) {
+    list.innerHTML = `<div style="grid-column:1/-1">${buildEmptyState('fa-solid fa-microchip', 'No exploits indexed in this category.')}</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered
+    .map((skill) => {
+      const iconHtml = skill.icon_url
+        ? `<img src="${skill.icon_url}" alt="${escapeHtml(skill.name)}" />`
+        : `<i class="${skill.icon_class || 'fa-solid fa-star'}"></i>`;
+
+      return `
+        <div class="skill-admin-card">
+          <div class="skill-admin-icon">${iconHtml}</div>
+          <span class="skill-admin-name">${escapeHtml(skill.name)}</span>
+          <div class="skill-admin-actions">
+            <button class="btn-icon" onclick="editSkill(${skill.id})" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn-icon danger" onclick="deleteSkill(${skill.id}, '${escapeJs(skill.name)}')" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
 }
 
-function openSkillModal(data) {
-  document.getElementById('skill-modal-title').textContent = data ? 'Edit Skill' : 'Add Skill';
-  document.getElementById('skill-id').value = data ? data.id : '';
-  document.getElementById('s-name').value = data ? data.name : '';
-  document.getElementById('s-icon').value = data ? (data.icon_class || '') : '';
-  document.getElementById('s-icon-url').value = data ? (data.icon_url || '') : '';
-  document.getElementById('s-category').value = data ? (data.category || 'frontend') : currentSkillCat;
-  document.getElementById('s-order').value = data ? (data.sort_order || 0) : 0;
+function openSkillModal(skill) {
+  document.getElementById('skill-modal-title').textContent = skill ? 'Edit Exploit' : 'Add Exploit';
+  document.getElementById('skill-id').value = skill ? skill.id : '';
+  document.getElementById('s-name').value = skill ? skill.name : '';
+  document.getElementById('s-icon').value = skill ? skill.icon_class || '' : '';
+  document.getElementById('s-icon-url').value = skill ? skill.icon_url || '' : '';
+  document.getElementById('s-category').value = skill ? skill.category || 'frontend' : currentSkillCat;
+  document.getElementById('s-order').value = skill ? skill.sort_order || 0 : 0;
   document.getElementById('skill-alert').classList.add('hidden');
   document.getElementById('skill-modal').classList.remove('hidden');
 }
@@ -326,165 +723,216 @@ function closeSkillModal() {
 }
 
 function editSkill(id) {
-  const s = allSkills.find(x => x.id === id);
-  if (s) openSkillModal(s);
+  const skill = allSkills.find((item) => item.id === id);
+  if (skill) {
+    openSkillModal(skill);
+  }
 }
 
 function deleteSkill(id, name) {
-  openConfirm(`Delete skill "${name}"?`, async () => {
+  openConfirm(`Delete exploit entry "${name}"?`, async () => {
     await api('DELETE', `/api/admin/skills/${id}`);
-    loadSkills();
+    await loadSkills();
+    await loadOverview();
   });
 }
 
-async function saveSkill(e) {
-  e.preventDefault();
+async function saveSkill(event) {
+  event.preventDefault();
+
   const id = document.getElementById('skill-id').value;
-  const alert = document.getElementById('skill-alert');
+  const alertBox = document.getElementById('skill-alert');
   const payload = {
     name: document.getElementById('s-name').value,
     icon_class: document.getElementById('s-icon').value,
     icon_url: document.getElementById('s-icon-url').value,
     category: document.getElementById('s-category').value,
-    sort_order: parseInt(document.getElementById('s-order').value) || 0,
+    sort_order: Number.parseInt(document.getElementById('s-order').value, 10) || 0,
     visible: true
   };
-  const res = id
+
+  const response = id
     ? await api('PUT', `/api/admin/skills/${id}`, payload)
     : await api('POST', '/api/admin/skills', payload);
-  const data = await res.json();
-  if (res.ok) { closeSkillModal(); loadSkills(); }
-  else showAlert(alert, data.error || 'Save failed', 'error');
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    showAlert(alertBox, data.error || 'Exploit injection failed', 'error');
+    return;
+  }
+
+  closeSkillModal();
+  await loadSkills();
+  await loadOverview();
 }
 
-// ─── Messages ────────────────────────────────────────────────────────────────
 async function loadMessages() {
+  const list = document.getElementById('messages-list');
+
   try {
-    const res = await api('GET', '/api/admin/messages');
-    const messages = await res.json();
-    const list = document.getElementById('messages-list');
-    const unread = messages.filter(m => !m.read_flag && !m.read).length;
-    const countEl = document.getElementById('messages-count');
-    if (countEl) countEl.textContent = messages.length + ' total · ' + unread + ' unread';
+    const response = await api('GET', '/api/admin/messages');
+    const messages = await response.json();
+    const unread = messages.filter((message) => !isMessageRead(message)).length;
+    document.getElementById('messages-count').textContent = `${messages.length} total | ${unread} unread`;
 
     if (!messages.length) {
-      list.innerHTML = '<div class="empty-state"><i class="fa-solid fa-envelope-open"></i><p>No messages yet.</p></div>';
+      list.innerHTML = buildEmptyState('fa-solid fa-satellite-dish', 'No intercepted transmissions yet.');
       return;
     }
 
-    list.innerHTML = messages.map(function(m) {
-      var isRead = m.read === 1 || m.read === true;
-      var date = m.created_at ? new Date(m.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '';
-      return '<div class="msg-card ' + (isRead ? '' : 'msg-unread') + '" id="msg-' + m.id + '">'
-        + '<div class="msg-header">'
-        + '<div><div class="msg-sender">' + escHtml(m.name) + '</div><div class="msg-email">' + escHtml(m.email) + '</div></div>'
-        + '<div style="display:flex;align-items:center;gap:.5rem">'
-        + '<span class="msg-date">' + date + '</span>'
-        + (!isRead ? '<button class="btn-icon" onclick="markRead(' + m.id + ')" title="Mark read"><i class="fa-solid fa-check"></i></button>' : '<span class="msg-badge read">Read</span>')
-        + '<button class="btn-icon danger" onclick="deleteMsg(' + m.id + ')" title="Delete"><i class="fa-solid fa-trash"></i></button>'
-        + '</div></div>'
-        + '<div class="msg-body">' + escHtml(m.message) + '</div>'
-        + '</div>';
-    }).join('');
-  } catch(e) {
-    document.getElementById('messages-list').innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>Failed to load messages.</p></div>';
+    list.innerHTML = messages
+      .map((message) => {
+        const read = isMessageRead(message);
+        const date = message.created_at
+          ? new Date(message.created_at).toLocaleDateString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            })
+          : '';
+
+        return `
+          <div class="msg-card ${read ? '' : 'msg-unread'}" id="msg-${message.id}">
+            <div class="msg-header">
+              <div>
+                <div class="msg-sender">${escapeHtml(message.name)}</div>
+                <div class="msg-email">${escapeHtml(message.email)}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;justify-content:flex-end">
+                <span class="msg-date">${date}</span>
+                ${read
+                  ? '<span class="msg-badge read">READ</span>'
+                  : `<button class="btn-icon" onclick="markRead(${message.id})" title="Mark read"><i class="fa-solid fa-check"></i></button>`}
+                <button class="btn-icon danger" onclick="deleteMsg(${message.id})" title="Delete">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="msg-body">${escapeHtml(message.message)}</div>
+          </div>
+        `;
+      })
+      .join('');
+  } catch (error) {
+    list.innerHTML = buildEmptyState('fa-solid fa-triangle-exclamation', 'Signal feed failed to load.');
   }
 }
 
-function escHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function isMessageRead(message) {
+  return message.read === true || message.read === 1 || message.read_flag === true || message.read_flag === 1;
 }
 
 async function markRead(id) {
-  await api('PUT', '/api/admin/messages/' + id + '/read');
-  var card = document.getElementById('msg-' + id);
-  if (card) {
-    card.classList.remove('msg-unread');
-    var btn = card.querySelector('.btn-icon:not(.danger)');
-    if (btn) btn.outerHTML = '<span class="msg-badge read">Read</span>';
-  }
-  loadOverview();
+  await api('PUT', `/api/admin/messages/${id}/read`);
+  await loadMessages();
+  await loadOverview();
 }
 
 function deleteMsg(id) {
-  openConfirm('Delete this message?', async () => {
+  openConfirm('Delete this intercepted transmission?', async () => {
     await api('DELETE', `/api/admin/messages/${id}`);
-    loadMessages();
-    loadOverview();
+    await loadMessages();
+    await loadOverview();
   });
 }
 
-// ─── Content ─────────────────────────────────────────────────────────────────
 async function loadContent() {
-  const res = await api('GET', '/api/admin/content');
-  const data = await res.json();
+  const response = await api('GET', '/api/admin/content');
+  const data = await response.json();
   const form = document.getElementById('content-form');
-  Object.entries(data).forEach(([key, val]) => {
-    const el = form.elements[key];
-    if (el) el.value = val;
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (form.elements[key]) {
+      form.elements[key].value = value;
+    }
   });
 }
 
-async function saveContent(e) {
-  e.preventDefault();
-  const alert = document.getElementById('content-alert');
-  const form = e.target;
+async function saveContent(event) {
+  event.preventDefault();
+
+  const alertBox = document.getElementById('content-alert');
+  const form = event.target;
   const payload = {};
-  ['status_pill','hero_tagline','hero_description','about_slogan','about_description','email','location'].forEach(k => {
-    if (form.elements[k]) payload[k] = form.elements[k].value;
+
+  ['status_pill', 'hero_tagline', 'hero_description', 'about_slogan', 'about_description', 'email', 'location'].forEach((key) => {
+    if (form.elements[key]) {
+      payload[key] = form.elements[key].value;
+    }
   });
-  const res = await api('PUT', '/api/admin/content', payload);
-  const data = await res.json();
-  if (res.ok) showAlert(alert, 'Saved successfully!', 'success');
-  else showAlert(alert, data.error || 'Save failed', 'error');
+
+  const response = await api('PUT', '/api/admin/content', payload);
+  const data = await response.json();
+
+  if (!response.ok) {
+    showAlert(alertBox, data.error || 'Payload injection failed', 'error');
+    return;
+  }
+
+  showAlert(alertBox, 'Payload committed successfully.', 'success');
 }
 
-// ─── Certificates ────────────────────────────────────────────────────────────
 async function loadCerts() {
-  const res = await api('GET', '/api/admin/certificates');
-  allCerts = await res.json();
+  const response = await api('GET', '/api/admin/certificates');
+  allCerts = await response.json();
   renderCerts();
 }
 
 function renderCerts() {
   const list = document.getElementById('certificates-list');
-  if (!allCerts.length) { list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem">No certificates yet. Add your first one!</p>'; return; }
 
-  list.innerHTML = allCerts.map(c => {
-    const typeIcon = c.type === 'award' ? 'fa-trophy' : 'fa-certificate';
-    const typeColor = c.type === 'award' ? '#fbbf24' : '#60a5fa';
-    return `
-    <div class="admin-card">
-      <div class="admin-card-img" style="background:linear-gradient(135deg,${typeColor}22,${typeColor}11)">
-        <i class="fa-solid ${typeIcon}" style="color:${typeColor};font-size:1.5rem"></i>
-      </div>
-      <div class="admin-card-body">
-        <div class="admin-card-title">${escHtml(c.title)}</div>
-        <div class="admin-card-desc">${c.issuer ? escHtml(c.issuer) : ''}${c.issue_date ? ' · ' + escHtml(c.issue_date) : ''}</div>
-        <div class="admin-card-tags">
-          <span class="tag" style="color:${typeColor}">${c.type === 'award' ? 'Award' : 'Certificate'}</span>
-          <span class="visibility-badge ${c.visible ? 'vis-yes' : 'vis-no'}">${c.visible ? 'Visible' : 'Hidden'}</span>
+  if (!allCerts.length) {
+    list.innerHTML = buildEmptyState('fa-solid fa-fingerprint', 'No credential chains archived yet.');
+    return;
+  }
+
+  list.innerHTML = allCerts
+    .map((cert) => {
+      const isAward = cert.type === 'award';
+      const typeColor = isAward ? '#ffd35d' : '#57f7ff';
+      const typeLabel = isAward ? 'AWARD' : 'CERT';
+      const typeIcon = isAward ? 'fa-trophy' : 'fa-certificate';
+
+      return `
+        <div class="admin-card">
+          <div class="admin-card-img" style="background:linear-gradient(135deg, ${typeColor}22, rgba(4, 13, 10, 0.95));">
+            <i class="fa-solid ${typeIcon}" style="color:${typeColor};font-size:1.5rem"></i>
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-card-title">${escapeHtml(cert.title)}</div>
+            <div class="admin-card-desc">
+              ${escapeHtml(cert.issuer || 'Unknown issuer')}${cert.issue_date ? ` | ${escapeHtml(cert.issue_date)}` : ''}
+            </div>
+            <div class="admin-card-tags">
+              <span class="tag" style="color:${typeColor};border-color:${typeColor}33;background:${typeColor}12">${typeLabel}</span>
+              <span class="visibility-badge ${cert.visible ? 'vis-yes' : 'vis-no'}">${cert.visible ? 'ACTIVE' : 'HIDDEN'}</span>
+            </div>
+          </div>
+          <div class="admin-card-actions">
+            <button class="btn-icon" onclick="editCert(${cert.id})" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn-icon danger" onclick="deleteCert(${cert.id}, '${escapeJs(cert.title)}')" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="admin-card-actions">
-        <button class="btn-icon" onclick="editCert(${c.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn-icon danger" onclick="deleteCert(${c.id},'${escHtml(c.title).replace(/'/g,"\\'")}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-      </div>
-    </div>`;
-  }).join('');
+      `;
+    })
+    .join('');
 }
 
-function openCertModal(data) {
-  document.getElementById('cert-modal-title').textContent = data ? 'Edit Certificate' : 'Add Certificate';
-  document.getElementById('cert-id').value = data ? data.id : '';
-  document.getElementById('c-title').value = data ? data.title : '';
-  document.getElementById('c-issuer').value = data ? (data.issuer || '') : '';
-  document.getElementById('c-date').value = data ? (data.issue_date || '') : '';
-  document.getElementById('c-type').value = data ? (data.type || 'certificate') : 'certificate';
-  document.getElementById('c-order').value = data ? (data.sort_order || 0) : 0;
-  document.getElementById('c-url').value = data ? (data.credential_url || '') : '';
-  document.getElementById('c-image').value = data ? (data.image_url || '') : '';
+function openCertModal(cert) {
+  document.getElementById('cert-modal-title').textContent = cert ? 'Edit Certificate' : 'Add Certificate';
+  document.getElementById('cert-id').value = cert ? cert.id : '';
+  document.getElementById('c-title').value = cert ? cert.title : '';
+  document.getElementById('c-issuer').value = cert ? cert.issuer || '' : '';
+  document.getElementById('c-date').value = cert ? cert.issue_date || '' : '';
+  document.getElementById('c-type').value = cert ? cert.type || 'certificate' : 'certificate';
+  document.getElementById('c-order').value = cert ? cert.sort_order || 0 : 0;
+  document.getElementById('c-url').value = cert ? cert.credential_url || '' : '';
+  document.getElementById('c-image').value = cert ? cert.image_url || '' : '';
   document.getElementById('cert-alert').classList.add('hidden');
   document.getElementById('cert-modal').classList.remove('hidden');
 }
@@ -494,49 +942,132 @@ function closeCertModal() {
 }
 
 function editCert(id) {
-  const c = allCerts.find(x => x.id === id);
-  if (c) openCertModal(c);
+  const cert = allCerts.find((item) => item.id === id);
+  if (cert) {
+    openCertModal(cert);
+  }
 }
 
 function deleteCert(id, title) {
-  openConfirm(`Delete certificate "${title}"?`, async () => {
+  openConfirm(`Delete certificate chain "${title}"?`, async () => {
     await api('DELETE', `/api/admin/certificates/${id}`);
-    loadCerts();
-    loadOverview();
+    await loadCerts();
+    await loadOverview();
   });
 }
 
-async function saveCert(e) {
-  e.preventDefault();
+async function saveCert(event) {
+  event.preventDefault();
+
   const id = document.getElementById('cert-id').value;
-  const alert = document.getElementById('cert-alert');
+  const alertBox = document.getElementById('cert-alert');
   const payload = {
     title: document.getElementById('c-title').value,
     issuer: document.getElementById('c-issuer').value,
     issue_date: document.getElementById('c-date').value,
     type: document.getElementById('c-type').value,
-    sort_order: parseInt(document.getElementById('c-order').value) || 0,
+    sort_order: Number.parseInt(document.getElementById('c-order').value, 10) || 0,
     credential_url: document.getElementById('c-url').value,
     image_url: document.getElementById('c-image').value,
     visible: true
   };
-  const res = id
+
+  const response = id
     ? await api('PUT', `/api/admin/certificates/${id}`, payload)
     : await api('POST', '/api/admin/certificates', payload);
-  const data = await res.json();
-  if (res.ok) { closeCertModal(); loadCerts(); loadOverview(); }
-  else showAlert(alert, data.error || 'Save failed', 'error');
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    showAlert(alertBox, data.error || 'Credential sync failed', 'error');
+    return;
+  }
+
+  closeCertModal();
+  await loadCerts();
+  await loadOverview();
 }
 
-// ─── Confirm modal ───────────────────────────────────────────────────────────
-function openConfirm(msg, cb) {
-  document.getElementById('confirm-msg').textContent = msg;
-  confirmCallback = cb;
+function openConfirm(message, callback) {
+  confirmCallback = callback;
+  document.getElementById('confirm-msg').textContent = message;
   document.getElementById('confirm-modal').classList.remove('hidden');
-  document.getElementById('confirm-ok-btn').onclick = () => { cb(); closeConfirm(); };
+  document.getElementById('confirm-ok-btn').onclick = async () => {
+    if (confirmCallback) {
+      await confirmCallback();
+    }
+    closeConfirm();
+  };
 }
 
 function closeConfirm() {
-  document.getElementById('confirm-modal').classList.add('hidden');
   confirmCallback = null;
+  document.getElementById('confirm-modal').classList.add('hidden');
+}
+
+function buildEmptyState(iconClass, message) {
+  return `
+    <div class="empty-state">
+      <i class="${iconClass}"></i>
+      <p>${escapeHtml(message)}</p>
+    </div>
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJs(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function initMatrixRain() {
+  const canvas = document.getElementById('matrix-rain');
+  matrixContext = canvas.getContext('2d');
+
+  const resize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const fontSize = window.innerWidth < 768 ? 12 : 14;
+    const totalColumns = Math.ceil(canvas.width / fontSize);
+    matrixColumns = Array.from({ length: totalColumns }, () => Math.random() * canvas.height / fontSize);
+    canvas.dataset.fontSize = String(fontSize);
+  };
+
+  const draw = () => {
+    if (!matrixContext) {
+      return;
+    }
+
+    const fontSize = Number(canvas.dataset.fontSize || 14);
+
+    matrixContext.fillStyle = 'rgba(1, 4, 3, 0.08)';
+    matrixContext.fillRect(0, 0, canvas.width, canvas.height);
+    matrixContext.fillStyle = 'rgba(89, 255, 172, 0.75)';
+    matrixContext.font = `${fontSize}px "Share Tech Mono"`;
+
+    matrixColumns.forEach((columnY, index) => {
+      const char = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+      const x = index * fontSize;
+      const y = columnY * fontSize;
+
+      matrixContext.fillText(char, x, y);
+
+      if (y > canvas.height && Math.random() > 0.975) {
+        matrixColumns[index] = 0;
+      } else {
+        matrixColumns[index] += 1;
+      }
+    });
+  };
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.setInterval(draw, 52);
 }

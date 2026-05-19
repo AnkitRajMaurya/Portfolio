@@ -142,7 +142,7 @@ app.post("/api/admin/projects", requireAdmin, async (req, res) => {
     const tags = Array.isArray(tech_tags) ? tech_tags.join(",") : (tech_tags || "");
     const result = await db.execute({
       sql: "INSERT INTO projects (title,description,image_url,demo_url,github_url,tech_tags,badge,sort_order,visible) VALUES (?,?,?,?,?,?,?,?,?)",
-      args: [title, description||"", image_url||"", demo_url||"", github_url||"", tags, badge||"Live", sort_order||0, visible!==false?1:0],
+      args: [title, description || "", image_url || "", demo_url || "", github_url || "", tags, badge || "Live", sort_order || 0, visible !== false ? 1 : 0],
     });
     res.json({ id: Number(result.lastInsertRowid), message: "Created" });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -154,7 +154,7 @@ app.put("/api/admin/projects/:id", requireAdmin, async (req, res) => {
     const tags = Array.isArray(tech_tags) ? tech_tags.join(",") : (tech_tags || "");
     await db.execute({
       sql: "UPDATE projects SET title=?,description=?,image_url=?,demo_url=?,github_url=?,tech_tags=?,badge=?,sort_order=?,visible=? WHERE id=?",
-      args: [title, description||"", image_url||"", demo_url||"", github_url||"", tags, badge||"Live", sort_order||0, visible!==false?1:0, req.params.id],
+      args: [title, description || "", image_url || "", demo_url || "", github_url || "", tags, badge || "Live", sort_order || 0, visible !== false ? 1 : 0, req.params.id],
     });
     res.json({ message: "Updated" });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -179,7 +179,7 @@ app.post("/api/admin/skills", requireAdmin, async (req, res) => {
     const { name, icon_class, icon_url, category, sort_order } = req.body;
     const result = await db.execute({
       sql: "INSERT INTO skills (name,icon_class,icon_url,category,sort_order,visible) VALUES (?,?,?,?,?,1)",
-      args: [name, icon_class||"", icon_url||"", category||"frontend", sort_order||0],
+      args: [name, icon_class || "", icon_url || "", category || "frontend", sort_order || 0],
     });
     res.json({ id: Number(result.lastInsertRowid), message: "Created" });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -190,7 +190,7 @@ app.put("/api/admin/skills/:id", requireAdmin, async (req, res) => {
     const { name, icon_class, icon_url, category, sort_order, visible } = req.body;
     await db.execute({
       sql: "UPDATE skills SET name=?,icon_class=?,icon_url=?,category=?,sort_order=?,visible=? WHERE id=?",
-      args: [name, icon_class||"", icon_url||"", category||"frontend", sort_order||0, visible!==false?1:0, req.params.id],
+      args: [name, icon_class || "", icon_url || "", category || "frontend", sort_order || 0, visible !== false ? 1 : 0, req.params.id],
     });
     res.json({ message: "Updated" });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -268,7 +268,7 @@ app.post("/api/admin/certificates", requireAdmin, async (req, res) => {
     const { title, issuer, issue_date, credential_url, image_url, type, sort_order } = req.body;
     const result = await db.execute({
       sql: "INSERT INTO certificates (title,issuer,issue_date,credential_url,image_url,type,sort_order,visible) VALUES (?,?,?,?,?,?,?,1)",
-      args: [title, issuer||"", issue_date||"", credential_url||"", image_url||"", type||"certificate", sort_order||0],
+      args: [title, issuer || "", issue_date || "", credential_url || "", image_url || "", type || "certificate", sort_order || 0],
     });
     res.json({ id: Number(result.lastInsertRowid), message: "Created" });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -279,7 +279,7 @@ app.put("/api/admin/certificates/:id", requireAdmin, async (req, res) => {
     const { title, issuer, issue_date, credential_url, image_url, type, sort_order, visible } = req.body;
     await db.execute({
       sql: "UPDATE certificates SET title=?,issuer=?,issue_date=?,credential_url=?,image_url=?,type=?,sort_order=?,visible=? WHERE id=?",
-      args: [title, issuer||"", issue_date||"", credential_url||"", image_url||"", type||"certificate", sort_order||0, visible!==false?1:0, req.params.id],
+      args: [title, issuer || "", issue_date || "", credential_url || "", image_url || "", type || "certificate", sort_order || 0, visible !== false ? 1 : 0, req.params.id],
     });
     res.json({ message: "Updated" });
   } catch (e) { res.status(500).json({ error: e.message }); }

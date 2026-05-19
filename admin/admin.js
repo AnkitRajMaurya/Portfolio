@@ -12,6 +12,41 @@ let matrixChars = '01ABCDEF<>[]{}#$%&*+=?-';
 let failedLoginAttempts = 0;
 let threatOverlayTimer = null;
 let successOverlayTimer = null;
+let commandConsoleTimer = null;
+let commandConsoleIndex = 0;
+
+const FAKE_COMMANDS = [
+  {
+    command: 'scan --ports',
+    output: 'Ports 22, 80, 443, 8080 mapped. Secure relay intact.',
+    state: 'ok'
+  },
+  {
+    command: 'decrypt payload.enc',
+    output: 'Payload unpacked. 4 encrypted modules exposed to root memory.',
+    state: 'secure'
+  },
+  {
+    command: 'access --secure-channel',
+    output: 'Quantum tunnel accepted. Shadow link now routed through node sigma.',
+    state: 'secure'
+  },
+  {
+    command: 'status --all',
+    output: 'Firewall active. Telemetry green. Intrusion grid standing by.',
+    state: 'ok'
+  },
+  {
+    command: 'trace --ghost-session',
+    output: 'Anomaly signatures mirrored into blackbox archive for review.',
+    state: 'warn'
+  },
+  {
+    command: 'sync --root-panel',
+    output: 'Dashboard vectors synchronized with primary control core.',
+    state: 'ok'
+  }
+];
 
 const SECTION_META = {
   overview: {
@@ -43,6 +78,7 @@ const SECTION_META = {
 document.addEventListener('DOMContentLoaded', () => {
   bindCoreEvents();
   initMatrixRain();
+  initFakeCommandConsole();
   playBootSequence();
 });
 
@@ -335,6 +371,75 @@ function detectBrowserLabel() {
   if (agent.includes('Safari/') && !agent.includes('Chrome/')) return 'SAFARI';
 
   return 'UNKNOWN';
+}
+
+function initFakeCommandConsole() {
+  const stream = document.getElementById('command-stream');
+
+  if (!stream) {
+    return;
+  }
+
+  stream.innerHTML = '';
+  commandConsoleIndex = 0;
+
+  if (commandConsoleTimer) {
+    window.clearTimeout(commandConsoleTimer);
+  }
+
+  queueFakeCommand();
+}
+
+function queueFakeCommand() {
+  const stream = document.getElementById('command-stream');
+
+  if (!stream) {
+    return;
+  }
+
+  const preset = FAKE_COMMANDS[commandConsoleIndex % FAKE_COMMANDS.length];
+  commandConsoleIndex += 1;
+
+  const entry = document.createElement('div');
+  entry.className = 'command-entry';
+
+  const line = document.createElement('div');
+  line.className = 'command-line';
+  line.innerHTML = '<span class="command-prompt">root@system:~$</span><span class="command-typed"></span><span class="command-cursor">_</span>';
+
+  const output = document.createElement('div');
+  output.className = 'command-output hidden';
+  output.innerHTML = `<span class="command-state ${preset.state}">${preset.state}</span><span>${escapeHtml(preset.output)}</span>`;
+
+  entry.appendChild(line);
+  entry.appendChild(output);
+  stream.appendChild(entry);
+
+  const typed = line.querySelector('.command-typed');
+  const cursor = line.querySelector('.command-cursor');
+  let index = 0;
+
+  const typeNext = () => {
+    typed.textContent = preset.command.slice(0, index);
+    index += 1;
+
+    if (index <= preset.command.length) {
+      commandConsoleTimer = window.setTimeout(typeNext, 32);
+      return;
+    }
+
+    cursor.textContent = '';
+    output.classList.remove('hidden');
+
+    while (stream.children.length > 5) {
+      stream.removeChild(stream.firstElementChild);
+    }
+
+    stream.scrollTop = stream.scrollHeight;
+    commandConsoleTimer = window.setTimeout(queueFakeCommand, 1100);
+  };
+
+  typeNext();
 }
 
 function showLoginScreen() {

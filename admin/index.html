@@ -276,10 +276,29 @@
         <div class="intel-grid">
           <article class="intel-panel trace-panel">
             <div class="panel-header">
-              <h3><i class="fa-solid fa-wave-square"></i> LIVE TRACE</h3>
-              <span class="panel-chip">REALTIME</span>
+              <h3><i class="fa-solid fa-terminal"></i> LIVE CONSOLE</h3>
+              <span class="panel-chip">EXEC</span>
             </div>
-            <div id="trace-feed" class="trace-feed"></div>
+            <div class="command-console">
+              <div class="command-console-bar">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot yellow"></span>
+                <span class="terminal-dot green"></span>
+                <span class="command-console-title">root@system:~</span>
+              </div>
+              <div id="command-stream" class="command-stream"></div>
+            </div>
+            <div class="console-examples">
+              <span class="console-example">scan --ports</span>
+              <span class="console-example">decrypt payload.enc</span>
+              <span class="console-example">access --secure-channel</span>
+              <span class="console-example">status --all</span>
+            </div>
+            <div class="trace-subhead">
+              <span>SYSTEM LOG</span>
+              <span>LIVE</span>
+            </div>
+            <div id="trace-feed" class="trace-feed compact-trace-feed"></div>
           </article>
           <article class="intel-panel network-panel">
             <div class="panel-header">

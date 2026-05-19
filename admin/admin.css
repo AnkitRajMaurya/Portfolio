@@ -1473,9 +1473,163 @@ label {
   margin-bottom: 1.1rem;
 }
 
+.command-console {
+  border: 1px solid rgba(77, 255, 156, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(4, 14, 10, 0.96), rgba(2, 8, 6, 0.98));
+  box-shadow: inset 0 0 0 1px rgba(77, 255, 156, 0.03);
+}
+
+.command-console-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(77, 255, 156, 0.08);
+  background: rgba(7, 21, 15, 0.92);
+}
+
+.command-console-title {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.command-stream {
+  min-height: 220px;
+  max-height: 220px;
+  overflow: hidden;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: 'Fira Code', monospace;
+}
+
+.command-entry {
+  display: grid;
+  gap: 0.35rem;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: commandEntryIn 0.24s ease forwards;
+}
+
+@keyframes commandEntryIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.command-line {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 22px;
+  color: var(--accent-strong);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.command-prompt {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.command-typed {
+  color: var(--text-strong);
+  word-break: break-word;
+}
+
+.command-cursor {
+  color: var(--accent);
+  animation: blink 0.9s steps(1) infinite;
+}
+
+.command-output {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-left: 1.55rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.command-output::before {
+  content: '>';
+  color: var(--cyan);
+}
+
+.command-state {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.command-state.ok {
+  color: #b5ffe0;
+  background: rgba(77, 255, 156, 0.12);
+}
+
+.command-state.warn {
+  color: #fff0b5;
+  background: rgba(255, 211, 93, 0.12);
+}
+
+.command-state.secure {
+  color: #c6fbff;
+  background: rgba(87, 247, 255, 0.12);
+}
+
+.console-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.95rem;
+}
+
+.console-example {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(77, 255, 156, 0.12);
+  background: rgba(77, 255, 156, 0.06);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.trace-subhead {
+  margin-top: 1rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .trace-feed {
   display: grid;
   gap: 0.85rem;
+}
+
+.compact-trace-feed {
+  gap: 0.65rem;
 }
 
 .trace-line {
@@ -1521,6 +1675,17 @@ label {
 .trace-severity.alert {
   color: #ffd0d8;
   background: rgba(255, 94, 122, 0.12);
+}
+
+.compact-trace-feed .trace-line {
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+}
+
+.compact-trace-feed .trace-time,
+.compact-trace-feed .trace-text,
+.compact-trace-feed .trace-severity {
+  font-size: 0.7rem;
 }
 
 .network-panel {

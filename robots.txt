@@ -33,4 +33,4 @@ User-agent: PerplexityBot
 Allow: /
 
 Sitemap: https://ankitrajmaurya.vercel.app/sitemap.xml
-LLMs: https://ankitrajmaurya.vercel.app/llms.txt
+# LLMs: https://ankitrajmaurya.vercel.app/llms.txt

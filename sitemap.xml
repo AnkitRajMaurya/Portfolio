@@ -2,20 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
       <loc>https://ankitrajmaurya.vercel.app/</loc>
-      <lastmod>2026-05-08</lastmod>
-      <changefreq>monthly</changefreq>
+      <lastmod>2026-05-20</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>1.0</priority>
    </url>
    <url>
       <loc>https://ankitrajmaurya.vercel.app/llms.txt</loc>
-      <lastmod>2026-05-08</lastmod>
+      <lastmod>2026-05-20</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
-   </url>
-   <url>
-      <loc>https://ankitrajmaurya.vercel.app/404.html</loc>
-      <lastmod>2026-05-08</lastmod>
-      <changefreq>yearly</changefreq>
-      <priority>0.3</priority>
    </url>
 </urlset>

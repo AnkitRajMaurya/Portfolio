@@ -4698,6 +4698,79 @@ section {
   display: none !important;
 }
 
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 9999;
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.projects-intro {
+  max-width: 60rem;
+  margin-top: 1rem;
+  color: var(--text-alt);
+  line-height: 1.7;
+}
+
+.faq-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.faq-item {
+  padding: 1.25rem 1.35rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '+';
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.faq-item[open] summary::after {
+  content: '-';
+}
+
+.faq-item p {
+  margin: 0.9rem 0 0;
+  color: var(--text-alt);
+  line-height: 1.7;
+}
+
+.faq-item a {
+  color: var(--primary-color);
+}
+
 @media (max-width: 640px) {
   .certificates-grid {
     grid-template-columns: 1fr;

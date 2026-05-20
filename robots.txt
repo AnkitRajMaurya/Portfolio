@@ -5,8 +5,16 @@ Disallow: /.env
 Disallow: /admin/
 Disallow: /api/admin/
 
-# LLMs and AI crawlers — allow full access for AI discoverability
 User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
 Allow: /
 
 User-agent: Claude-Web
@@ -26,4 +34,3 @@ Allow: /
 
 Sitemap: https://ankitrajmaurya.vercel.app/sitemap.xml
 LLMs: https://ankitrajmaurya.vercel.app/llms.txt
-

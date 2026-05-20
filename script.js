@@ -18,15 +18,23 @@ function initLoadingScreen() {
     `;
   document.body.appendChild(loader);
 
-  window.addEventListener("load", () => {
+  const hideLoader = () => {
+    if (loader.style.opacity === "0") return;
+    loader.style.opacity = "0";
+    document.body.classList.add("loaded");
     setTimeout(() => {
-      loader.style.opacity = "0";
-      document.body.classList.add("loaded");
-      setTimeout(() => {
-        loader.remove();
-      }, 500);
+      loader.remove();
     }, 500);
+  };
+
+  // Dismiss loader on window load OR after a fallback timeout (1.5 seconds)
+  // to ensure immediate usability on slow mobile connections.
+  window.addEventListener("load", () => {
+    setTimeout(hideLoader, 200);
   });
+  
+  // Safe fallback to prevent loader getting stuck on slow networks
+  setTimeout(hideLoader, 1500);
 }
 
 // Initialize particles background
@@ -47,8 +55,8 @@ function initParticles() {
 
   if (typeof particlesJS !== "function") return;
 
-  if (prefersReduced) {
-    // Disable on reduced motion for performance
+  if (prefersReduced || isMobile) {
+    // Disable on mobile or reduced motion for performance
     particlesContainer.remove();
     return;
   }

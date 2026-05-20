@@ -11,6 +11,9 @@ const { db, initDB } = require("./db");
 
 const app = express();
 
+const compression = require("compression");
+app.use(compression());
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
@@ -46,13 +49,25 @@ const transporter = nodemailer.createTransport({
 // ═══════════════════════════════════════════════════════════════════════
 
 // Serve admin panel static files FIRST
-app.use("/admin", express.static(path.join(__dirname, "admin")));
+const staticOptions = {
+  maxAge: "1y",
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === ".html" || ext === ".json" || ext === ".xml") {
+      res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    }
+  }
+};
+
+app.use("/admin", express.static(path.join(__dirname, "admin"), staticOptions));
 
 // Serve uploaded project images
-app.use("/img/projects", express.static(path.join(__dirname, "img", "projects")));
+app.use("/img/projects", express.static(path.join(__dirname, "img", "projects"), staticOptions));
 
 // Serve main portfolio static files
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, staticOptions));
 
 // ═══════════════════════════════════════════════════════════════════════
 //  PUBLIC API

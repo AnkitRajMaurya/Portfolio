@@ -607,4 +607,21 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+
+  /* --- Visitor Geotracking Analytics --- */
+  async function trackVisit() {
+    try {
+      await fetch('/api/analytics/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_path: window.location.pathname,
+          referer: document.referrer || 'Direct'
+        })
+      });
+    } catch (e) {
+      console.warn('Analytics ping aborted', e);
+    }
+  }
+  trackVisit();
 });

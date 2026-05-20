@@ -2763,3 +2763,208 @@ label {
     padding: 1.3rem 1.1rem;
   }
 }
+
+/* =========================================================================
+   REALWORLD SIGNAL MAP & ACTIVITY FEED NEON CUSTOM STYLING
+   ========================================================================= */
+
+/* Pulsing Leaflet Markers */
+.custom-ping-container {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.ping-dot {
+  width: 8px;
+  height: 8px;
+  background: #59ffac;
+  border-radius: 50%;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  box-shadow: 0 0 10px #59ffac, 0 0 20px #59ffac;
+  z-index: 2;
+}
+
+.ping-pulse {
+  width: 20px;
+  height: 20px;
+  background: rgba(89, 255, 172, 0.25);
+  border: 1px solid #59ffac;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: ping-wave 1.6s infinite ease-out;
+  z-index: 1;
+}
+
+@keyframes ping-wave {
+  0% {
+    transform: scale(0.35);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Leaflet Container Overrides */
+#real-world-map {
+  outline: none;
+}
+
+/* Hide standard leaflet attribution and zoom controls default designs or override them to fit cyber theme */
+.leaflet-bar {
+  border: 1px solid rgba(77, 255, 156, 0.24) !important;
+  box-shadow: 0 0 10px rgba(89, 255, 172, 0.15) !important;
+  background: rgba(4, 15, 10, 0.85) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  background: rgba(4, 15, 10, 0.85) !important;
+  color: #59ffac !important;
+  border-bottom: 1px solid rgba(77, 255, 156, 0.24) !important;
+  transition: all 0.2s ease;
+}
+
+.leaflet-bar a:hover {
+  background: rgba(77, 255, 156, 0.25) !important;
+  color: #fff !important;
+}
+
+/* Glassmorphic Cyber Popup Styles */
+.cyber-popup-wrapper .leaflet-popup-content-wrapper {
+  background: rgba(3, 11, 7, 0.92) !important;
+  border: 1px solid rgba(89, 255, 172, 0.35) !important;
+  box-shadow: 0 0 20px rgba(89, 255, 172, 0.2), inset 0 0 12px rgba(89, 255, 172, 0.1) !important;
+  border-radius: 12px !important;
+  color: #e4fff2 !important;
+  padding: 0 !important;
+  font-family: 'Share Tech Mono', 'Fira Code', monospace !important;
+  backdrop-filter: blur(8px);
+}
+
+.cyber-popup-wrapper .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 0.95rem 1.1rem !important;
+  min-width: 250px;
+}
+
+.cyber-popup-wrapper .leaflet-popup-tip {
+  background: rgba(3, 11, 7, 0.95) !important;
+  border-left: 1px solid rgba(89, 255, 172, 0.35) !important;
+  border-bottom: 1px solid rgba(89, 255, 172, 0.35) !important;
+  box-shadow: none !important;
+}
+
+.map-popup-cyber {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.map-popup-cyber .popup-title {
+  color: #59ffac;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(89, 255, 172, 0.18);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.map-popup-cyber .popup-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.7rem;
+}
+
+.map-popup-cyber .popup-row span {
+  color: rgba(89, 255, 172, 0.6);
+}
+
+.map-popup-cyber .popup-row strong {
+  color: #e4fff2;
+  font-weight: 500;
+}
+
+/* Activity feed specific trace styles */
+.trace-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 8px;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.trace-icon-wrapper.stable {
+  color: #59ffac;
+  background: rgba(77, 255, 156, 0.08);
+  border: 1px solid rgba(77, 255, 156, 0.2);
+  box-shadow: 0 0 6px rgba(77, 255, 156, 0.1);
+}
+
+.trace-icon-wrapper.watch {
+  color: #ffd35d;
+  background: rgba(255, 211, 93, 0.08);
+  border: 1px solid rgba(255, 211, 93, 0.2);
+  box-shadow: 0 0 6px rgba(255, 211, 93, 0.1);
+}
+
+.trace-icon-wrapper.alert {
+  color: #ff5e7a;
+  background: rgba(255, 94, 122, 0.08);
+  border: 1px solid rgba(255, 94, 122, 0.2);
+  box-shadow: 0 0 6px rgba(255, 94, 122, 0.1);
+}
+
+.trace-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.trace-text-title {
+  color: #e4fff2;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.trace-text-desc {
+  color: var(--text-muted, #729683);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+#recent-activity-feed .trace-line {
+  grid-template-columns: auto auto 1fr auto;
+  align-items: flex-start;
+  padding: 0.8rem 1rem;
+}
+
+#recent-activity-feed .trace-time {
+  white-space: nowrap;
+  font-size: 0.68rem;
+  margin-top: 0.3rem;
+  opacity: 0.85;
+}
+
+#recent-activity-feed .trace-severity {
+  align-self: flex-start;
+  margin-top: 0.2rem;
+}
+

@@ -14,20 +14,12 @@ let threatOverlayTimer = null;
 let successOverlayTimer = null;
 let commandConsoleTimer = null;
 let commandConsoleIndex = 0;
+let leafletMap = null;
+let leafletMarkersGroup = null;
 let systemMonitorTimer = null;
-let globalMapTimer = null;
 let soundEnabled = localStorage.getItem('admin_sound_enabled') !== '0';
 let audioContext = null;
 let commandAudioTick = 0;
-
-const MAP_NODE_STATES = {
-  delhi: ['MASKED', 'ROOT', 'CLEAR'],
-  frankfurt: ['LINKED', 'RELAY', 'STABLE'],
-  singapore: ['GREEN', 'SHIELD', 'SYNCED'],
-  tokyo: ['SYNCED', 'LOW LAT', 'TRACKED'],
-  newyork: ['PROBED', 'MIRROR', 'VECTOR'],
-  saopaulo: ['SHADOW', 'GHOST', 'EVADE']
-};
 
 const FAKE_COMMANDS = [
   {
@@ -99,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMatrixRain();
   initFakeCommandConsole();
   initSystemMonitor();
-  initGlobalMap();
+  // Leaflet map is initialized dynamically when dashboard viewport opens
   playBootSequence();
 });
 
@@ -251,6 +243,12 @@ function handleLogout() {
   if (uptimeTimer) {
     window.clearInterval(uptimeTimer);
     uptimeTimer = null;
+  }
+
+  if (leafletMap) {
+    leafletMap.remove();
+    leafletMap = null;
+    leafletMarkersGroup = null;
   }
 
   document.getElementById('login-username').focus();
@@ -524,14 +522,29 @@ function initSystemMonitor() {
   systemMonitorTimer = window.setInterval(updateSystemMonitor, 2600);
 }
 
-function initGlobalMap() {
-  updateGlobalMap();
-
-  if (globalMapTimer) {
-    window.clearInterval(globalMapTimer);
+function initRealWorldMap() {
+  if (leafletMap) {
+    leafletMap.invalidateSize();
+    return;
   }
 
-  globalMapTimer = window.setInterval(updateGlobalMap, 2200);
+  const mapContainer = document.getElementById('real-world-map');
+  if (!mapContainer || typeof L === 'undefined') {
+    return;
+  }
+
+  leafletMap = L.map('real-world-map', {
+    center: [20.5937, 78.9629],
+    zoom: 2,
+    zoomControl: true,
+    attributionControl: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(leafletMap);
+
+  leafletMarkersGroup = L.layerGroup().addTo(leafletMap);
 }
 
 function updateSystemMonitor(snapshot = {}) {
@@ -551,19 +564,121 @@ function updateSystemMonitor(snapshot = {}) {
   setMonitorMetric('temp', `${temp}C`, Math.min(100, temp + 12));
 }
 
-function updateGlobalMap() {
-  Object.entries(MAP_NODE_STATES).forEach(([key, states]) => {
-    const meta = document.getElementById(`map-${key}-meta`);
-    const node = meta ? meta.closest('.map-node') : null;
+function updateRealWorldMap(recentLogs) {
+  if (!leafletMap || !leafletMarkersGroup) {
+    return;
+  }
 
-    if (!meta || !node) {
-      return;
-    }
+  leafletMarkersGroup.clearLayers();
 
-    const nextState = states[Math.floor(Math.random() * states.length)];
-    meta.textContent = nextState;
-    node.classList.toggle('flash-alert', Math.random() > 0.8);
+  if (!recentLogs || recentLogs.length === 0) {
+    return;
+  }
+
+  const latLngs = [];
+
+  recentLogs.forEach((log) => {
+    const lat = Number(log.lat);
+    const lon = Number(log.lon);
+
+    if (isNaN(lat) || isNaN(lon)) return;
+
+    latLngs.push([lat, lon]);
+
+    const city = log.city || 'Unknown Node';
+    const country = log.country || 'Unknown Sector';
+    const path = log.page_path || '/';
+    const time = new Date(log.created_at || Date.now()).toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+
+    const customPingIcon = L.divIcon({
+      className: 'custom-ping-container',
+      html: `<div class="ping-pulse"></div><div class="ping-dot"></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    const popupContent = `
+      <div class="map-popup-cyber">
+        <div class="popup-title"><i class="fa-solid fa-satellite-dish"></i> SIGNAL SOURCE</div>
+        <div class="popup-row"><span>COORDINATES:</span> <strong>${lat.toFixed(4)}, ${lon.toFixed(4)}</strong></div>
+        <div class="popup-row"><span>NODE LOCATION:</span> <strong>${escapeHtml(city)}, ${escapeHtml(country)}</strong></div>
+        <div class="popup-row"><span>RESOURCE PATH:</span> <strong style="color: #00ffaa;">${escapeHtml(path)}</strong></div>
+        <div class="popup-row"><span>TIMESTAMP:</span> <strong>${time}</strong></div>
+      </div>
+    `;
+
+    const marker = L.marker([lat, lon], { icon: customPingIcon });
+    marker.bindPopup(popupContent, {
+      className: 'cyber-popup-wrapper',
+      closeButton: false
+    });
+
+    leafletMarkersGroup.addLayer(marker);
   });
+
+  if (latLngs.length > 0) {
+    const latest = latLngs[0];
+    leafletMap.setView(latest, leafletMap.getZoom());
+  }
+}
+
+function renderRecentActivity(activities) {
+  const container = document.getElementById('recent-activity-feed');
+  if (!container) return;
+
+  if (!activities || activities.length === 0) {
+    container.innerHTML = buildEmptyState('fa-solid fa-clock-rotate-left', 'No recent system activities logged.');
+    return;
+  }
+
+  container.innerHTML = activities
+    .map((act) => {
+      let icon = 'fa-solid fa-circle-notch';
+      let sevClass = 'stable';
+      
+      if (act.type === 'project') {
+        icon = 'fa-solid fa-code';
+        sevClass = 'stable';
+      } else if (act.type === 'message') {
+        icon = 'fa-solid fa-tower-broadcast';
+        sevClass = 'alert';
+      } else if (act.type === 'visitor') {
+        icon = 'fa-solid fa-satellite-dish';
+        sevClass = 'watch';
+      }
+
+      let timeString = '';
+      if (act.time) {
+        const d = new Date(act.time);
+        timeString = d.toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }) + ' ' + d.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: 'short'
+        });
+      }
+
+      return `
+        <div class="trace-line">
+          <span class="trace-time">${timeString}</span>
+          <div class="trace-text">
+            <span class="trace-icon-wrapper ${sevClass}"><i class="${icon}"></i></span>
+            <strong style="color: var(--text-light, #e4fff2); font-weight: 600; margin-right: 0.35rem;">${escapeHtml(act.title)}:</strong>
+            <span>${escapeHtml(act.description)}</span>
+          </div>
+          <span class="trace-severity ${sevClass}">${act.type.toUpperCase()}</span>
+        </div>
+      `;
+    })
+    .join('');
 }
 
 function setMonitorMetric(name, label, width) {
@@ -645,6 +760,10 @@ function showDashboard() {
   document.body.classList.remove('threat-mode');
   uptimeStartedAt = Date.now();
   startUptimeClock();
+
+  window.setTimeout(() => {
+    initRealWorldMap();
+  }, 100);
 }
 
 function startUptimeClock() {
@@ -685,6 +804,16 @@ function switchSection(name) {
   syncSectionHeading(meta.title, meta.sub);
   document.getElementById('sidebar').classList.remove('open');
 
+  if (name === 'overview') {
+    loadOverview();
+    window.setTimeout(() => {
+      if (leafletMap) {
+        leafletMap.invalidateSize();
+      } else {
+        initRealWorldMap();
+      }
+    }, 100);
+  }
   if (name === 'projects') loadProjects();
   if (name === 'skills') loadSkills();
   if (name === 'messages') loadMessages();
@@ -704,20 +833,26 @@ function syncSectionHeading(title, subtitle) {
 
 async function loadOverview() {
   try {
-    const [projectResponse, skillResponse, messageResponse, certResponse] = await Promise.all([
+    const [projectResponse, skillResponse, messageResponse, certResponse, analyticsResponse, activityResponse] = await Promise.all([
       api('GET', '/api/admin/projects'),
       api('GET', '/api/admin/skills'),
       api('GET', '/api/admin/messages'),
-      api('GET', '/api/admin/certificates')
+      api('GET', '/api/admin/certificates'),
+      api('GET', '/api/admin/analytics'),
+      api('GET', '/api/admin/recent-activity')
     ]);
 
     allProjects = await projectResponse.json();
     allSkills = await skillResponse.json();
     const messages = await messageResponse.json();
     allCerts = await certResponse.json();
+    const analytics = await analyticsResponse.json();
+    const activities = await activityResponse.json();
 
     const unread = messages.filter((message) => !isMessageRead(message)).length;
 
+    document.getElementById('stat-views').textContent = analytics.totalViews ?? 0;
+    document.getElementById('stat-visitors').textContent = analytics.uniqueVisitors ?? 0;
     document.getElementById('stat-projects').textContent = allProjects.length;
     document.getElementById('stat-skills').textContent = allSkills.length;
     document.getElementById('stat-messages').textContent = messages.length;
@@ -739,7 +874,10 @@ async function loadOverview() {
       certs: allCerts.length,
       unread
     });
+    updateRealWorldMap(analytics.recentLogs);
+    renderRecentActivity(activities);
   } catch (error) {
+    console.error("Failed to load overview data:", error);
     updateUnreadBadge(0);
     updateSystemMonitor({
       projects: 0,

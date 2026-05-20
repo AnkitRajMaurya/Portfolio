@@ -132,6 +132,60 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
+app.post("/api/analytics/track", async (req, res) => {
+  try {
+    const { page_path, referer } = req.body;
+    
+    // Get visitor IP
+    let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1";
+    if (ip.includes(",")) {
+      ip = ip.split(",")[0].trim();
+    }
+    
+    const userAgent = req.headers["user-agent"] || "Unknown";
+    
+    // Check Vercel geolocational headers
+    let country = req.headers["x-vercel-ip-country"] || "Unknown";
+    let city = req.headers["x-vercel-ip-city"] || "Unknown";
+    let lat = req.headers["x-vercel-ip-latitude"] ? parseFloat(req.headers["x-vercel-ip-latitude"]) : null;
+    let lon = req.headers["x-vercel-ip-longitude"] ? parseFloat(req.headers["x-vercel-ip-longitude"]) : null;
+    
+    // If local environment (localhost, private network, loopback, or missing coordinates)
+    const isLocalIP = ip === "::1" || ip === "127.0.0.1" || ip.startsWith("10.") || ip.startsWith("192.168.") || ip.startsWith("172.");
+    
+    if (isLocalIP) {
+      // Mock coordinates for Muzaffarpur, Bihar, India (or New Delhi) for visual confirmation
+      country = "India";
+      city = "Muzaffarpur (Local Dev)";
+      lat = 26.2201;
+      lon = 85.3837;
+    } else if (!lat || !lon) {
+      // If deployed but Vercel headers are missing, fallback to standard geolocation lookup using node-fetch equivalent
+      try {
+        const geoResponse = await fetch(`http://ip-api.com/json/${ip}`).then(r => r.json());
+        if (geoResponse && geoResponse.status === "success") {
+          country = geoResponse.country || country;
+          city = geoResponse.city || city;
+          lat = geoResponse.lat || lat;
+          lon = geoResponse.lon || lon;
+        }
+      } catch (geoErr) {
+        console.error("External geolocation failed:", geoErr);
+      }
+    }
+    
+    await db.execute({
+      sql: "INSERT INTO visitor_logs (ip_address, user_agent, country, city, lat, lon, page_path, referer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      args: [ip, userAgent, country, city, lat || 0.0, lon || 0.0, page_path || "/", referer || "Direct"]
+    });
+    
+    res.status(200).json({ status: "success" });
+  } catch (error) {
+    console.error("Analytics tracking error:", error);
+    res.status(500).json({ error: "Failed to track visit" });
+  }
+});
+
 // ═══════════════════════════════════════════════════════════════════════
 //  ADMIN AUTH
 // ═══════════════════════════════════════════════════════════════════════
@@ -300,6 +354,79 @@ app.put("/api/admin/messages/:id/read", requireAdmin, async (req, res) => {
 app.delete("/api/admin/messages/:id", requireAdmin, async (req, res) => {
   await db.execute({ sql: "DELETE FROM messages WHERE id=?", args: [req.params.id] });
   res.json({ message: "Deleted" });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+//  ADMIN — ANALYTICS & ACTIVITY
+// ═══════════════════════════════════════════════════════════════════════
+
+app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
+  try {
+    // Get total views count
+    const totalViewsRes = await db.execute("SELECT COUNT(*) as count FROM visitor_logs");
+    const totalViews = totalViewsRes.rows[0].count;
+    
+    // Get unique visitors count (by IP address)
+    const uniqueVisitorsRes = await db.execute("SELECT COUNT(DISTINCT ip_address) as count FROM visitor_logs");
+    const uniqueVisitors = uniqueVisitorsRes.rows[0].count;
+    
+    // Get last 100 visitor logs to plot on Leaflet
+    const recentLogsRes = await db.execute("SELECT * FROM visitor_logs ORDER BY created_at DESC LIMIT 100");
+    
+    res.json({
+      totalViews,
+      uniqueVisitors,
+      recentLogs: recentLogsRes.rows
+    });
+  } catch (error) {
+    console.error("Admin analytics fetch error:", error);
+    res.status(500).json({ error: "Failed to load analytics details" });
+  }
+});
+
+app.get("/api/admin/recent-activity", requireAdmin, async (req, res) => {
+  try {
+    // 1. Get latest projects (latest 10)
+    const projectsRes = await db.execute("SELECT id, title, created_at FROM projects ORDER BY created_at DESC LIMIT 10");
+    const projects = projectsRes.rows.map(p => ({
+      type: "project",
+      title: `Project Payload Deployed`,
+      description: `New project "${p.title}" successfully compiled and committed to database core.`,
+      time: p.created_at
+    }));
+
+    // 2. Get latest messages (latest 10)
+    const messagesRes = await db.execute("SELECT id, name, created_at FROM messages ORDER BY created_at DESC LIMIT 10");
+    const messages = messagesRes.rows.map(m => ({
+      type: "message",
+      title: `Transmission Intercepted`,
+      description: `New incoming signal intercepted from operator "${m.name}". Secure logs committed to index.`,
+      time: m.created_at
+    }));
+
+    // 3. Get latest visitors (latest 10)
+    const visitorsRes = await db.execute("SELECT id, city, country, page_path, created_at FROM visitor_logs ORDER BY created_at DESC LIMIT 10");
+    const visitors = visitorsRes.rows.map(v => ({
+      type: "visitor",
+      title: `Remote Session Logged`,
+      description: `Connection tracked at page "${v.page_path}" originating from location: ${v.city}, ${v.country}.`,
+      time: v.created_at
+    }));
+
+    // Chronologically merge them
+    const merged = [...projects, ...messages, ...visitors];
+    // Sort descending by time
+    merged.sort((a, b) => {
+      const aTime = a.time ? new Date(a.time).getTime() : 0;
+      const bTime = b.time ? new Date(b.time).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    res.json(merged.slice(0, 15)); // return latest 15 activities
+  } catch (error) {
+    console.error("Admin activity fetch error:", error);
+    res.status(500).json({ error: "Failed to compile recent activity list" });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════

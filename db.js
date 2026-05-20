@@ -63,6 +63,19 @@ async function initDB() {
       username TEXT PRIMARY KEY,
       password_hash TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS visitor_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ip_address TEXT,
+      user_agent TEXT,
+      country TEXT,
+      city TEXT,
+      lat REAL,
+      lon REAL,
+      page_path TEXT,
+      referer TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 
   // Add missing columns to older tables (ignores error if column already exists)

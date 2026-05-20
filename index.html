@@ -581,15 +581,28 @@
           <i class="fa-solid fa-trophy"></i> Certificates & Awards
         </h2>
         <div class="certificates-grid" id="certificates-grid" aria-live="polite">
-          <div class="cert-card glass-card skeleton-card" aria-hidden="true">
-            <div class="skeleton-line w60" style="height:20px"></div>
-            <div class="skeleton-line w80 mt8"></div>
-            <div class="skeleton-line w40 mt4"></div>
-          </div>
-          <div class="cert-card glass-card skeleton-card" aria-hidden="true">
-            <div class="skeleton-line w60" style="height:20px"></div>
-            <div class="skeleton-line w80 mt8"></div>
-            <div class="skeleton-line w40 mt4"></div>
+          <!-- Fallback Certificate Card (SEO & Static Host friendly) -->
+          <div class="cert-card glass-card cert-card--has-image">
+            <div class="cert-card__img-container">
+              <img src="https://res.cloudinary.com/duhw4pa8k/image/upload/v1778675301/WhatsApp_Image_2026-05-13_at_17.56.14_pvgthh.jpg" alt="AI Prompt War – Runner-Up Certificate" loading="lazy" class="cert-card__img" />
+            </div>
+            <div class="cert-card__body">
+              <div class="cert-card__header">
+                <span class="cert-type cert-type--certificate">
+                  <i class="fa-solid fa-certificate"></i> Certificate
+                </span>
+                <span class="cert-date"><i class="fa-regular fa-calendar"></i> Apr 2026</span>
+              </div>
+              <h3 class="cert-card__title">AI Prompt War – Runner-Up</h3>
+              <div class="cert-card__meta">
+                <span class="cert-issuer"><i class="fa-regular fa-building"></i> Oriental Group of Institutes</span>
+              </div>
+              <div class="cert-card__footer">
+                <a href="https://res.cloudinary.com/duhw4pa8k/image/upload/v1778675301/WhatsApp_Image_2026-05-13_at_17.56.14_pvgthh.jpg" target="_blank" rel="noopener noreferrer" class="cert-link">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> View Credential
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         <p class="certificates-empty hidden" id="certificates-empty"
@@ -985,11 +998,25 @@
       var link = cert.credential_url
         ? '<a href="' + cert.credential_url + '" target="_blank" rel="noopener noreferrer" class="cert-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Credential</a>'
         : '';
-      return '<div class="cert-card glass-card">'
+      
+      var hasImg = !!cert.image_url;
+      var cardClass = 'cert-card glass-card' + (hasImg ? ' cert-card--has-image' : '');
+      
+      var imgHtml = '';
+      if (hasImg) {
+        imgHtml = '<div class="cert-card__img-container">'
+          + '<img src="' + cert.image_url + '" alt="' + cert.title + '" loading="lazy" class="cert-card__img" />'
+          + '</div>';
+      }
+
+      return '<div class="' + cardClass + '">'
+        + imgHtml
+        + '<div class="cert-card__body">'
         + '<div class="cert-card__header">' + typeBadge + dateStr + '</div>'
         + '<h3 class="cert-card__title">' + cert.title + '</h3>'
         + '<div class="cert-card__meta">' + issuerStr + '</div>'
         + (link ? '<div class="cert-card__footer">' + link + '</div>' : '')
+        + '</div>'
         + '</div>';
     }
 

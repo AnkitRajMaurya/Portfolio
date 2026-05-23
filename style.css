@@ -1,4 +1,25 @@
-/* Fonts imported in HTML index.html for high-performance non-blocking load */
+/* --- Aquire Web Font (Localized for high performance & swap display) --- */
+@font-face {
+  font-family: 'Aquire';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Aquire'), url('https://fonts.cdnfonts.com/s/35282/Aquire-BW0ox.woff') format('woff');
+}
+@font-face {
+  font-family: 'Aquire';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: local('Aquire'), url('https://fonts.cdnfonts.com/s/35282/AquireLight-YzE0o.woff') format('woff');
+}
+@font-face {
+  font-family: 'Aquire';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Aquire'), url('https://fonts.cdnfonts.com/s/35282/AquireBold-8Ma60.woff') format('woff');
+}
 
 /* --- Global Styles --- */
 :root {
@@ -90,7 +111,7 @@ body::before {
       rgba(240, 244, 255, 0.95) 100%);
   pointer-events: none;
   z-index: -1;
-  animation: gradientAnimation 20s ease infinite;
+  /* Disabled dynamic position shift to save massive repaint cost behind backdrop-filter */
   backdrop-filter: blur(60px) saturate(120%);
   -webkit-backdrop-filter: blur(60px) saturate(120%);
 }
@@ -423,18 +444,13 @@ html {
   left: 100%;
 }
 
-/* Liquid Animation */
-@keyframes liquidFlow {
+/* Hardware-Accelerated Liquid Rotation Animation (Composited) */
+@keyframes liquidRotate {
   0% {
-    border-radius: 60% 40% 30% 70%/60% 30% 70% 40%;
+    transform: rotate(0deg);
   }
-
-  50% {
-    border-radius: 30% 60% 70% 40%/50% 60% 30% 60%;
-  }
-
   100% {
-    border-radius: 60% 40% 30% 70%/60% 30% 70% 40%;
+    transform: rotate(360deg);
   }
 }
 
@@ -448,9 +464,10 @@ html {
   inset: -2px;
   border-radius: inherit;
   background: linear-gradient(45deg, var(--primary-color), var(--accent));
-  animation: liquidFlow 8s ease-in-out infinite;
+  animation: liquidRotate 10s linear infinite;
   z-index: -1;
   filter: blur(8px);
+  will-change: transform;
 }
 
 /* 3D Transform on Scroll */
@@ -709,22 +726,27 @@ html {
   transform: translateY(-4px);
 }
 
-/* Custom Cursor */
+/* Hardware-Accelerated Custom Cursor (Composited) */
 .custom-cursor {
   width: 20px;
   height: 20px;
   border: 2px solid var(--primary-color);
   border-radius: 50%;
   position: fixed;
+  top: 0;
+  left: 0;
   pointer-events: none;
   z-index: 9999;
-  transition: transform 0.1s ease;
+  will-change: transform;
+  transform: translate3d(var(--cursor-x, -100px), var(--cursor-y, -100px), 0) scale(var(--cursor-scale, 1));
+  transition: transform 0.05s ease-out, background-color 0.3s ease, border-color 0.3s ease;
   mix-blend-mode: difference;
 }
 
 .custom-cursor.active {
-  transform: scale(1.5);
+  --cursor-scale: 1.5;
   background: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .container {
@@ -920,8 +942,34 @@ ul {
   align-items: center;
 }
 
+/* High-performance initial load keyframes (Composited) */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(40px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .hero-content {
   max-width: 600px;
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .greeting {
@@ -991,6 +1039,9 @@ ul {
 
 .hero-image {
   position: relative;
+  opacity: 0;
+  animation: fadeInRight 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+  will-change: transform, opacity;
 }
 
 .hero-image-container {

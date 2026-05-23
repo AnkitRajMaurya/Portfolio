@@ -1,3 +1,12 @@
+// Utility script loader for dynamic script deferral
+function loadScript(url, callback) {
+  const script = document.createElement("script");
+  script.src = url;
+  script.defer = true;
+  script.onload = callback;
+  document.head.appendChild(script);
+}
+
 // Preload critical resources
 function preloadResources() {
   const imagesToPreload = document.querySelectorAll("img[data-src]");
@@ -29,9 +38,13 @@ function initLoadingScreen() {
 
   // Dismiss loader on window load OR after a fallback timeout (1.5 seconds)
   // to ensure immediate usability on slow mobile connections.
-  window.addEventListener("load", () => {
+  if (document.readyState === "complete") {
     setTimeout(hideLoader, 200);
-  });
+  } else {
+    window.addEventListener("load", () => {
+      setTimeout(hideLoader, 200);
+    });
+  }
   
   // Safe fallback to prevent loader getting stuck on slow networks
   setTimeout(hideLoader, 1500);
@@ -39,60 +52,62 @@ function initLoadingScreen() {
 
 // Initialize particles background
 function initParticles() {
-  // Skip or lighten on mobile / reduced-motion
   const isMobile = window.innerWidth < 768;
   const prefersReduced = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
-  // Ensure container exists or create it
   let particlesContainer = document.getElementById("particles-js");
+
+  if (prefersReduced || isMobile) {
+    // Disable on mobile or reduced motion for performance
+    if (particlesContainer) particlesContainer.remove();
+    return;
+  }
+
   if (!particlesContainer) {
     particlesContainer = document.createElement("div");
     particlesContainer.id = "particles-js";
     document.body.appendChild(particlesContainer);
   }
 
-  if (typeof particlesJS !== "function") return;
-
-  if (prefersReduced || isMobile) {
-    // Disable on mobile or reduced motion for performance
-    particlesContainer.remove();
-    return;
-  }
-
-  particlesJS("particles-js", {
-    particles: {
-      number: { value: isMobile ? 15 : 45, density: { enable: true, value_area: 900 } },
-      color: { value: "#00ffd5" },
-      shape: { type: "circle" },
-      opacity: { value: 0.5, random: true },
-      size: { value: 3, random: true },
-      line_linked: {
-        enable: true,
-        distance: 150,
-        color: "#00ffd5",
-        opacity: 0.2,
-        width: 1,
-      },
-      move: {
-        enable: true,
-        speed: isMobile ? 0.5 : 1.2,
-        direction: "none",
-        random: true,
-        straight: false,
-        out_mode: "out",
-      },
-    },
-    interactivity: {
-      detect_on: "canvas",
-      events: {
-        onhover: { enable: !isMobile, mode: "repulse" },
-        onclick: { enable: !isMobile, mode: "push" },
-        resize: true,
-      },
-    },
-    retina_detect: true,
+  // Load particles.js dynamically only on desktop
+  loadScript("https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js", () => {
+    if (typeof particlesJS === "function") {
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 45, density: { enable: true, value_area: 900 } },
+          color: { value: "#00ffd5" },
+          shape: { type: "circle" },
+          opacity: { value: 0.5, random: true },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#00ffd5",
+            opacity: 0.2,
+            width: 1,
+          },
+          move: {
+            enable: true,
+            speed: 1.2,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+          },
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "repulse" },
+            onclick: { enable: true, mode: "push" },
+            resize: true,
+          },
+        },
+        retina_detect: true,
+      });
+    }
   });
 }
 
@@ -303,16 +318,17 @@ const PremiumEffects = {
   },
 
   initParallax() {
+    const blobs = document.querySelectorAll(".blob");
+    if (!blobs.length) return;
     document.addEventListener("mousemove", (e) => {
-      const blobs = document.querySelectorAll(".blob");
       const x = e.clientX / window.innerWidth;
       const y = e.clientY / window.innerHeight;
 
       blobs.forEach((blob, index) => {
-        const speed = (index + 1) * 0.2;
-        const xMove = (x - 0.5) * speed * 100;
-        const yMove = (y - 0.5) * speed * 100;
-        blob.style.transform = `translate(${xMove}px, ${yMove}px)`;
+        const speed = (index + 1) * 0.25;
+        const xMove = (x - 0.5) * speed * 80;
+        const yMove = (y - 0.5) * speed * 80;
+        blob.style.transform = `translate3d(${xMove}px, ${yMove}px, 0)`;
       });
     });
   },
@@ -353,59 +369,68 @@ const PremiumEffects = {
 
 // Defer heavy effects to idle time wrapper
 function runHeavyEffects() {
-  PremiumEffects.init();
   ScrollManager.init();
 
   const isMobile = window.innerWidth < 768;
+  if (isMobile) {
+    // On mobile, completely skip loading heavy script animation layers to maximize FCP, TBT and scroll smoothness
+    return;
+  }
 
-  /* --- Scroll Reveal Animation --- */
-  if (window.ScrollReveal) {
-    const sr = ScrollReveal({
-      distance: isMobile ? "30px" : "60px",
-      duration: isMobile ? 600 : 1000,
-      delay: isMobile ? 0 : 100,
-      reset: false,
-    });
-    if (isMobile) {
-      sr.reveal(".hero-content, .about-text, .skill-group, .featured-project, .contact-content", { origin: "bottom", interval: 100 });
-    } else {
-      sr.reveal(".hero-content", { origin: "left" });
-      sr.reveal(".hero-image", { origin: "right", delay: 200 });
+  PremiumEffects.init();
+
+  /* --- Dynamic Script Loading and Animation Initialization --- */
+  
+  // Load ScrollReveal dynamically
+  loadScript("https://unpkg.com/scrollreveal", () => {
+    if (window.ScrollReveal) {
+      const sr = ScrollReveal({
+        distance: "60px",
+        duration: 1000,
+        delay: 100,
+        reset: false,
+      });
       sr.reveal(".about-text", { origin: "left" });
       sr.reveal(".about-image", { origin: "right", delay: 200 });
       sr.reveal(".skill-group", { origin: "bottom", interval: 100 });
       sr.reveal(".featured-project", { origin: "bottom", interval: 200 });
       sr.reveal(".contact-content", { origin: "bottom" });
     }
-  }
+  });
 
-  /* --- GSAP Animations --- */
-  if (window.gsap && window.ScrollTrigger && !isMobile) {
-    gsap.registerPlugin(ScrollTrigger);
-    gsap.to(".hero-image", {
-      yPercent: 50,
-      ease: "none",
-      scrollTrigger: {
-        trigger: ".home",
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
+  // Load GSAP & ScrollTrigger dynamically
+  loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js", () => {
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js", () => {
+      if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.to(".hero-image", {
+          yPercent: 50,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".home",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+
+        gsap.utils.toArray("section").forEach((section) => {
+          gsap.from(section, {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            scrollTrigger: {
+              trigger: section,
+              start: "top 80%",
+              end: "top 50%",
+              scrub: 1,
+            },
+          });
+        });
+      }
     });
-    gsap.utils.toArray("section").forEach((section) => {
-      gsap.from(section, {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        scrollTrigger: {
-          trigger: section,
-          start: "top 80%",
-          end: "top 50%",
-          scrub: 1,
-        },
-      });
-    });
-  }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -528,14 +553,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   window.addEventListener("scroll", scrollActive, { passive: true });
 
-  /* --- Custom Cursor --- */
+  /* --- Custom Cursor (Hardware Accelerated via CSS Variables) --- */
   const cursor = document.querySelector(".custom-cursor");
-  if (cursor) {
+  const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
+
+  if (cursor && !hasFinePointer) {
+    // Touch devices (phones/tablets) don't have mouse cursors, so remove it to save DOM footprint & layout calculation cost
+    cursor.remove();
+  } else if (cursor) {
     document.addEventListener(
       "mousemove",
       (e) => {
-        cursor.style.left = e.clientX + "px";
-        cursor.style.top = e.clientY + "px";
+        cursor.style.setProperty("--cursor-x", `${e.clientX - 10}px`);
+        cursor.style.setProperty("--cursor-y", `${e.clientY - 10}px`);
       },
       { passive: true }
     );
@@ -545,16 +575,17 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("mouseup", () =>
       cursor.classList.remove("active")
     );
-    const clickables = document.querySelectorAll(
-      "a, button, .skill-item, .nav-link"
-    );
-    clickables.forEach((element) => {
-      element.addEventListener("mouseover", () =>
-        cursor.classList.add("active")
-      );
-      element.addEventListener("mouseleave", () =>
-        cursor.classList.remove("active")
-      );
+    
+    // Premium Event Delegation for hovers (handles static and dynamically fetched cards)
+    document.addEventListener("mouseover", (e) => {
+      if (e.target.closest("a, button, .skill-item, .nav-link, .tech-skill-item, .project-card, .cert-card")) {
+        cursor.classList.add("active");
+      }
+    });
+    document.addEventListener("mouseout", (e) => {
+      if (e.target.closest("a, button, .skill-item, .nav-link, .tech-skill-item, .project-card, .cert-card")) {
+        cursor.classList.remove("active");
+      }
     });
   }
 
@@ -584,28 +615,21 @@ document.addEventListener("DOMContentLoaded", function () {
   /* --- GSAP Animations --- */
   // Moved into idle-time init
 
-  /* --- Initial Load Animation --- */
+  /* --- Initial Load Fade-in --- */
   const content = document.querySelector("main");
   if (content) {
     content.style.opacity = "0";
-    window.addEventListener("load", () => {
+    
+    const showContent = () => {
       content.style.transition = "opacity 0.5s ease-in-out";
       content.style.opacity = "1";
-      if (window.gsap) {
-        gsap.from(".hero-content > *", {
-          y: 30,
-          opacity: 0,
-          duration: 1,
-          stagger: 0.2,
-        });
-        gsap.from(".hero-image", {
-          x: 100,
-          opacity: 0,
-          duration: 1,
-          delay: 0.5,
-        });
-      }
-    });
+    };
+
+    if (document.readyState === "complete") {
+      showContent();
+    } else {
+      window.addEventListener("load", showContent);
+    }
   }
 
   /* --- Visitor Geotracking Analytics --- */

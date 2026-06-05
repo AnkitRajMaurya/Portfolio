@@ -3661,16 +3661,7 @@ section {
     transform: none !important;
   }
 
-  /* Project previews: hide iframe on mobile, show placeholder */
-  .project-iframe-wrapper,
-  .desktop-only {
-    display: none !important;
-  }
 
-  .project-preview-link.mobile-only,
-  .mobile-only {
-    display: block !important;
-  }
 
   /* Phone: keep profile images colorful */
   .hero-image img,
@@ -3802,6 +3793,19 @@ section {
   border-radius: 6px;
   pointer-events: none;
   opacity: 0.92;
+}
+
+/* Media query override to hide desktop iframes and show mobile placeholders on viewports <= 768px */
+@media screen and (max-width: 768px) {
+  .project-iframe-wrapper,
+  .desktop-only {
+    display: none !important;
+  }
+
+  .project-preview-link.mobile-only,
+  .mobile-only {
+    display: block !important;
+  }
 }
 
 /* ============================================================

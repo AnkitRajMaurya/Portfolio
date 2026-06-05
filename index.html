@@ -645,7 +645,17 @@
           </article>
 
           <article class="project-card">
-            <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link"
+            <div class="project-iframe-wrapper desktop-only">
+              <div class="iframe-topbar">
+                <span class="dot r"></span>
+                <span class="dot y"></span>
+                <span class="dot g"></span>
+                <span class="iframe-url">https://orbitui-eta.vercel.app/</span>
+              </div>
+              <iframe src="https://orbitui-eta.vercel.app/" title="Orbit UI Live Preview"></iframe>
+              <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="iframe-overlay-link" aria-label="Open Orbit UI website in new tab"></a>
+            </div>
+            <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-preview-link mobile-only"
               aria-label="Open Orbit UI website">
               <div class="project-preview-placeholder project-card--orbit">
                 <div class="preview-icon"><i class="fa-solid fa-globe"></i></div>
@@ -675,8 +685,18 @@
           </article>
 
           <article class="project-card">
+            <div class="project-iframe-wrapper desktop-only">
+              <div class="iframe-topbar">
+                <span class="dot r"></span>
+                <span class="dot y"></span>
+                <span class="dot g"></span>
+                <span class="iframe-url">https://weather-project-lovat-five.vercel.app/</span>
+              </div>
+              <iframe src="https://weather-project-lovat-five.vercel.app/" title="Weather Application Live Preview"></iframe>
+              <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer" class="iframe-overlay-link" aria-label="Open Weather Application website in new tab"></a>
+            </div>
             <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer"
-              class="project-preview-link" aria-label="Open Weather Application website">
+              class="project-preview-link mobile-only" aria-label="Open Weather Application website">
               <div class="project-preview-placeholder project-card--weather">
                 <div class="preview-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
                 <p class="mono">Real-time weather dashboard</p>
@@ -949,15 +969,40 @@
           + '<img src="' + p.image_url + '" alt="Screenshot of ' + p.title + '" loading="lazy" class="project-preview-img" />'
           + badge + '</div>';
       } else {
-        previewHtml = '<div class="project-preview-placeholder">'
+        var cardSlug = p.title.toLowerCase()
+          .replace("codex ", "")
+          .replace(" ui", "")
+          .replace(" application", "")
+          .replace(" project", "")
+          .replace(/ /g, '-');
+        previewHtml = '<div class="project-preview-placeholder project-card--' + cardSlug + '">'
           + '<div class="preview-icon"><i class="' + iconClass + '"></i></div>'
           + '<p class="mono">' + (p.description ? p.description.split('.')[0] : p.title) + '</p>'
           + badge + '</div>';
       }
 
       var linkUrl = p.demo_url || p.github_url || '#';
+      
+      var mediaHtml = '';
+      var iframeBlocked = p.title === 'Codex Monarch';
+      if (p.demo_url && !iframeBlocked) {
+        mediaHtml = '<div class="project-iframe-wrapper desktop-only">'
+          + '<div class="iframe-topbar">'
+          + '<span class="dot r"></span>'
+          + '<span class="dot y"></span>'
+          + '<span class="dot g"></span>'
+          + '<span class="iframe-url">' + p.demo_url + '</span>'
+          + '</div>'
+          + '<iframe src="' + p.demo_url + '" title="' + p.title + ' Live Preview"></iframe>'
+          + '<a href="' + p.demo_url + '" target="_blank" rel="noopener noreferrer" class="iframe-overlay-link" aria-label="Open ' + p.title + ' website in new tab"></a>'
+          + '</div>'
+          + '<a href="' + linkUrl + '" target="_blank" rel="noopener noreferrer" class="project-preview-link mobile-only">' + previewHtml + '</a>';
+      } else {
+        mediaHtml = '<a href="' + linkUrl + '" target="_blank" rel="noopener noreferrer" class="project-preview-link">' + previewHtml + '</a>';
+      }
+
       return '<article class="project-card">'
-        + '<a href="' + linkUrl + '" target="_blank" rel="noopener noreferrer" class="project-preview-link">' + previewHtml + '</a>'
+        + mediaHtml
         + '<div class="project-card__body">'
         + '<h3 class="project-card__title">' + p.title + '</h3>'
         + '<p class="project-card__desc">' + (p.description || '') + '</p>'

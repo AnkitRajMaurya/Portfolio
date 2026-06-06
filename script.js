@@ -435,18 +435,32 @@ function runHeavyEffects() {
 
 /**
  * Fetch ALL projects from /api/projects and render dynamic cards.
- * Static HTML cards are kept as SEO/crawler fallback — replaced only on API success.
  * Uses Cloudinary image_url when available, otherwise shows a themed placeholder.
  */
 async function fetchAndRenderProjects() {
   const showcase = document.getElementById("projects-showcase");
   if (!showcase) return;
 
+  const showError = (msg) => {
+    showcase.innerHTML = `
+      <div style="text-align: center; padding: 3rem; color: var(--text-alt); grid-column: 1 / -1; border: 1px dashed var(--surface-outline); border-radius: 12px;">
+        <i class="fa-solid fa-triangle-exclamation fa-2x" style="color: var(--primary-color); margin-bottom: 1rem; opacity: 0.7;"></i>
+        <p class="mono">${msg}</p>
+      </div>
+    `;
+  };
+
   try {
     const res = await fetch("/api/projects");
-    if (!res.ok) return; // keep static fallback cards
+    if (!res.ok) {
+      showError("Failed to load projects. Please try again later.");
+      return;
+    }
     const projects = await res.json();
-    if (!projects.length) return; // keep static if empty
+    if (!projects.length) {
+      showError("No projects found in the database.");
+      return;
+    }
 
     // Icon set used for placeholder when no image
     const defaultIcons = [
@@ -568,11 +582,20 @@ async function fetchAndRenderProjects() {
       fragment.appendChild(article);
     });
 
-    // Replace static cards with dynamic ones
+    // Replace static loading state with dynamic cards
     showcase.innerHTML = "";
     showcase.appendChild(fragment);
   } catch (e) {
-    // API unreachable — static HTML cards remain as fallback
+    console.error("Error fetching projects:", e);
+    const showcase = document.getElementById("projects-showcase");
+    if (showcase) {
+      showcase.innerHTML = `
+        <div style="text-align: center; padding: 3rem; color: var(--text-alt); grid-column: 1 / -1; border: 1px dashed var(--surface-outline); border-radius: 12px;">
+          <i class="fa-solid fa-triangle-exclamation fa-2x" style="color: var(--primary-color); margin-bottom: 1rem; opacity: 0.7;"></i>
+          <p class="mono">Failed to load projects. Please try again later.</p>
+        </div>
+      `;
+    }
   }
 }
 
@@ -731,39 +754,17 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Premium Event Delegation for hovers (handles static and dynamically fetched cards)
     document.addEventListener("mouseover", (e) => {
-      if (e.target.closest("a, button, .skill-item, .nav-link, .tech-skill-item, .project-card, .cert-card")) {
+      if (e.target.closest("a, button, .nav-link, .tech-skill-item, .project-card")) {
         cursor.classList.add("active");
       }
     });
     document.addEventListener("mouseout", (e) => {
-      if (e.target.closest("a, button, .skill-item, .nav-link, .tech-skill-item, .project-card, .cert-card")) {
+      if (e.target.closest("a, button, .nav-link, .tech-skill-item, .project-card")) {
         cursor.classList.remove("active");
       }
     });
   }
 
-  /* --- Skill Level Animation --- */
-  function animateSkillLevels() {
-    const skillLevels = document.querySelectorAll(".skill-level");
-    skillLevels.forEach((level) => {
-      const percentage = level.getAttribute("data-level");
-      level.style.setProperty("--level", percentage + "%");
-      level.classList.add("animate");
-    });
-  }
-  const skillsSection = document.querySelector(".skills");
-  if (skillsSection) {
-    const skillsObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          animateSkillLevels();
-          skillsObserver.unobserve(skillsSection);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    skillsObserver.observe(skillsSection);
-  }
 
   /* --- GSAP Animations --- */
   // Moved into idle-time init

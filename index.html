@@ -617,92 +617,11 @@
           data loads from the portfolio CMS, with crawlable fallback details kept in the HTML for search engines and AI tools.
         </p>
         <div class="projects-showcase" id="projects-showcase" aria-live="polite">
-          <article class="project-card">
-            <a href="https://codex-monarch.vercel.app/" target="_blank" rel="noopener noreferrer"
-              class="project-preview-link" aria-label="Open Codex Monarch website">
-              <div class="project-preview-placeholder project-card--monarch">
-                <div class="preview-icon"><i class="fa-solid fa-crown"></i></div>
-                <p class="mono">Hackathon platform and student tech community</p>
-                <span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> Live</span>
-              </div>
-            </a>
-            <div class="project-card__body">
-              <h3 class="project-card__title">Codex Monarch</h3>
-              <p class="project-card__desc">A student-led technical community platform for hackathons, engineering events, coding arenas, and collaborative projects.</p>
-              <div class="project-card__tech">
-                <span><i class="fa-solid fa-code"></i> JavaScript</span>
-                <span><i class="fa-solid fa-code"></i> Node.js</span>
-                <span><i class="fa-solid fa-code"></i> Express.js</span>
-                <span><i class="fa-solid fa-code"></i> MongoDB</span>
-              </div>
-              <div class="project-card__actions">
-                <a href="https://codex-monarch.vercel.app/" target="_blank" rel="noopener noreferrer"
-                  class="project-card__btn project-card__btn--primary">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Site
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <article class="project-card" data-project-id="orbit-ui">
-            <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer"
-              class="project-preview-link" aria-label="Open Orbit UI website" data-preview>
-              <div class="project-preview-placeholder project-card--orbit">
-                <div class="preview-icon"><i class="fa-solid fa-globe"></i></div>
-                <p class="mono">Component library and UI showcase</p>
-                <span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> Live</span>
-              </div>
-            </a>
-            <div class="project-card__body">
-              <h3 class="project-card__title">Orbit UI</h3>
-              <p class="project-card__desc">A modern UI component library and design showcase built for clean, lightweight, production-ready frontend development.</p>
-              <div class="project-card__tech">
-                <span><i class="fa-solid fa-code"></i> HTML5</span>
-                <span><i class="fa-solid fa-code"></i> CSS3</span>
-                <span><i class="fa-solid fa-code"></i> JavaScript</span>
-              </div>
-              <div class="project-card__actions">
-                <a href="https://github.com/AnkitRajMaurya/ORBITUI" target="_blank" rel="noopener noreferrer"
-                  class="project-card__btn project-card__btn--ghost">
-                  <i class="fa-brands fa-github"></i> Source
-                </a>
-                <a href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer"
-                  class="project-card__btn project-card__btn--primary">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <article class="project-card" data-project-id="weather-app">
-            <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer"
-              class="project-preview-link" aria-label="Open Weather Application website" data-preview>
-              <div class="project-preview-placeholder project-card--weather">
-                <div class="preview-icon"><i class="fa-solid fa-cloud-sun-rain"></i></div>
-                <p class="mono">Real-time weather dashboard</p>
-                <span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> Live</span>
-              </div>
-            </a>
-            <div class="project-card__body">
-              <h3 class="project-card__title">Weather Application</h3>
-              <p class="project-card__desc">A weather application that provides current conditions, forecasts, and location-aware weather updates using the OpenWeather API.</p>
-              <div class="project-card__tech">
-                <span><i class="fa-solid fa-code"></i> React</span>
-                <span><i class="fa-solid fa-code"></i> OpenWeather API</span>
-                <span><i class="fa-solid fa-code"></i> CSS</span>
-              </div>
-              <div class="project-card__actions">
-                <a href="https://github.com/AnkitRajMaurya/weather-project" target="_blank" rel="noopener noreferrer"
-                  class="project-card__btn project-card__btn--ghost">
-                  <i class="fa-brands fa-github"></i> Source
-                </a>
-                <a href="https://weather-project-lovat-five.vercel.app/" target="_blank" rel="noopener noreferrer"
-                  class="project-card__btn project-card__btn--primary">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo
-                </a>
-              </div>
-            </div>
-          </article>
+          <!-- Dynamic Projects Loading -->
+          <div style="text-align: center; padding: 3rem; color: var(--text-alt); grid-column: 1 / -1;">
+            <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary-color); margin-bottom: 1rem;"></i>
+            <p class="mono">Loading projects from database...</p>
+          </div>
         </div>
       </div>
     </section>

@@ -4489,6 +4489,24 @@ section {
   filter: brightness(0) invert(1);
 }
 
+/* Invert black logos in dark mode */
+[data-theme="dark"] .tech-skill-item.dark-invert {
+  --skill-color: #ffffff !important;
+}
+
+[data-theme="dark"] .tech-skill-item.dark-invert .tech-skill-icon {
+  color: #ffffff;
+  background: color-mix(in srgb, #ffffff 12%, transparent);
+  border-color: color-mix(in srgb, #ffffff 30%, transparent);
+  box-shadow: 0 2px 16px color-mix(in srgb, #ffffff 15%, transparent);
+}
+
+[data-theme="dark"] .tech-skill-item.dark-invert:hover .tech-skill-icon {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 12px 32px color-mix(in srgb, #ffffff 45%, transparent);
+}
+
 @media (max-width: 600px) {
   .tech-skills-grid {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -4866,3 +4884,90 @@ section {
     padding: 1.15rem;
   }
 }
+
+/* ── Project Preview Image (Cloudinary) ─────────────────────────────────── */
+
+/* The preview link wraps the image/placeholder — stretch to fill the card top */
+a.project-preview-link {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  position: relative;
+  background: var(--bg-alt);
+  aspect-ratio: 16 / 9;
+  text-decoration: none;
+}
+
+a.project-preview-link:hover {
+  opacity: 0.92;
+}
+
+/* Cloudinary img injected by JS */
+.project-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+  transition: transform 0.4s ease;
+}
+
+a.project-preview-link:hover .project-preview-img {
+  transform: scale(1.04);
+}
+
+/* When a real image is loaded, remove placeholder padding/icon styling */
+.project-preview-placeholder.has-image {
+  padding: 0;
+  background: transparent;
+  min-height: unset;
+}
+
+/* Static placeholder (shown when no image_url yet) */
+.project-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 220px;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-alt);
+}
+
+.project-preview-placeholder .preview-icon {
+  font-size: 2.5rem;
+  opacity: 0.5;
+  margin-bottom: 0.25rem;
+}
+
+.project-preview-placeholder .project-card__badge {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+/* Themed placeholder backgrounds */
+.project-card--orbit {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.08));
+}
+
+.project-card--weather {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(14, 165, 233, 0.08));
+}
+
+.project-card--monarch {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.10), rgba(234, 179, 8, 0.07));
+}
+

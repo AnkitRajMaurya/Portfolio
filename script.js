@@ -433,9 +433,162 @@ function runHeavyEffects() {
   });
 }
 
+/**
+ * Fetch ALL projects from /api/projects and render dynamic cards.
+ * Static HTML cards are kept as SEO/crawler fallback — replaced only on API success.
+ * Uses Cloudinary image_url when available, otherwise shows a themed placeholder.
+ */
+async function fetchAndRenderProjects() {
+  const showcase = document.getElementById("projects-showcase");
+  if (!showcase) return;
+
+  try {
+    const res = await fetch("/api/projects");
+    if (!res.ok) return; // keep static fallback cards
+    const projects = await res.json();
+    if (!projects.length) return; // keep static if empty
+
+    // Icon set used for placeholder when no image
+    const defaultIcons = [
+      "fa-solid fa-rocket",
+      "fa-solid fa-globe",
+      "fa-solid fa-code",
+      "fa-solid fa-laptop-code",
+      "fa-solid fa-cubes",
+      "fa-solid fa-bolt",
+    ];
+
+    // Build all cards
+    const fragment = document.createDocumentFragment();
+
+    projects.forEach((p, idx) => {
+      const article = document.createElement("article");
+      article.className = "project-card";
+
+      // — Preview section (image or placeholder) —
+      const demoUrl = p.demo_url || "#";
+      const previewLink = document.createElement("a");
+      previewLink.href = demoUrl;
+      previewLink.target = "_blank";
+      previewLink.rel = "noopener noreferrer";
+      previewLink.className = "project-preview-link";
+      previewLink.setAttribute("aria-label", `Open ${p.title} website`);
+
+      const placeholder = document.createElement("div");
+      placeholder.className = "project-preview-placeholder";
+
+      if (p.image_url) {
+        // Cloudinary image available
+        const img = document.createElement("img");
+        img.src = p.image_url;
+        img.alt = `${p.title} screenshot`;
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.className = "project-preview-img";
+        img.onerror = () => {
+          // On error, restore placeholder
+          placeholder.classList.remove("has-image");
+          placeholder.innerHTML = `
+            <div class="preview-icon"><i class="${defaultIcons[idx % defaultIcons.length]}"></i></div>
+            <p class="mono">${escapeHTML(p.description ? p.description.slice(0, 60) : p.title)}</p>
+            ${p.badge ? `<span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> ${escapeHTML(p.badge)}</span>` : ""}
+          `;
+        };
+        placeholder.appendChild(img);
+        placeholder.classList.add("has-image");
+      } else {
+        // No image — themed placeholder
+        placeholder.innerHTML = `
+          <div class="preview-icon"><i class="${defaultIcons[idx % defaultIcons.length]}"></i></div>
+          <p class="mono">${escapeHTML(p.description ? p.description.slice(0, 60) : p.title)}</p>
+          ${p.badge ? `<span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> ${escapeHTML(p.badge)}</span>` : ""}
+        `;
+      }
+
+      previewLink.appendChild(placeholder);
+      article.appendChild(previewLink);
+
+      // — Body section —
+      const body = document.createElement("div");
+      body.className = "project-card__body";
+
+      // Title
+      const title = document.createElement("h3");
+      title.className = "project-card__title";
+      title.textContent = p.title;
+      body.appendChild(title);
+
+      // Description
+      if (p.description) {
+        const desc = document.createElement("p");
+        desc.className = "project-card__desc";
+        desc.textContent = p.description;
+        body.appendChild(desc);
+      }
+
+      // Tech tags
+      const tags = Array.isArray(p.tech_tags) ? p.tech_tags : [];
+      if (tags.length) {
+        const techDiv = document.createElement("div");
+        techDiv.className = "project-card__tech";
+        tags.forEach((t) => {
+          const span = document.createElement("span");
+          span.innerHTML = `<i class="fa-solid fa-code"></i> ${escapeHTML(t)}`;
+          techDiv.appendChild(span);
+        });
+        body.appendChild(techDiv);
+      }
+
+      // Actions (GitHub + Demo)
+      const actions = document.createElement("div");
+      actions.className = "project-card__actions";
+
+      if (p.github_url) {
+        const ghBtn = document.createElement("a");
+        ghBtn.href = p.github_url;
+        ghBtn.target = "_blank";
+        ghBtn.rel = "noopener noreferrer";
+        ghBtn.className = "project-card__btn project-card__btn--ghost";
+        ghBtn.innerHTML = '<i class="fa-brands fa-github"></i> Source';
+        actions.appendChild(ghBtn);
+      }
+
+      if (p.demo_url) {
+        const demoBtn = document.createElement("a");
+        demoBtn.href = p.demo_url;
+        demoBtn.target = "_blank";
+        demoBtn.rel = "noopener noreferrer";
+        demoBtn.className = "project-card__btn project-card__btn--primary";
+        demoBtn.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Site';
+        actions.appendChild(demoBtn);
+      }
+
+      body.appendChild(actions);
+      article.appendChild(body);
+      fragment.appendChild(article);
+    });
+
+    // Replace static cards with dynamic ones
+    showcase.innerHTML = "";
+    showcase.appendChild(fragment);
+  } catch (e) {
+    // API unreachable — static HTML cards remain as fallback
+  }
+}
+
+/** Escape HTML to prevent XSS in dynamic content */
+function escapeHTML(str) {
+  const div = document.createElement("div");
+  div.appendChild(document.createTextNode(str || ""));
+  return div.innerHTML;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   initLoadingScreen();
   preloadResources();
+
+  // Fetch and render ALL project cards from Turso API
+  fetchAndRenderProjects();
 
   // Initialize theme manager
   ThemeManager.init();

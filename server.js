@@ -18,6 +18,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
 
+
 const contactLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 50 });
 app.use("/api/contact", contactLimiter);

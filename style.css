@@ -862,6 +862,25 @@ ul {
   filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.3));
 }
 
+.nav-logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  transition: var(--transition);
+  display: block;
+  /* Light Mode: deep navy blue */
+  filter: brightness(0) invert(0.15) sepia(0.9) saturate(3.5) hue-rotate(200deg) brightness(0.9) contrast(1.1);
+}
+
+.nav-logo:hover .nav-logo-img {
+  transform: scale(1.05);
+}
+
+/* Dark Mode: pure white with a subtle purple-blue glow */
+[data-theme="dark"] .nav-logo-img {
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+}
+
 .nav-list {
   display: flex;
   align-items: center;

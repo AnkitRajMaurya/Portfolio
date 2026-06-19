@@ -7,6 +7,27 @@ function loadScript(url, callback) {
   document.head.appendChild(script);
 }
 
+const PHONE_BREAKPOINT = 768;
+
+function isPhoneViewport() {
+  return window.innerWidth <= PHONE_BREAKPOINT;
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function shouldUseLiteExperience() {
+  const connection =
+    navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const saveData = Boolean(connection && connection.saveData);
+  const slowConnection = Boolean(
+    connection && /(^|-)2g$|(^|-)3g$/.test(connection.effectiveType || "")
+  );
+
+  return isPhoneViewport() || prefersReducedMotion() || saveData || slowConnection;
+}
+
 // Preload critical resources
 function preloadResources() {
   const imagesToPreload = document.querySelectorAll("img[data-src]");
@@ -17,6 +38,11 @@ function preloadResources() {
 
 // Initialize loading screen
 function initLoadingScreen() {
+  if (shouldUseLiteExperience()) {
+    document.body.classList.add("loaded");
+    return;
+  }
+
   const loader = document.createElement("div");
   loader.className = "page-loader";
   loader.innerHTML = `
@@ -52,14 +78,9 @@ function initLoadingScreen() {
 
 // Initialize particles background
 function initParticles() {
-  const isMobile = window.innerWidth < 768;
-  const prefersReduced = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
-
   let particlesContainer = document.getElementById("particles-js");
 
-  if (prefersReduced || isMobile) {
+  if (shouldUseLiteExperience()) {
     // Disable on mobile or reduced motion for performance
     if (particlesContainer) particlesContainer.remove();
     return;
@@ -278,8 +299,16 @@ const ContactForm = {
 // Smooth scrolling with progress indicator
 const ScrollManager = {
   init() {
+    this.progressBar = document.querySelector(".scroll-progress");
+    this.header = document.getElementById("header");
+    this.scrollUp = document.getElementById("scroll-up");
+    this.sections = Array.from(document.querySelectorAll("section[id]"));
+    this.isPhone = isPhoneViewport();
+    this.lastScroll = window.pageYOffset;
+    this.ticking = false;
     this.createProgressBar();
     this.bindScrollEvents();
+    this.update();
   },
 
   createProgressBar() {
@@ -291,20 +320,67 @@ const ScrollManager = {
   },
 
   bindScrollEvents() {
-    window.addEventListener(
-      "scroll",
-      () => {
-        const winScroll =
-          document.body.scrollTop || document.documentElement.scrollTop;
-        const height =
-          document.documentElement.scrollHeight -
-          document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
-        const bar = document.querySelector(".scroll-progress");
-        if (bar) bar.style.width = scrolled + "%";
-      },
-      { passive: true }
-    );
+    window.addEventListener("scroll", () => {
+      if (this.ticking) return;
+
+      this.ticking = true;
+      requestAnimationFrame(() => {
+        this.update();
+        this.ticking = false;
+      });
+    }, { passive: true });
+  },
+
+  update() {
+    const currentScroll = window.pageYOffset;
+
+    if (this.progressBar && !this.isPhone) {
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = height > 0 ? currentScroll / height : 0;
+      this.progressBar.style.transform = `scaleX(${Math.min(Math.max(scrolled, 0), 1)})`;
+    }
+
+    if (this.header) {
+      if (currentScroll > 50) {
+        this.header.classList.add("header-scrolled");
+        this.header.style.transform =
+          !this.isPhone && currentScroll > this.lastScroll && currentScroll > 200
+            ? "translateY(-100%)"
+            : "translateY(0)";
+      } else {
+        this.header.classList.remove("header-scrolled");
+        this.header.style.transform = "translateY(0)";
+      }
+    }
+
+    if (this.scrollUp) {
+      this.scrollUp.classList.toggle("show-scroll", currentScroll > 400);
+    }
+
+    if (!this.isPhone) {
+      this.updateActiveLink(currentScroll);
+    }
+
+    this.lastScroll = currentScroll;
+  },
+
+  updateActiveLink(currentScroll) {
+    this.sections.forEach((current) => {
+      const sectionHeight = current.offsetHeight;
+      const sectionTop = current.offsetTop - 100;
+      const sectionId = current.getAttribute("id");
+      const link = document.querySelector(`.nav-link[href*="${sectionId}"]`);
+
+      if (!link) return;
+
+      if (currentScroll > sectionTop && currentScroll <= sectionTop + sectionHeight) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
   },
 };
 
@@ -369,10 +445,7 @@ const PremiumEffects = {
 
 // Defer heavy effects to idle time wrapper
 function runHeavyEffects() {
-  ScrollManager.init();
-
-  const isMobile = window.innerWidth < 768;
-  if (isMobile) {
+  if (shouldUseLiteExperience()) {
     // On mobile, completely skip loading heavy script animation layers to maximize FCP, TBT and scroll smoothness
     return;
   }
@@ -480,13 +553,15 @@ async function fetchAndRenderProjects() {
       article.className = "project-card";
 
       // — Preview section (image or placeholder) —
-      const demoUrl = p.demo_url || "#";
+      const previewUrl = p.demo_url || p.github_url || "#";
       const previewLink = document.createElement("a");
-      previewLink.href = demoUrl;
-      previewLink.target = "_blank";
-      previewLink.rel = "noopener noreferrer";
+      previewLink.href = previewUrl;
+      if (previewUrl !== "#") {
+        previewLink.target = "_blank";
+        previewLink.rel = "noopener noreferrer";
+      }
       previewLink.className = "project-preview-link";
-      previewLink.setAttribute("aria-label", `Open ${p.title} website`);
+      previewLink.setAttribute("aria-label", `Open ${p.title} project`);
 
       const placeholder = document.createElement("div");
       placeholder.className = "project-preview-placeholder";
@@ -599,6 +674,46 @@ async function fetchAndRenderProjects() {
   }
 }
 
+function initDeferredProjects() {
+  const showcase = document.getElementById("projects-showcase");
+  if (!showcase) return;
+
+  let hasLoadedProjects = false;
+  const loadProjects = () => {
+    if (hasLoadedProjects) return;
+    hasLoadedProjects = true;
+    fetchAndRenderProjects();
+  };
+
+  if (window.location.hash === "#projects") {
+    loadProjects();
+    return;
+  }
+
+  if (!("IntersectionObserver" in window)) {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadProjects, { timeout: 1500 });
+    } else {
+      setTimeout(loadProjects, 400);
+    }
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        loadProjects();
+      }
+    },
+    {
+      rootMargin: isPhoneViewport() ? "220px 0px" : "380px 0px",
+    }
+  );
+
+  observer.observe(showcase);
+}
+
 /** Escape HTML to prevent XSS in dynamic content */
 function escapeHTML(str) {
   const div = document.createElement("div");
@@ -610,8 +725,8 @@ document.addEventListener("DOMContentLoaded", function () {
   initLoadingScreen();
   preloadResources();
 
-  // Fetch and render ALL project cards from Turso API
-  fetchAndRenderProjects();
+  ScrollManager.init();
+  initDeferredProjects();
 
   // Initialize theme manager
   ThemeManager.init();
@@ -624,30 +739,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(runHeavyEffects, 300);
   }
 
-  // Initialize particles with theme-aware colors
-  const theme = localStorage.getItem("theme") || "light";
   initParticles();
-
-  /* --- Header Background on Scroll --- */
-  const header = document.getElementById("header");
-  let lastScroll = 0;
-
-  window.addEventListener(
-    "scroll",
-    function () {
-      const currentScroll = window.pageYOffset;
-      if (currentScroll > 50) {
-        header.classList.add("header-scrolled");
-        header.style.transform =
-          (currentScroll > lastScroll && currentScroll > 200) ? "translateY(-100%)" : "translateY(0)";
-      } else {
-        header.classList.remove("header-scrolled");
-        header.style.transform = "translateY(0)";
-      }
-      lastScroll = currentScroll;
-    },
-    { passive: true }
-  );
 
   /* --- Mobile Navigation --- */
   const navMenu = document.getElementById("nav-menu");
@@ -692,43 +784,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  /* --- Scroll Up Button --- */
-  const scrollUp = document.getElementById("scroll-up");
-  if (scrollUp) {
-    window.addEventListener(
-      "scroll",
-      function () {
-        if (window.scrollY > 400) scrollUp.classList.add("show-scroll");
-        else scrollUp.classList.remove("show-scroll");
-      },
-      { passive: true }
-    );
-  }
-
-  /* --- Scroll Reveal Animation --- */
-  // Moved into idle-time init
-
-  /* --- Active Navigation Link --- */
-  const sections = document.querySelectorAll("section[id]");
-  function scrollActive() {
-    const scrollY = window.pageYOffset;
-    sections.forEach((current) => {
-      const sectionHeight = current.offsetHeight;
-      const sectionTop = current.offsetTop - 100;
-      const sectionId = current.getAttribute("id");
-      if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-        document
-          .querySelector(".nav-link[href*=" + sectionId + "]")
-          ?.classList.add("active");
-      } else {
-        document
-          .querySelector(".nav-link[href*=" + sectionId + "]")
-          ?.classList.remove("active");
-      }
-    });
-  }
-  window.addEventListener("scroll", scrollActive, { passive: true });
-
   /* --- Custom Cursor (Hardware Accelerated via CSS Variables) --- */
   const cursor = document.querySelector(".custom-cursor");
   const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
@@ -772,14 +827,20 @@ document.addEventListener("DOMContentLoaded", function () {
   /* --- Initial Load Fade-in --- */
   const content = document.querySelector("main");
   if (content) {
-    content.style.opacity = "0";
+    if (shouldUseLiteExperience()) {
+      content.style.opacity = "1";
+    } else {
+      content.style.opacity = "0";
+    }
     
     const showContent = () => {
       content.style.transition = "opacity 0.5s ease-in-out";
       content.style.opacity = "1";
     };
 
-    if (document.readyState === "complete") {
+    if (shouldUseLiteExperience()) {
+      showContent();
+    } else if (document.readyState === "complete") {
       showContent();
     } else {
       window.addEventListener("load", showContent);
@@ -789,17 +850,30 @@ document.addEventListener("DOMContentLoaded", function () {
   /* --- Visitor Geotracking Analytics --- */
   async function trackVisit() {
     try {
+      const payload = JSON.stringify({
+        page_path: window.location.pathname,
+        referer: document.referrer || 'Direct'
+      });
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon('/api/analytics/track', blob);
+        return;
+      }
+
       await fetch('/api/analytics/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          page_path: window.location.pathname,
-          referer: document.referrer || 'Direct'
-        })
+        body: payload
       });
     } catch (e) {
       console.warn('Analytics ping aborted', e);
     }
   }
-  trackVisit();
+
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(trackVisit, { timeout: 2500 });
+  } else {
+    setTimeout(trackVisit, shouldUseLiteExperience() ? 1200 : 300);
+  }
 });

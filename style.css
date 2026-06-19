@@ -4546,6 +4546,39 @@ section {
   margin-top: 4px;
 }
 
+.skeleton-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.skeleton-chip,
+.skeleton-button {
+  display: inline-block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--bg-alt) 25%, var(--surface-soft) 50%, var(--bg-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-chip {
+  width: 5.4rem;
+  height: 1.9rem;
+}
+
+.skeleton-action-row {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.skeleton-button {
+  width: 7.25rem;
+  height: 2.45rem;
+  border-radius: 12px;
+}
+
 /* ── Contact form alerts ── */
 .form-alert {
   padding: .85rem 1rem;

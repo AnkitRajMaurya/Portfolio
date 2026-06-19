@@ -523,6 +523,8 @@ async function fetchAndRenderProjects() {
     `;
   };
 
+  renderProjectSkeletons(showcase);
+
   try {
     const res = await fetch("/api/projects");
     if (!res.ok) {
@@ -674,9 +676,38 @@ async function fetchAndRenderProjects() {
   }
 }
 
+function buildProjectSkeletonMarkup(count = 3) {
+  return Array.from({ length: count }, () => `
+    <article class="project-card skeleton-card" aria-hidden="true">
+      <div class="skeleton-preview"></div>
+      <div class="project-card__body">
+        <div class="skeleton-line w60"></div>
+        <div class="skeleton-line w100 mt8"></div>
+        <div class="skeleton-line w80 mt4"></div>
+        <div class="skeleton-chip-row mt8">
+          <span class="skeleton-chip"></span>
+          <span class="skeleton-chip"></span>
+          <span class="skeleton-chip"></span>
+        </div>
+        <div class="skeleton-action-row">
+          <span class="skeleton-button"></span>
+          <span class="skeleton-button"></span>
+        </div>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderProjectSkeletons(showcase) {
+  if (!showcase) return;
+  showcase.innerHTML = buildProjectSkeletonMarkup(isPhoneViewport() ? 2 : 3);
+}
+
 function initDeferredProjects() {
   const showcase = document.getElementById("projects-showcase");
   if (!showcase) return;
+
+  renderProjectSkeletons(showcase);
 
   let hasLoadedProjects = false;
   const loadProjects = () => {

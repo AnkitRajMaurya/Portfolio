@@ -167,6 +167,11 @@ const ThemeManager = {
       particles.color.value = theme === "light" ? "#2563eb" : "#60a5fa";
       particles.line_linked.color = theme === "light" ? "#2563eb" : "#60a5fa";
     }
+
+    // Apply dark invert styling for black icons in dark mode
+    if (typeof window.applyDarkInvertStyling === 'function') {
+      window.applyDarkInvertStyling();
+    }
   },
 };
 

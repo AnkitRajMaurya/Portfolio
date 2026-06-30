@@ -859,13 +859,35 @@
 
     function buildSkillItem(name, iconClass, iconUrl) {
       var color = SKILL_COLORS[name] || '#6366f1';
+      // Add dark-invert class for black or very dark colors
+      var darkInvertClass = (color === '#000000' || color === '#181717' || color === '#0f0f0f' || color === '#1a1a1a') ? ' dark-invert' : '';
       var iconHtml = iconUrl
         ? '<img src="' + iconUrl + '" alt="' + name + '" loading="lazy" />'
         : '<i class="' + (iconClass || 'fa-solid fa-star') + '"></i>';
-      return '<div class="tech-skill-item" style="--skill-color:' + color + '">'
+      return '<div class="tech-skill-item' + darkInvertClass + '" style="--skill-color:' + color + '">'
         + '<div class="tech-skill-icon">' + iconHtml + '</div>'
         + '<span>' + name + '</span></div>';
     }
+
+    // Function to apply dark mode styling to black icons
+    function applyDarkInvertStyling() {
+      const darkInvertItems = document.querySelectorAll('.tech-skill-item.dark-invert .tech-skill-icon i');
+      if (darkInvertItems.length > 0) {
+        darkInvertItems.forEach(item => {
+          // Apply white color for dark mode
+          const theme = document.documentElement.getAttribute('data-theme');
+          if (theme === 'dark') {
+            item.style.color = '#ffffff';
+          } else {
+            // Reset to original color in light mode (from CSS variable)
+            item.style.color = '';
+          }
+        });
+      }
+    }
+    
+    // Make the function available globally
+    window.applyDarkInvertStyling = applyDarkInvertStyling;
 
     fetch('/api/skills')
       .then(function (r) { return r.json(); })
@@ -877,6 +899,8 @@
             return buildSkillItem(s.name, s.icon_class, s.icon_url);
           }).join('');
         });
+        // Apply dark invert styling after skills are loaded
+        applyDarkInvertStyling();
       })
       .catch(function () { });
 

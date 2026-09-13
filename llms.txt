@@ -41,7 +41,7 @@ Ankit Raj Maurya is a full-stack developer and co-founder of Codex Monarch. He b
 
 ## Featured Projects
 
-- Codex Monarch: https://codex-monarch.vercel.app/
+- Codex Monarch: https://www.codexmonarch.me/
   Student-led technical community platform for hackathons, engineering events, coding arenas, and collaborative projects.
 - Orbit UI: https://orbitui-eta.vercel.app/
   UI component library and design showcase built with HTML, CSS, and JavaScript.

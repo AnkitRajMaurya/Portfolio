@@ -104,7 +104,7 @@ async function initDB() {
   if (proj.rows[0].c === 0) {
     await db.executeMultiple(`
       INSERT INTO projects (title, description, image_url, demo_url, github_url, tech_tags, badge, sort_order) VALUES
-        ('Codex Monarch', 'A premier student-led technical community platform for national-level hackathons and collaborative engineering projects. Features time-gated coding arenas and a LeetCode-style IDE.', '', 'https://codex-monarch.vercel.app/', '', 'Node.js,MongoDB,JavaScript', 'Live', 1),
+        ('Codex Monarch', 'A premier student-led technical community platform for national-level hackathons and collaborative engineering projects. Features time-gated coding arenas and a LeetCode-style IDE.', '', 'https://www.codexmonarch.me/', '', 'Node.js,MongoDB,JavaScript', 'Live', 1),
         ('Orbit UI', 'A modern component library and UI showcase built with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use.', '', 'https://orbitui-eta.vercel.app/', 'https://github.com/AnkitRajMaurya/ORBITUI', 'HTML5,CSS3,JavaScript', 'Live', 2),
         ('Weather Application', 'A full-featured weather application providing real-time weather data using the OpenWeather API, including current conditions and forecasts.', '', 'https://weather-project-lovat-five.vercel.app/', 'https://github.com/AnkitRajMaurya/weather-project', 'React,OpenWeather,CSS Modules', 'Live', 3);
     `);

@@ -11,12 +11,16 @@ interface ParticlePortraitProps {
 
 export default function ParticlePortrait({ className = '', onScrollProgress }: ParticlePortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [webGLError, setWebGLError] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    // Wait until the hero frame has a real layout size before creating the
+    // WebGL canvas; a zero-height parent produces an invisible renderer.
+    const initialWidth = container.clientWidth;
+    const initialHeight = container.clientHeight;
 
     let renderer: THREE.WebGLRenderer | null = null;
     let scene: THREE.Scene | null = null;
@@ -54,57 +58,6 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
       varying float vProgress;
       varying vec3 vRandom;
 
-      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-      vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-
-      float snoise(vec3 v) {
-        const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-        vec3 i  = floor(v + dot(v, C.yyy));
-        vec3 x0 = v - i + dot(i, C.xxx);
-        vec3 g = step(x0.yzx, x0.xyz);
-        vec3 l = 1.0 - g;
-        vec3 i1 = min(g.xyz, l.zxy);
-        vec3 i2 = max(g.xyz, l.zxy);
-        vec3 x1 = x0 - i1 + C.xxx;
-        vec3 x2 = x0 - i2 + C.yyy;
-        vec3 x3 = x0 - D.yyy;
-        i = mod289(i);
-        vec4 p = permute(permute(permute(
-                   i.z + vec4(0.0, i1.z, i2.z, 1.0))
-                 + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-                 + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-        float n_ = 0.142857142857;
-        vec3  ns = n_ * D.wyz - D.xzx;
-        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-        vec4 x_ = floor(j * ns.z);
-        vec4 y_ = floor(j - 7.0 * x_);
-        vec4 x = x_ *ns.x + ns.yyyy;
-        vec4 y = y_ *ns.x + ns.yyyy;
-        vec4 h = 1.0 - abs(x) - abs(y);
-        vec4 b0 = vec4(x.xy, y.xy);
-        vec4 b1 = vec4(x.zw, y.zw);
-        vec4 s0 = floor(b0)*2.0 + 1.0;
-        vec4 s1 = floor(b1)*2.0 + 1.0;
-        vec4 sh = -step(h, vec4(0.0));
-        vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
-        vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
-        vec3 p0 = vec3(a0.xy, h.x);
-        vec3 p1 = vec3(a0.zw, h.y);
-        vec3 p2 = vec3(a1.xy, h.z);
-        vec3 p3 = vec3(a1.zw, h.w);
-        vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-        p0 *= norm.x;
-        p1 *= norm.y;
-        p2 *= norm.z;
-        p3 *= norm.w;
-        vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-        m = m * m;
-        return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
-      }
-
       void main() {
         vLuminance = aLuminance;
         vEdge = aEdge;
@@ -119,14 +72,6 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
         float ease = pow(localProgress, 1.5);
 
         if (ease > 0.001) {
-          // Curl noise field
-          vec3 nCoord = pos * 0.005 + vec3(uTime * 0.2, uTime * 0.15, aRandomSeed.z * 2.0);
-          vec3 noiseVec = vec3(
-            snoise(nCoord),
-            snoise(nCoord + vec3(23.4, 51.2, 0.0)),
-            snoise(nCoord + vec3(9.1, 74.3, 15.0))
-          );
-
           // Directional wind: outward and upward dispersion
           vec3 wind = vec3(
             (aRandomSeed.x - 0.5) * 450.0 + (pos.x * 0.6),
@@ -134,7 +79,12 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
             (aRandomSeed.z - 0.5) * 500.0
           );
 
-          pos += (wind + noiseVec * 260.0) * ease * uDisplacement;
+          vec3 drift = vec3(
+            sin(uTime + aRandomSeed.z * 6.283) * 34.0,
+            cos(uTime * 0.8 + aRandomSeed.x * 6.283) * 28.0,
+            sin(uTime * 0.7 + aRandomSeed.y * 6.283) * 24.0
+          );
+          pos += (wind + drift) * ease * uDisplacement;
         }
 
         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -193,8 +143,8 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
 
     // Try initializing WebGLRenderer safely
     try {
-      const width = container.clientWidth || 780;
-      const height = container.clientHeight || 680;
+      const width = initialWidth || 780;
+      const height = initialHeight || 560;
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
@@ -206,7 +156,7 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
         powerPreference: 'high-performance',
       });
       renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
       // Append canvas directly to container
       renderer.domElement.style.position = 'absolute';
@@ -225,7 +175,7 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
     // Load actual high-resolution portrait photograph of Ankit Raj Maurya
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = '/img/hero-portrait.png';
+    img.src = '/img/hero-portrait.webp';
 
     img.onload = () => {
       try {
@@ -233,7 +183,7 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
         const ctx = sampleCanvas.getContext('2d');
         if (!ctx) return;
 
-        const targetW = window.innerWidth < 768 ? 160 : 210;
+        const targetW = window.innerWidth < 768 ? 112 : 160;
         const aspect = img.height / img.width;
         const targetH = Math.round(targetW * aspect);
 
@@ -248,7 +198,10 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
         const luminances: number[] = [];
         const edges: number[] = [];
 
-        const scale = 2.45;
+        // Preserve the source portrait's natural proportions while sizing it
+        // for the hero composition.
+        const scaleX = window.innerWidth < 768 ? 1.65 : 2.2;
+        const scaleY = window.innerWidth < 768 ? 1.85 : 2.45;
         const centerX = targetW / 2;
         const centerY = targetH * 0.42; // Center on Ankit's face
 
@@ -281,8 +234,8 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
             const isHair = (normY < 0.38) && (normX < 0.45) && (rawLuminance < 0.28);
             const edgeWeight = Math.min(1.0, Math.pow(normX * 1.2, 2.0) + (isHair ? 0.35 : 0.0));
 
-            const posX = (x - targetW / 2) * scale;
-            const posY = -(y - centerY) * scale;
+            const posX = (x - targetW / 2) * scaleX;
+            const posY = -(y - centerY) * scaleY;
             const posZ = (Math.random() - 0.5) * 16.0;
 
             positions.push(posX, posY, posZ);
@@ -311,14 +264,13 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
         points = new THREE.Points(geometry, material);
         scene?.add(points);
 
-        setIsLoaded(true);
-
         // GSAP ScrollTrigger timeline to scrub the particle dispersion across 5 states
         scrollTriggerInstance = ScrollTrigger.create({
           trigger: '#hero-stage',
           start: 'top top',
           end: 'bottom+=300 top',
           scrub: 1.0,
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             const progress = self.progress;
             uniforms.uProgress.value = progress;
@@ -326,6 +278,17 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
               onScrollProgress(progress);
             }
           },
+          onRefresh: (self) => {
+            uniforms.uProgress.value = self.progress;
+          },
+        });
+
+        // The portrait image finishes loading after the initial page layout.
+        // Refresh the pinned trigger now so its first-frame position and
+        // dissolve progress are correct before the user scrolls.
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+          scrollTriggerInstance?.update();
         });
       } catch (err) {
         console.warn('Particle mesh generation issue:', err);
@@ -379,22 +342,16 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full flex items-center justify-center overflow-hidden ${className}`}
-      style={{ minHeight: '620px', pointerEvents: 'none' }}
+      className={`particle-portrait-canvas ${className}`}
+      style={{ pointerEvents: 'none' }}
     >
-      {webGLError && (
-        <div className="relative w-[340px] h-[480px] flex items-center justify-center">
-          <img
-            src="/img/hero-portrait.png"
-            alt="Ankit Raj Maurya"
-            className="w-full h-full object-cover filter contrast-125 grayscale"
-            style={{
-              maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 95%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 95%)',
-            }}
-          />
-        </div>
-      )}
+      <img
+        className="portrait-fallback-image"
+        src="/img/hero-portrait.webp"
+        alt=""
+        aria-hidden="true"
+        style={{ opacity: webGLError ? 0.82 : 0 }}
+      />
     </div>
   );
 }

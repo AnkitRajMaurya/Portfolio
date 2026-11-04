@@ -3,19 +3,17 @@
 
 .hero-section {
   position: relative;
-  min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 6.5rem 2rem 2rem;
-  overflow: hidden;
+  min-height: 100svh;
+  padding: 6rem 5vw 1rem;
   background-color: var(--background);
 
   @include respond-to('tablet') {
-    padding: 5.5rem 1.25rem 1.5rem;
-    min-height: 92vh;
+    padding: 5rem 1.25rem 1rem;
   }
 }
 
@@ -58,25 +56,54 @@
 }
 
 .hero-portrait-container {
-  position: absolute;
-  top: 36%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
   width: 100%;
   max-width: 840px;
-  height: 660px;
+  height: min(560px, 66svh);
+  min-height: 420px;
   z-index: 2;
   pointer-events: none;
 
   @include respond-to('tablet') {
-    height: 520px;
-    top: 35%;
+    height: 480px;
+    min-height: 0;
   }
 
   @include respond-to('mobile') {
-    height: 440px;
-    top: 33%;
+    width: 100%;
+    height: 390px;
   }
+}
+
+.particle-portrait-canvas {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.portrait-fallback-image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(300px, 78vw);
+  height: 100%;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: center top;
+  filter: grayscale(1) contrast(1.25);
+  opacity: 0.72;
+  transition: opacity 300ms ease;
+  mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
 }
 
 .hero-foreground-content {
@@ -87,11 +114,11 @@
   align-items: center;
   text-align: center;
   max-width: 1100px;
-  margin-top: 32vh;
+  margin-top: clamp(140px, 28svh, 200px);
   pointer-events: auto;
 
   @include respond-to('tablet') {
-    margin-top: 26vh;
+    margin-top: clamp(110px, 18svh, 150px);
   }
 
   .hero-eyebrow {
@@ -102,7 +129,7 @@
     background: transparent;
     border: none;
     box-shadow: none;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.9rem;
 
     .eyebrow-dot {
       width: 5px;
@@ -124,12 +151,12 @@
 
   .hero-main-title {
     font-family: $font-display;
-    font-size: clamp(3.2rem, 8vw, 7.5rem);
+    font-size: clamp(3.2rem, 7.3vw, 7rem);
     line-height: 0.98;
     font-weight: 400;
     color: var(--foreground);
     letter-spacing: -0.015em;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
@@ -138,6 +165,13 @@
 
     @include respond-to('tablet') {
       flex-wrap: wrap;
+      font-size: clamp(3rem, 6vw, 5rem);
+    }
+
+    @include respond-to('mobile') {
+      font-size: clamp(2.35rem, 10.5vw, 3.4rem);
+      gap: 0 0.35rem;
+      margin-bottom: 0.75rem;
     }
 
     .hero-title-part {
@@ -157,9 +191,16 @@
     line-height: 1.65;
     color: rgba(240, 234, 224, 0.78);
     max-width: 620px;
-    margin-bottom: 2.25rem;
+    margin-bottom: 1.5rem;
     font-weight: 350;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+
+    @include respond-to('mobile') {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-width: 34rem;
+      margin-bottom: 1rem;
+    }
   }
 
   .hero-cta-group {
@@ -168,16 +209,16 @@
     gap: 1.25rem;
 
     @include respond-to('mobile') {
-      flex-direction: column;
-      width: 100%;
-      gap: 0.75rem;
+      flex-direction: row;
+      width: auto;
+      gap: 0.5rem;
     }
 
     .btn-hero-primary {
       display: inline-flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.85rem 1.75rem;
+      padding: 0.75rem 1.35rem;
       border-radius: 8px;
       background: rgba(240, 234, 224, 0.06);
       border: 1px solid rgba(240, 234, 224, 0.15);
@@ -208,7 +249,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.85rem 1.25rem;
+      padding: 0.75rem 0.75rem;
       border-radius: 8px;
       color: var(--muted);
       font-family: $font-body;
@@ -242,7 +283,11 @@
   align-items: center;
   z-index: 10;
   border-top: 1px solid var(--grid-line);
-  padding: 1.25rem 0.5rem 0;
+  padding: 0.85rem 0.5rem 0;
+
+  @include respond-to('mobile') {
+    padding-top: 0.55rem;
+  }
 
   .bottom-meta-col {
     font-family: $font-mono;

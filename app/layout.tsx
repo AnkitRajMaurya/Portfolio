@@ -43,7 +43,7 @@ export const metadata: Metadata = {
       'Explore the digital portfolio of Ankit Raj Maurya — featuring interactive WebGL shader portrait dispersion, production platforms, and verified engineering achievements.',
     images: [
       {
-        url: '/img/hero-portrait.png',
+        url: '/img/hero-portrait.webp',
         width: 1024,
         height: 1024,
         alt: 'Ankit Raj Maurya Portfolio Stage',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: 'Ankit Raj Maurya | Full-Stack Developer & Creative Engineer',
     description:
       'Full-Stack Developer & Creative Engineer. Building scalable web applications, community platforms, and interactive visual technology.',
-    images: ['/img/hero-portrait.png'],
+    images: ['/img/hero-portrait.webp'],
   },
 };
 

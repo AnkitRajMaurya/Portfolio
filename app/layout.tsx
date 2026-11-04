@@ -26,13 +26,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://ankitrajmaurya.vercel.app/',
   },
-  icons: {
-    icon: [
-      { url: '/favicon.png', type: 'image/png' },
-      { url: '/favicon.ico' },
-    ],
-    apple: '/apple-icon.png',
-  },
+  icons: '/favicon.png',
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -41,21 +35,14 @@ export const metadata: Metadata = {
     title: 'Ankit Raj Maurya | Full-Stack Developer & Creative Engineer',
     description:
       'Explore the digital portfolio of Ankit Raj Maurya — featuring interactive WebGL shader portrait dispersion, production platforms, and verified engineering achievements.',
-    images: [
-      {
-        url: '/img/hero-portrait.webp',
-        width: 1024,
-        height: 1024,
-        alt: 'Ankit Raj Maurya Portfolio Stage',
-      },
-    ],
+    images: '/img/hero-portrait.webp',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ankit Raj Maurya | Full-Stack Developer & Creative Engineer',
     description:
       'Full-Stack Developer & Creative Engineer. Building scalable web applications, community platforms, and interactive visual technology.',
-    images: ['/img/hero-portrait.webp'],
+    images: '/img/hero-portrait.webp',
   },
 };
 

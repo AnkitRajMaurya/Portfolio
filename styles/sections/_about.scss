@@ -1,0 +1,303 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── 03. ABOUT — Sticky sidebar + editorial bio + stat rows ──────────────────
+
+.about-section {
+  position: relative;
+  width: 100%;
+  background: var(--background);
+  border-bottom: 1px solid var(--grid-line);
+  overflow: hidden;
+
+  // Subtle watermark index
+  &::before {
+    content: '03';
+    position: absolute;
+    top: -2rem;
+    right: -1rem;
+    font-family: $font-mono;
+    font-size: clamp(10rem, 18vw, 18rem);
+    font-weight: 700;
+    color: rgba(240, 234, 224, 0.025);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+}
+
+.about-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+
+  @include respond-to('desktop') {
+    grid-template-columns: 280px 1fr;
+  }
+
+  @include respond-to('tablet') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── LEFT: Sticky sidebar with amber accent bar ──────────────────────────────
+.about-meta-rail {
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+  align-self: start;
+  padding: 6rem 2.5rem 6rem 2rem;
+  border-right: 1px solid var(--grid-line);
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+
+  // Amber accent bar on the very left
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4rem;
+    bottom: 4rem;
+    width: 3px;
+    background: linear-gradient(180deg, transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
+  }
+
+  @include respond-to('tablet') {
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--grid-line);
+    padding: 4rem 1.5rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 2rem;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .section-label {
+    @include section-label;
+    width: 100%;
+  }
+
+  .meta-card-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    @include respond-to('tablet') {
+      min-width: 200px;
+      flex: 1;
+    }
+
+    .meta-block-title {
+      @include mono-eyebrow;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+    }
+
+    .edu-entry {
+      margin-bottom: 1.25rem;
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--border);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &:hover {
+        border-left-color: var(--accent);
+      }
+
+      .edu-years {
+        font-family: $font-mono;
+        font-size: 0.7rem;
+        color: var(--accent);
+        display: block;
+        margin-bottom: 0.2rem;
+      }
+
+      .edu-degree {
+        font-family: $font-body;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--foreground);
+        line-height: 1.35;
+        margin-bottom: 0.15rem;
+      }
+
+      .edu-institution {
+        font-family: $font-body;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+    }
+
+    .meta-text-val {
+      font-family: $font-body;
+      font-size: 0.9rem;
+      color: var(--foreground);
+      font-weight: 500;
+    }
+
+    .meta-subtext-val {
+      font-family: $font-mono;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .roles-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      li {
+        font-family: $font-body;
+        font-size: 0.85rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: color 0.2s ease;
+
+        &::before {
+          content: '→';
+          color: var(--accent);
+          font-family: $font-mono;
+          font-size: 0.75rem;
+          flex-shrink: 0;
+        }
+
+        &:hover {
+          color: var(--foreground);
+        }
+      }
+    }
+  }
+}
+
+// ── RIGHT: Editorial biography + stat rows ──────────────────────────────────
+.about-editorial-content {
+  padding: 6rem 3rem 6rem 4rem;
+  display: flex;
+  flex-direction: column;
+
+  @include respond-to('desktop') {
+    padding: 5rem 2.5rem;
+  }
+
+  @include respond-to('tablet') {
+    padding: 4rem 1.5rem;
+  }
+
+  .about-main-headline {
+    font-family: $font-display;
+    font-size: clamp(2.75rem, 5.5vw, 5rem);
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--foreground);
+    margin-bottom: 3rem;
+
+    .headline-italic {
+      font-style: italic;
+      color: var(--accent);
+    }
+  }
+
+  // Large pull-quote paragraph
+  .bio-paragraphs {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    font-family: $font-body;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 760px;
+    margin-bottom: 4.5rem;
+
+    .lead-bio {
+      font-size: 1.35rem;
+      line-height: 1.55;
+      font-weight: 350;
+      color: var(--foreground);
+      padding-left: 1.5rem;
+      border-left: 3px solid var(--accent);
+    }
+  }
+
+  // Horizontal "stat rows" — not generic cards
+  .engineering-values-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    .value-card {
+      display: grid;
+      grid-template-columns: 80px auto 1fr;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.75rem 0;
+      border-top: 1px solid var(--grid-line);
+      transition: background 0.2s ease;
+
+      &:last-child {
+        border-bottom: 1px solid var(--grid-line);
+      }
+
+      &:hover {
+        .value-index { color: var(--accent); }
+      }
+
+      @include respond-to('tablet') {
+        grid-template-columns: 48px 1fr;
+        grid-template-rows: auto auto;
+        gap: 0.75rem;
+
+        .value-title {
+          grid-column: 2;
+          grid-row: 1;
+        }
+
+        .value-desc {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .value-index {
+        font-family: $font-mono;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: rgba(240, 234, 224, 0.12);
+        transition: color 0.3s ease;
+        line-height: 1;
+      }
+
+      .value-title {
+        font-family: $font-display;
+        font-size: 1.5rem;
+        color: var(--foreground);
+        font-weight: 400;
+        white-space: nowrap;
+      }
+
+      .value-desc {
+        font-family: $font-body;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+// Color Tokens
+$bg-primary: #080807;
+$bg-secondary: #10100f;
+$surface: #151411;
+$surface-hover: #1e1d19;
+$foreground: #f0eae0;
+$muted: #a69d91;
+$subtle: #5a544c;
+$accent: #d97745;
+$accent-glow: rgba(217, 119, 69, 0.35);
+$accent-bright: #ff9b54;
+$border: rgba(240, 234, 224, 0.12);
+$border-strong: rgba(240, 234, 224, 0.22);
+$grid-line: rgba(240, 234, 224, 0.055);
+
+// Typography Tokens
+$font-display: 'Instrument Serif', Georgia, serif;
+$font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+// Breakpoints
+$bp-mobile-sm: 360px;
+$bp-mobile: 480px;
+$bp-tablet: 768px;
+$bp-desktop: 1024px;
+$bp-desktop-lg: 1440px;
+$bp-wide: 1800px;
+
+// Transitions
+$ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$duration-normal: 0.4s;
+$duration-slow: 0.8s;

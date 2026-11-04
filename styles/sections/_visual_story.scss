@@ -1,0 +1,313 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── 01. VISUAL STORY — Magazine editorial spread with amber left border rule ──
+
+.visual-story-section {
+  position: relative;
+  width: 100%;
+  min-height: 110vh;
+  padding: 8rem 2rem 10rem;
+  overflow: hidden;
+  background-color: var(--background-secondary);
+  border-bottom: 1px solid var(--grid-line);
+
+  // Amber left border rule — the editorial signature
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8rem;
+    bottom: 8rem;
+    width: 3px;
+    background: linear-gradient(180deg, transparent 0%, var(--accent) 15%, var(--accent) 85%, transparent 100%);
+    z-index: 10;
+  }
+
+  // Large "01" watermark background
+  &::after {
+    content: '01';
+    position: absolute;
+    top: -3rem;
+    right: -1rem;
+    font-family: $font-mono;
+    font-size: clamp(12rem, 20vw, 20rem);
+    font-weight: 700;
+    color: rgba(240, 234, 224, 0.025);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @include respond-to('tablet') {
+    padding: 5rem 1.5rem 7rem;
+    min-height: auto;
+
+    &::before { display: none; }
+  }
+}
+
+.story-ambient-glow {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 450px;
+  background: radial-gradient(ellipse at center, rgba(217, 119, 69, 0.07) 0%, transparent 65%);
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.story-content-wrapper {
+  max-width: 1300px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+}
+
+.story-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+
+  .section-label {
+    @include section-label;
+    margin-bottom: 0;
+  }
+
+  .story-meta-badge {
+    @include mono-eyebrow;
+    color: var(--subtle);
+
+    @include respond-to('mobile') {
+      display: none;
+    }
+  }
+}
+
+.story-headline-block {
+  margin-bottom: 1.75rem;
+
+  .story-headline-line {
+    font-size: clamp(3rem, 8.5vw, 8rem);
+    line-height: 0.95;
+    font-weight: 400;
+    color: var(--foreground);
+    letter-spacing: -0.02em;
+    margin: 0;
+
+    .serif-upright {
+      font-family: $font-display;
+      color: var(--foreground);
+    }
+
+    .serif-italic {
+      font-family: $font-display;
+      font-style: italic;
+      color: var(--accent);
+      padding-left: 0.25rem;
+    }
+  }
+}
+
+.story-subtext {
+  font-family: $font-body;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 600px;
+  margin-bottom: 5rem;
+
+  @include respond-to('tablet') {
+    margin-bottom: 3.5rem;
+  }
+}
+
+// ── Cards overflow the section boundary for editorial effect ─────────────────
+.story-parallax-stage {
+  position: relative;
+  width: 100%;
+  height: 640px;
+  margin-top: 2rem;
+
+  @include respond-to('tablet') {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+}
+
+.story-layer-card {
+  position: absolute;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s $ease-cinematic;
+
+  &:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9);
+    transform: translateY(-6px) !important;
+  }
+
+  @include respond-to('tablet') {
+    position: relative;
+    width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+
+    &:hover {
+      transform: none !important;
+    }
+  }
+
+  .card-browser-chrome {
+    height: 32px;
+    background: rgba(21, 20, 17, 0.95);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 6px;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+
+      &.red    { background: #ff5f56; }
+      &.yellow { background: #ffbd2e; }
+      &.green  { background: #27c93f; }
+    }
+
+    .browser-url {
+      font-family: $font-mono;
+      font-size: 0.65rem;
+      color: var(--subtle);
+      margin-left: 12px;
+    }
+  }
+
+  .card-image-box {
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+
+    .card-screenshot {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s $ease-cinematic;
+    }
+  }
+
+  &:hover .card-screenshot {
+    transform: scale(1.03);
+  }
+
+  .card-caption {
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+
+    .card-tag {
+      font-family: $font-mono;
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .card-title {
+      font-family: $font-body;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+  }
+
+  &.card-readytogo {
+    width: 440px;
+    left: 0;
+    top: 60px;
+    z-index: 2;
+
+    .card-image-box { height: 270px; }
+  }
+
+  &.card-codex {
+    width: 580px;
+    left: 30%;
+    top: 20px;
+    z-index: 5;
+
+    .card-image-box { height: 350px; }
+
+    @include respond-to('desktop') {
+      width: 480px;
+      left: 20%;
+    }
+  }
+
+  &.card-orbit {
+    width: 460px;
+    right: 0;
+    top: 180px;
+    z-index: 3;
+
+    .card-image-box { height: 280px; }
+  }
+}
+
+.story-floating-badge {
+  position: absolute;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  @include glass-panel;
+  background: rgba(21, 20, 17, 0.92);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+
+  @include respond-to('tablet') {
+    display: none;
+  }
+
+  .badge-icon {
+    color: var(--accent);
+    font-family: $font-mono;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
+  .badge-text {
+    font-family: $font-mono;
+    font-size: 0.72rem;
+    color: var(--foreground);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  &.badge-top-right {
+    top: 20px;
+    right: 8%;
+  }
+
+  &.badge-bottom-left {
+    bottom: 20px;
+    left: 8%;
+  }
+}

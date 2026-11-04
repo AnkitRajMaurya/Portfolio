@@ -1,0 +1,215 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── 05. TECHNICAL SKILLS — Technical datasheet / spec sheet layout ───────────
+
+.skills-section {
+  position: relative;
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--grid-line);
+  overflow: hidden;
+
+  &::before {
+    content: '05';
+    position: absolute;
+    top: -2rem;
+    right: -1rem;
+    font-family: $font-mono;
+    font-size: clamp(10rem, 16vw, 16rem);
+    font-weight: 700;
+    color: rgba(240, 234, 224, 0.03);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+.skills-header {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 7rem 2rem 0;
+  position: relative;
+  z-index: 1;
+
+  @include respond-to('tablet') {
+    padding: 5rem 1.5rem 0;
+  }
+
+  .section-label {
+    @include section-label;
+  }
+
+  .skills-main-title {
+    font-family: $font-display;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--foreground);
+    margin-bottom: 1.25rem;
+
+    .title-italic {
+      font-style: italic;
+      color: var(--accent);
+    }
+  }
+
+  .skills-desc {
+    font-family: $font-body;
+    font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 5rem;
+  }
+}
+
+// ── Spec sheet / datasheet layout ───────────────────────────────────────────
+.skills-domains-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+
+  @include respond-to('tablet') {
+    padding: 0 1.5rem 5rem;
+  }
+}
+
+.skill-domain-card {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  border-top: 1px solid var(--grid-line);
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  transition: background 0.2s ease;
+
+  &:last-child {
+    border-bottom: 1px solid var(--grid-line);
+  }
+
+  &:hover {
+    background: rgba(240, 234, 224, 0.015);
+  }
+
+  @include respond-to('desktop') {
+    grid-template-columns: 220px 1fr;
+  }
+
+  @include respond-to('tablet') {
+    grid-template-columns: 1fr;
+  }
+
+  .domain-card-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 2.25rem 2rem 2.25rem 0;
+    border-right: 1px solid var(--grid-line);
+    border-bottom: none;
+    gap: 0.35rem;
+
+    @include respond-to('tablet') {
+      border-right: none;
+      border-bottom: 1px solid var(--grid-line);
+      padding: 1.75rem 0 1.25rem;
+      flex-direction: row;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .domain-num {
+      font-family: $font-mono;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      display: block;
+    }
+
+    .domain-title-wrap {
+      .domain-name {
+        font-family: $font-mono;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--foreground);
+        margin-bottom: 0.3rem;
+      }
+
+      .domain-context {
+        font-family: $font-body;
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-style: italic;
+      }
+    }
+  }
+
+  .domain-skills-table {
+    padding: 2.25rem 0 2.25rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    @include respond-to('tablet') {
+      padding: 1.5rem 0;
+    }
+
+    .skill-row-item {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(240, 234, 224, 0.05);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover .skill-text-name {
+        color: var(--accent);
+      }
+
+      @include respond-to('tablet') {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+      }
+
+      .skill-name-col {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+
+        .bullet-amber {
+          color: var(--accent);
+          font-size: 1rem;
+          flex-shrink: 0;
+        }
+
+        .skill-text-name {
+          font-family: $font-body;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: var(--foreground);
+          transition: color 0.2s ease;
+        }
+      }
+
+      .skill-detail-col {
+        .skill-desc-text {
+          font-family: $font-body;
+          font-size: 0.82rem;
+          color: var(--subtle);
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+}

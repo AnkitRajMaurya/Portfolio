@@ -1,915 +1,503 @@
-// Utility script loader for dynamic script deferral
-function loadScript(url, callback) {
-  const script = document.createElement("script");
-  script.src = url;
-  script.defer = true;
-  script.onload = callback;
-  document.head.appendChild(script);
-}
+/**
+ * ANKIT RAJ MAURYA — PORTFOLIO JAVASCRIPT
+ * Full-fidelity interactions, WebGL shader background, 3D tilt, bento spotlight,
+ * timeline fill, sticky stacking cards, interactive canvas portrait.
+ */
 
-const PHONE_BREAKPOINT = 768;
+document.addEventListener("DOMContentLoaded", () => {
+  initBackgroundShader();
+  initPortraitCanvas();
+  initNavigation();
+  initScrollEffects();
+  initStackTabsAndSpotlight();
+  initCertTilt();
+  initMagneticButton();
+  initCopyEmail();
+  initContactForm();
+});
 
-function isPhoneViewport() {
-  return window.innerWidth <= PHONE_BREAKPOINT;
-}
+/* ── 1. WebGL Procedural Background Shader (#gl) ───────────────────────── */
+function initBackgroundShader() {
+  const c = document.getElementById("gl");
+  if (!c) return;
 
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+  const gl = c.getContext("webgl", { antialias: false, alpha: false });
+  if (!gl) return;
 
-function shouldUseLiteExperience() {
-  const connection =
-    navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  const saveData = Boolean(connection && connection.saveData);
-  const slowConnection = Boolean(
-    connection && /(^|-)2g$|(^|-)3g$/.test(connection.effectiveType || "")
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function sh(t, s) {
+    const o = gl.createShader(t);
+    gl.shaderSource(o, s);
+    gl.compileShader(o);
+    return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null;
+  }
+
+  const vs = sh(
+    gl.VERTEX_SHADER,
+    "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"
   );
 
-  return isPhoneViewport() || prefersReducedMotion() || saveData || slowConnection;
-}
+  const fs = sh(
+    gl.FRAGMENT_SHADER,
+    "precision mediump float;uniform vec2 r,m;uniform float t;" +
+      "float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}" +
+      "float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}" +
+      "float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.;a*=.5;}return v;}" +
+      "void main(){vec2 u=gl_FragCoord.xy/r;vec2 p=(gl_FragCoord.xy-.5*r)/r.y;vec2 mp=(m-.5)*vec2(r.x/r.y,1.);" +
+      "vec2 q=vec2(fbm(p*2.+t*.06),fbm(p*2.+vec2(5.2,1.3)-t*.05));" +
+      "float f=fbm(p*2.2+q*2.4+mp*.5+t*.03);float d=length(p-mp);" +
+      "vec3 col=mix(vec3(.043,.039,.035),vec3(1.,.36,.12),smoothstep(.5,1.,f)*.5);" +
+      "col+=vec3(1.,.42,.15)*.1/(d*2.8+.35);col*=mix(.55,1.,u.y*.6+.4);gl_FragColor=vec4(col,1.);}"
+  );
 
-// Preload critical resources
-function preloadResources() {
-  const imagesToPreload = document.querySelectorAll("img[data-src]");
-  imagesToPreload.forEach((img) => {
-    img.src = img.dataset.src;
+  if (!vs || !fs) return;
+
+  const pr = gl.createProgram();
+  gl.attachShader(pr, vs);
+  gl.attachShader(pr, fs);
+  gl.linkProgram(pr);
+  gl.useProgram(pr);
+
+  const bf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bf);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 3, -1, -1, 3]),
+    gl.STATIC_DRAW
+  );
+
+  const al = gl.getAttribLocation(pr, "a");
+  gl.enableVertexAttribArray(al);
+  gl.vertexAttribPointer(al, 2, gl.FLOAT, false, 0, 0);
+
+  const ur = gl.getUniformLocation(pr, "r");
+  const um = gl.getUniformLocation(pr, "m");
+  const ut = gl.getUniformLocation(pr, "t");
+
+  function size() {
+    c.width = Math.max(2, Math.floor(window.innerWidth * 0.5));
+    c.height = Math.max(2, Math.floor(window.innerHeight * 0.5));
+    gl.viewport(0, 0, c.width, c.height);
+  }
+  size();
+  window.addEventListener("resize", size);
+
+  let mx = 0.5,
+    my = 0.5,
+    tx = 0.5,
+    ty = 0.5;
+  const t0 = performance.now();
+
+  window.addEventListener("pointermove", (e) => {
+    tx = e.clientX / window.innerWidth;
+    ty = 1 - e.clientY / window.innerHeight;
   });
-}
 
-// Initialize loading screen
-function initLoadingScreen() {
-  if (shouldUseLiteExperience()) {
-    document.body.classList.add("loaded");
-    return;
+  function draw(now) {
+    mx += (tx - mx) * 0.05;
+    my += (ty - my) * 0.05;
+    gl.uniform2f(ur, c.width, c.height);
+    gl.uniform2f(um, mx, my);
+    gl.uniform1f(ut, (now - t0) / 1000);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
-  const loader = document.createElement("div");
-  loader.className = "page-loader";
-  loader.innerHTML = `
-        <div class="loader-content">
-            <div class="loader-circle"></div>
-            <p class="mono">Loading...</p>
-        </div>
-    `;
-  document.body.appendChild(loader);
+  function loop(now) {
+    if (!document.hidden) draw(now);
+    requestAnimationFrame(loop);
+  }
 
-  const hideLoader = () => {
-    if (loader.style.opacity === "0") return;
-    loader.style.opacity = "0";
-    document.body.classList.add("loaded");
-    setTimeout(() => {
-      loader.remove();
-    }, 500);
-  };
-
-  // Dismiss loader on window load OR after a fallback timeout (1.5 seconds)
-  // to ensure immediate usability on slow mobile connections.
-  if (document.readyState === "complete") {
-    setTimeout(hideLoader, 200);
+  if (still) {
+    draw(t0 + 4000);
   } else {
-    window.addEventListener("load", () => {
-      setTimeout(hideLoader, 200);
-    });
+    requestAnimationFrame(loop);
   }
-  
-  // Safe fallback to prevent loader getting stuck on slow networks
-  setTimeout(hideLoader, 1500);
 }
 
-// Initialize particles background
-function initParticles() {
-  let particlesContainer = document.getElementById("particles-js");
+/* ── 2. Interactive Portrait Canvas (Hero Halftone / Particle Light) ────── */
+function initPortraitCanvas() {
+  const canvas = document.getElementById("portrait-canvas");
+  const card = document.getElementById("portrait-card");
+  if (!canvas || !card) return;
 
-  if (shouldUseLiteExperience()) {
-    // Disable on mobile or reduced motion for performance
-    if (particlesContainer) particlesContainer.remove();
-    return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const ctx = canvas.getContext("2d");
+  let width, height;
+  let particles = [];
+  let mouseX = 0.5,
+    mouseY = 0.3;
+  let targetMouseX = 0.5,
+    targetMouseY = 0.3;
+
+  function resizeCanvas() {
+    const rect = card.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = rect.width;
+    height = rect.height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+    initParticles();
   }
 
-  if (!particlesContainer) {
-    particlesContainer = document.createElement("div");
-    particlesContainer.id = "particles-js";
-    document.body.appendChild(particlesContainer);
+  function initParticles() {
+    particles = [];
+    const spacing = 18;
+    const cols = Math.floor(width / spacing);
+    const rows = Math.floor(height / spacing);
+
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
+        const x = c * spacing + spacing / 2;
+        const y = r * spacing + spacing / 2;
+        const distFromCenter =
+          Math.hypot(x - width / 2, y - height / 2) / (width / 2);
+        if (Math.random() > 0.4 || distFromCenter > 0.6) {
+          particles.push({
+            x,
+            y,
+            baseX: x,
+            baseY: y,
+            radius: 1.2 + Math.random() * 1.4,
+            alpha: 0.15 + Math.random() * 0.35,
+            phase: Math.random() * Math.PI * 2,
+            speed: 0.02 + Math.random() * 0.02,
+          });
+        }
+      }
+    }
   }
 
-  // Load particles.js dynamically only on desktop
-  loadScript("https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js", () => {
-    if (typeof particlesJS === "function") {
-      particlesJS("particles-js", {
-        particles: {
-          number: { value: 45, density: { enable: true, value_area: 900 } },
-          color: { value: "#00ffd5" },
-          shape: { type: "circle" },
-          opacity: { value: 0.5, random: true },
-          size: { value: 3, random: true },
-          line_linked: {
-            enable: true,
-            distance: 150,
-            color: "#00ffd5",
-            opacity: 0.2,
-            width: 1,
-          },
-          move: {
-            enable: true,
-            speed: 1.2,
-            direction: "none",
-            random: true,
-            straight: false,
-            out_mode: "out",
-          },
-        },
-        interactivity: {
-          detect_on: "canvas",
-          events: {
-            onhover: { enable: true, mode: "repulse" },
-            onclick: { enable: true, mode: "push" },
-            resize: true,
-          },
-        },
-        retina_detect: true,
+  function render() {
+    ctx.clearRect(0, 0, width, height);
+
+    mouseX += (targetMouseX - mouseX) * 0.08;
+    mouseY += (targetMouseY - mouseY) * 0.08;
+
+    const focalX = mouseX * width;
+    const focalY = mouseY * height;
+
+    particles.forEach((p) => {
+      p.phase += p.speed;
+      const pulse = Math.sin(p.phase) * 0.4;
+      const dx = p.baseX - focalX;
+      const dy = p.baseY - focalY;
+      const dist = Math.hypot(dx, dy);
+      const influenceRadius = 140;
+
+      let offsetX = 0;
+      let offsetY = 0;
+      let extraAlpha = 0;
+
+      if (dist < influenceRadius) {
+        const factor = 1 - dist / influenceRadius;
+        offsetX = (dx / dist) * factor * 12;
+        offsetY = (dy / dist) * factor * 12;
+        extraAlpha = factor * 0.5;
+      }
+
+      p.x = p.baseX + offsetX;
+      p.y = p.baseY + offsetY;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(0.6, p.radius + pulse), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 107, 44, ${Math.min(
+        0.9,
+        p.alpha + extraAlpha
+      )})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(render);
+  }
+
+  card.addEventListener("mousemove", (e) => {
+    const rect = card.getBoundingClientRect();
+    targetMouseX = (e.clientX - rect.left) / rect.width;
+    targetMouseY = (e.clientY - rect.top) / rect.height;
+  });
+
+  card.addEventListener("mouseleave", () => {
+    targetMouseX = 0.5;
+    targetMouseY = 0.3;
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+  render();
+}
+
+/* ── 3. Navigation, Scroll Progress & Section Spy ──────────────────────── */
+function initNavigation() {
+  const nav = document.getElementById("main-nav");
+  const mobileToggle = document.getElementById("mobile-toggle");
+  const navMenu = document.getElementById("nav-menu");
+
+  if (nav) {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        nav.classList.add("scrolled");
+      } else {
+        nav.classList.remove("scrolled");
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener("click", () => {
+      const isOpen = navMenu.classList.toggle("open");
+      mobileToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+
+    navMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        navMenu.classList.remove("open");
+        mobileToggle.setAttribute("aria-expanded", "false");
       });
+    });
+  }
+}
+
+function initScrollEffects() {
+  const pg = document.getElementById("pg") || document.getElementById("prog");
+  const tls = Array.from(document.querySelectorAll(".tl"));
+  const reveals = Array.from(document.querySelectorAll(".rv"));
+  const navLinks = Array.from(document.querySelectorAll("[data-s], .nav-item"));
+  const sections = Array.from(document.querySelectorAll("main section[id], section[id]"));
+
+  // 1. Immediately reveal elements already in view
+  reveals.forEach((el) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight * 1.15) {
+      el.classList.add("in");
+      el.classList.add("vis");
     }
   });
-}
 
-// Theme management
-const ThemeManager = {
-  init() {
-    this.themeToggle = document.getElementById("theme-toggle");
-    this.currentTheme = localStorage.getItem("theme") || "light";
-    this.setTheme(this.currentTheme);
-    if (this.themeToggle) {
-      this.themeIcon = this.themeToggle.querySelector("i");
-      this.themeIcon.className =
-        this.currentTheme === "light" ? "fas fa-moon" : "fas fa-sun";
-      this.bindEvents();
-    }
-  },
-
-  bindEvents() {
-    this.themeToggle.addEventListener("click", () => {
-      this.currentTheme = this.currentTheme === "light" ? "dark" : "light";
-      this.setTheme(this.currentTheme);
-    });
-  },
-
-  setTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-    if (this.themeIcon) {
-      this.themeIcon.className =
-        theme === "light" ? "fas fa-moon" : "fas fa-sun";
-    }
-
-    // Update particles colors based on theme
-    if (window.pJSDom && window.pJSDom.length > 0 && window.pJSDom[0].pJS) {
-      const particles = window.pJSDom[0].pJS.particles;
-      particles.color.value = theme === "light" ? "#2563eb" : "#60a5fa";
-      particles.line_linked.color = theme === "light" ? "#2563eb" : "#60a5fa";
-    }
-
-    // Apply dark invert styling for black icons in dark mode
-    if (typeof window.applyDarkInvertStyling === 'function') {
-      window.applyDarkInvertStyling();
-    }
-  },
-};
-
-// Form validation and submission
-const ContactForm = {
-  init() {
-    this.form = document.querySelector(".contact-form");
-    if (this.form) {
-      this.submitButton = this.form.querySelector('button[type="submit"]');
-      this.defaultButtonHtml = this.submitButton?.innerHTML || "";
-      this.bindEvents();
-    }
-  },
-
-  bindEvents() {
-    this.form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (this.validateForm()) {
-        await this.submitForm();
-      }
-    });
-  },
-
-  validateForm() {
-    const inputs = this.form.querySelectorAll("input, textarea");
-    let isValid = true;
-
-    inputs.forEach((input) => {
-      if (!input.value.trim()) {
-        this.showError(input, "This field is required");
-        isValid = false;
-      } else if (
-        input.type === "email" &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim())
-      ) {
-        this.showError(input, "Enter a valid email address");
-        isValid = false;
-      } else {
-        this.removeError(input);
-      }
-    });
-
-    return isValid;
-  },
-
-  showError(input, message) {
-    const errorDiv =
-      input.parentElement.querySelector(".error-message") ||
-      document.createElement("div");
-    errorDiv.className = "error-message";
-    errorDiv.textContent = message;
-    if (!input.parentElement.querySelector(".error-message")) {
-      input.parentElement.appendChild(errorDiv);
-    }
-    input.classList.add("error");
-  },
-
-  removeError(input) {
-    const errorDiv = input.parentElement.querySelector(".error-message");
-    if (errorDiv) {
-      errorDiv.remove();
-    }
-    input.classList.remove("error");
-  },
-
-  async submitForm() {
-    const formData = new FormData(this.form);
-    const data = Object.fromEntries(formData.entries());
-    const endpoint = (this.form.dataset.endpoint || "").trim();
-
-    try {
-      if (this.submitButton) {
-        this.submitButton.disabled = true;
-        this.submitButton.innerHTML =
-          'Sending Message <i class="fa-solid fa-spinner fa-spin"></i>';
-      }
-
-      if (endpoint) {
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(data),
+  // 2. Reveal on scroll
+  if ("IntersectionObserver" in window) {
+    const ro = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            e.target.classList.add("vis");
+            ro.unobserve(e.target);
+          }
         });
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to send message");
-        }
-
-        this.showSuccess("Message sent successfully! I'll get back to you soon.");
-      } else {
-        this.openMailClient(data);
-        this.showSuccess("Email draft opened. Please click send in your mail app.");
-      }
-    } catch (error) {
-      this.showError(this.form, error.message || "Failed to send message. Please try again.");
-    } finally {
-      if (this.submitButton) {
-        this.submitButton.disabled = false;
-        this.submitButton.innerHTML = this.defaultButtonHtml;
-      }
-    }
-  },
-
-  openMailClient(data) {
-    const name = (data.name || "").trim();
-    const email = (data.email || "").trim();
-    const message = (data.message || "").trim();
-    const subject = encodeURIComponent(`Portfolio Inquiry from ${name || "Visitor"}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+      },
+      { threshold: 0.05, rootMargin: "0px 0px 50px 0px" }
     );
-    window.location.href = `mailto:ankit5242raj1@outlook.com?subject=${subject}&body=${body}`;
-  },
+    reveals.forEach((el) => ro.observe(el));
 
-  showSuccess(messageText = "Message sent successfully!") {
-    this.form.reset();
-    const successMessage = document.createElement("div");
-    successMessage.className = "success-message";
-    successMessage.textContent = messageText;
-    this.form.appendChild(successMessage);
-    setTimeout(() => successMessage.remove(), 5000);
-  },
-};
+    // 2. Active section spy
+    const so = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            const secId = e.target.id;
+            navLinks.forEach((a) => {
+              const matches =
+                a.dataset.s === secId || a.getAttribute("href") === "#" + secId;
+              if (matches) {
+                a.setAttribute("aria-current", "true");
+                a.classList.add("active");
+              } else {
+                a.removeAttribute("aria-current");
+                a.classList.remove("active");
+              }
+            });
+          }
+        });
+      },
+      { rootMargin: "-30% 0px -50% 0px" }
+    );
+    sections.forEach((s) => so.observe(s));
+  } else {
+    reveals.forEach((el) => {
+      el.classList.add("in");
+      el.classList.add("vis");
+    });
+  }
 
-// Smooth scrolling with progress indicator
-const ScrollManager = {
-  init() {
-    this.progressBar = document.querySelector(".scroll-progress");
-    this.header = document.getElementById("header");
-    this.scrollUp = document.getElementById("scroll-up");
-    this.sections = Array.from(document.querySelectorAll("section[id]"));
-    this.isPhone = isPhoneViewport();
-    this.lastScroll = window.pageYOffset;
-    this.ticking = false;
-    this.createProgressBar();
-    this.bindScrollEvents();
-    this.update();
-  },
+  // 3. Scroll update (top progress bar + timeline line fill)
+  let tick = false;
+  function upd() {
+    tick = false;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = h > 0 ? window.scrollY / h : 0;
 
-  createProgressBar() {
-    if (!document.querySelector(".scroll-progress")) {
-      const progressBar = document.createElement("div");
-      progressBar.className = "scroll-progress";
-      document.body.appendChild(progressBar);
-    }
-  },
-
-  bindScrollEvents() {
-    window.addEventListener("scroll", () => {
-      if (this.ticking) return;
-
-      this.ticking = true;
-      requestAnimationFrame(() => {
-        this.update();
-        this.ticking = false;
-      });
-    }, { passive: true });
-  },
-
-  update() {
-    const currentScroll = window.pageYOffset;
-
-    if (this.progressBar && !this.isPhone) {
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-      const scrolled = height > 0 ? currentScroll / height : 0;
-      this.progressBar.style.transform = `scaleX(${Math.min(Math.max(scrolled, 0), 1)})`;
-    }
-
-    if (this.header) {
-      if (currentScroll > 50) {
-        this.header.classList.add("header-scrolled");
-        this.header.style.transform =
-          !this.isPhone && currentScroll > this.lastScroll && currentScroll > 200
-            ? "translateY(-100%)"
-            : "translateY(0)";
-      } else {
-        this.header.classList.remove("header-scrolled");
-        this.header.style.transform = "translateY(0)";
+    if (pg) {
+      pg.style.transform = `scaleX(${progress})`;
+      if (pg.id === "prog") {
+        pg.style.width = `${progress * 100}%`;
       }
     }
 
-    if (this.scrollUp) {
-      this.scrollUp.classList.toggle("show-scroll", currentScroll > 400);
-    }
+    tls.forEach((t) => {
+      const r = t.getBoundingClientRect();
+      const p = (window.innerHeight * 0.7 - r.top) / r.height;
+      const clamped = Math.max(0, Math.min(1, p));
+      t.style.setProperty("--p", clamped);
 
-    if (!this.isPhone) {
-      this.updateActiveLink(currentScroll);
-    }
-
-    this.lastScroll = currentScroll;
-  },
-
-  updateActiveLink(currentScroll) {
-    this.sections.forEach((current) => {
-      const sectionHeight = current.offsetHeight;
-      const sectionTop = current.offsetTop - 100;
-      const sectionId = current.getAttribute("id");
-      const link = document.querySelector(`.nav-link[href*="${sectionId}"]`);
-
-      if (!link) return;
-
-      if (currentScroll > sectionTop && currentScroll <= sectionTop + sectionHeight) {
-        link.classList.add("active");
-      } else {
-        link.classList.remove("active");
-      }
-    });
-  },
-};
-
-// Premium animation effects with liquid glass
-const PremiumEffects = {
-  init() {
-    if (window.innerWidth < 768) return; // Disable heavy effects on mobile
-    this.initParallax();
-    this.initMagneticButtons();
-    // Use global smooth scroll with header offset instead of duplicate
-  },
-
-  initParallax() {
-    const blobs = document.querySelectorAll(".blob");
-    if (!blobs.length) return;
-    document.addEventListener("mousemove", (e) => {
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
-
-      blobs.forEach((blob, index) => {
-        const speed = (index + 1) * 0.25;
-        const xMove = (x - 0.5) * speed * 80;
-        const yMove = (y - 0.5) * speed * 80;
-        blob.style.transform = `translate3d(${xMove}px, ${yMove}px, 0)`;
-      });
-    });
-  },
-
-  initMagneticButtons() {
-    const buttons = document.querySelectorAll(".btn");
-    buttons.forEach((btn) => {
-      btn.addEventListener("mousemove", (e) => {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        btn.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
-      });
-
-      btn.addEventListener("mouseleave", () => {
-        btn.style.transform = "translate(0, 0)";
-      });
-    });
-  },
-
-  initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
-        if (target) {
-          target.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
+      // Milestone dots activate
+      const items = t.querySelectorAll("li");
+      items.forEach((li) => {
+        const lr = li.getBoundingClientRect();
+        if (lr.top < window.innerHeight * 0.75) {
+          li.classList.add("in");
+          li.classList.add("vis");
         }
       });
     });
-  },
-
-};
-
-// Defer heavy effects to idle time wrapper
-function runHeavyEffects() {
-  if (shouldUseLiteExperience()) {
-    // On mobile, completely skip loading heavy script animation layers to maximize FCP, TBT and scroll smoothness
-    return;
   }
 
-  PremiumEffects.init();
-
-  /* --- Dynamic Script Loading and Animation Initialization --- */
-  
-  // Load ScrollReveal dynamically
-  loadScript("https://unpkg.com/scrollreveal", () => {
-    if (window.ScrollReveal) {
-      const sr = ScrollReveal({
-        distance: "60px",
-        duration: 1000,
-        delay: 100,
-        reset: false,
-      });
-      sr.reveal(".about-text", { origin: "left" });
-      sr.reveal(".about-image", { origin: "right", delay: 200 });
-      sr.reveal(".skill-group", { origin: "bottom", interval: 100 });
-      sr.reveal(".featured-project", { origin: "bottom", interval: 200 });
-      sr.reveal(".contact-content", { origin: "bottom" });
-    }
-  });
-
-  // Load GSAP & ScrollTrigger dynamically
-  loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js", () => {
-    loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js", () => {
-      if (window.gsap && window.ScrollTrigger) {
-        gsap.registerPlugin(ScrollTrigger);
-
-        gsap.to(".hero-image", {
-          yPercent: 50,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".home",
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-
-        gsap.utils.toArray("section").forEach((section) => {
-          gsap.from(section, {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            scrollTrigger: {
-              trigger: section,
-              start: "top 80%",
-              end: "top 50%",
-              scrub: 1,
-            },
-          });
-        });
-      }
-    });
-  });
-}
-
-/**
- * Fetch ALL projects from /api/projects and render dynamic cards.
- * Uses Cloudinary image_url when available, otherwise shows a themed placeholder.
- */
-async function fetchAndRenderProjects() {
-  const showcase = document.getElementById("projects-showcase");
-  if (!showcase) return;
-
-  const showError = (msg) => {
-    showcase.innerHTML = `
-      <div style="text-align: center; padding: 3rem; color: var(--text-alt); grid-column: 1 / -1; border: 1px dashed var(--surface-outline); border-radius: 12px;">
-        <i class="fa-solid fa-triangle-exclamation fa-2x" style="color: var(--primary-color); margin-bottom: 1rem; opacity: 0.7;"></i>
-        <p class="mono">${msg}</p>
-      </div>
-    `;
-  };
-
-  renderProjectSkeletons(showcase);
-
-  try {
-    const res = await fetch("/api/projects");
-    if (!res.ok) {
-      showError("Failed to load projects. Please try again later.");
-      return;
-    }
-    const projects = await res.json();
-    if (!projects.length) {
-      showError("No projects found in the database.");
-      return;
-    }
-
-    // Icon set used for placeholder when no image
-    const defaultIcons = [
-      "fa-solid fa-rocket",
-      "fa-solid fa-globe",
-      "fa-solid fa-code",
-      "fa-solid fa-laptop-code",
-      "fa-solid fa-cubes",
-      "fa-solid fa-bolt",
-    ];
-
-    // Build all cards
-    const fragment = document.createDocumentFragment();
-
-    projects.forEach((p, idx) => {
-      const article = document.createElement("article");
-      article.className = "project-card";
-
-      // — Preview section (image or placeholder) —
-      const previewUrl = p.demo_url || p.github_url || "#";
-      const previewLink = document.createElement("a");
-      previewLink.href = previewUrl;
-      if (previewUrl !== "#") {
-        previewLink.target = "_blank";
-        previewLink.rel = "noopener noreferrer";
-      }
-      previewLink.className = "project-preview-link";
-      previewLink.setAttribute("aria-label", `Open ${p.title} project`);
-
-      const placeholder = document.createElement("div");
-      placeholder.className = "project-preview-placeholder";
-
-      if (p.image_url) {
-        // Cloudinary image available
-        const img = document.createElement("img");
-        img.src = p.image_url;
-        img.alt = `${p.title} screenshot`;
-        img.loading = "lazy";
-        img.decoding = "async";
-        img.className = "project-preview-img";
-        img.onerror = () => {
-          // On error, restore placeholder
-          placeholder.classList.remove("has-image");
-          placeholder.innerHTML = `
-            <div class="preview-icon"><i class="${defaultIcons[idx % defaultIcons.length]}"></i></div>
-            <p class="mono">${escapeHTML(p.description ? p.description.slice(0, 60) : p.title)}</p>
-            ${p.badge ? `<span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> ${escapeHTML(p.badge)}</span>` : ""}
-          `;
-        };
-        placeholder.appendChild(img);
-        placeholder.classList.add("has-image");
-      } else {
-        // No image — themed placeholder
-        placeholder.innerHTML = `
-          <div class="preview-icon"><i class="${defaultIcons[idx % defaultIcons.length]}"></i></div>
-          <p class="mono">${escapeHTML(p.description ? p.description.slice(0, 60) : p.title)}</p>
-          ${p.badge ? `<span class="project-card__badge"><i class="fa-solid fa-circle" style="font-size:.45rem;color:#34d399"></i> ${escapeHTML(p.badge)}</span>` : ""}
-        `;
-      }
-
-      previewLink.appendChild(placeholder);
-      article.appendChild(previewLink);
-
-      // — Body section —
-      const body = document.createElement("div");
-      body.className = "project-card__body";
-
-      // Title
-      const title = document.createElement("h3");
-      title.className = "project-card__title";
-      title.textContent = p.title;
-      body.appendChild(title);
-
-      // Description
-      if (p.description) {
-        const desc = document.createElement("p");
-        desc.className = "project-card__desc";
-        desc.textContent = p.description;
-        body.appendChild(desc);
-      }
-
-      // Tech tags
-      const tags = Array.isArray(p.tech_tags) ? p.tech_tags : [];
-      if (tags.length) {
-        const techDiv = document.createElement("div");
-        techDiv.className = "project-card__tech";
-        tags.forEach((t) => {
-          const span = document.createElement("span");
-          span.innerHTML = `<i class="fa-solid fa-code"></i> ${escapeHTML(t)}`;
-          techDiv.appendChild(span);
-        });
-        body.appendChild(techDiv);
-      }
-
-      // Actions (GitHub + Demo)
-      const actions = document.createElement("div");
-      actions.className = "project-card__actions";
-
-      if (p.github_url) {
-        const ghBtn = document.createElement("a");
-        ghBtn.href = p.github_url;
-        ghBtn.target = "_blank";
-        ghBtn.rel = "noopener noreferrer";
-        ghBtn.className = "project-card__btn project-card__btn--ghost";
-        ghBtn.innerHTML = '<i class="fa-brands fa-github"></i> Source';
-        actions.appendChild(ghBtn);
-      }
-
-      if (p.demo_url) {
-        const demoBtn = document.createElement("a");
-        demoBtn.href = p.demo_url;
-        demoBtn.target = "_blank";
-        demoBtn.rel = "noopener noreferrer";
-        demoBtn.className = "project-card__btn project-card__btn--primary";
-        demoBtn.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Site';
-        actions.appendChild(demoBtn);
-      }
-
-      body.appendChild(actions);
-      article.appendChild(body);
-      fragment.appendChild(article);
-    });
-
-    // Replace static loading state with dynamic cards
-    showcase.innerHTML = "";
-    showcase.appendChild(fragment);
-  } catch (e) {
-    console.error("Error fetching projects:", e);
-    const showcase = document.getElementById("projects-showcase");
-    if (showcase) {
-      showcase.innerHTML = `
-        <div style="text-align: center; padding: 3rem; color: var(--text-alt); grid-column: 1 / -1; border: 1px dashed var(--surface-outline); border-radius: 12px;">
-          <i class="fa-solid fa-triangle-exclamation fa-2x" style="color: var(--primary-color); margin-bottom: 1rem; opacity: 0.7;"></i>
-          <p class="mono">Failed to load projects. Please try again later.</p>
-        </div>
-      `;
-    }
-  }
-}
-
-function buildProjectSkeletonMarkup(count = 3) {
-  return Array.from({ length: count }, () => `
-    <article class="project-card skeleton-card" aria-hidden="true">
-      <div class="skeleton-preview"></div>
-      <div class="project-card__body">
-        <div class="skeleton-line w60"></div>
-        <div class="skeleton-line w100 mt8"></div>
-        <div class="skeleton-line w80 mt4"></div>
-        <div class="skeleton-chip-row mt8">
-          <span class="skeleton-chip"></span>
-          <span class="skeleton-chip"></span>
-          <span class="skeleton-chip"></span>
-        </div>
-        <div class="skeleton-action-row">
-          <span class="skeleton-button"></span>
-          <span class="skeleton-button"></span>
-        </div>
-      </div>
-    </article>
-  `).join("");
-}
-
-function renderProjectSkeletons(showcase) {
-  if (!showcase) return;
-  showcase.innerHTML = buildProjectSkeletonMarkup(isPhoneViewport() ? 2 : 3);
-}
-
-function initDeferredProjects() {
-  const showcase = document.getElementById("projects-showcase");
-  if (!showcase) return;
-
-  renderProjectSkeletons(showcase);
-
-  let hasLoadedProjects = false;
-  const loadProjects = () => {
-    if (hasLoadedProjects) return;
-    hasLoadedProjects = true;
-    fetchAndRenderProjects();
-  };
-
-  if (window.location.hash === "#projects") {
-    loadProjects();
-    return;
-  }
-
-  if (!("IntersectionObserver" in window)) {
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(loadProjects, { timeout: 1500 });
-    } else {
-      setTimeout(loadProjects, 400);
-    }
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        observer.disconnect();
-        loadProjects();
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!tick) {
+        tick = true;
+        requestAnimationFrame(upd);
       }
     },
-    {
-      rootMargin: isPhoneViewport() ? "220px 0px" : "380px 0px",
-    }
+    { passive: true }
   );
-
-  observer.observe(showcase);
+  upd();
 }
 
-/** Escape HTML to prevent XSS in dynamic content */
-function escapeHTML(str) {
-  const div = document.createElement("div");
-  div.appendChild(document.createTextNode(str || ""));
-  return div.innerHTML;
-}
+/* ── 4. Tech Stack Tabs & Bento Spotlight ──────────────────────────────── */
+function initStackTabsAndSpotlight() {
+  const tabs = Array.from(document.querySelectorAll("[role=tab]"));
+  if (tabs.length === 0) return;
 
-document.addEventListener("DOMContentLoaded", function () {
-  initLoadingScreen();
-  preloadResources();
-
-  ScrollManager.init();
-  initDeferredProjects();
-
-  // Initialize theme manager
-  ThemeManager.init();
-  ContactForm.init();
-
-  // Defer heavy effects
-  if ("requestIdleCallback" in window) {
-    requestIdleCallback(runHeavyEffects, { timeout: 1500 });
-  } else {
-    setTimeout(runHeavyEffects, 300);
-  }
-
-  initParticles();
-
-  /* --- Mobile Navigation --- */
-  const navMenu = document.getElementById("nav-menu");
-  const navToggle = document.getElementById("nav-toggle");
-  const navClose = document.getElementById("nav-close");
-
-  if (navToggle) {
-    navToggle.addEventListener("click", () => {
-      navMenu.classList.add("active");
-      document.body.style.overflow = "hidden";
+  function sel(i) {
+    tabs.forEach((t, j) => {
+      const on = i === j;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+      const targetId = t.getAttribute("aria-controls");
+      const panel = document.getElementById(targetId);
+      if (panel) {
+        panel.hidden = !on;
+      }
     });
+    if (tabs[i]) tabs[i].focus();
   }
 
-  if (navClose) {
-    navClose.addEventListener("click", () => {
-      navMenu.classList.remove("active");
-      document.body.style.overflow = "";
-    });
-  }
-
-  const navLinks = document.querySelectorAll(".nav-link");
-  navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      navMenu.classList.remove("active");
-      document.body.style.overflow = "";
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => sel(i));
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") sel((i + 1) % tabs.length);
+      if (e.key === "ArrowLeft") sel((i + tabs.length - 1) % tabs.length);
     });
   });
 
-  /* --- Smooth Scrolling --- */
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", function (e) {
-      e.preventDefault();
-      const targetId = this.getAttribute("href");
-      const targetElement = document.querySelector(targetId);
-      if (targetElement) {
-        const headerOffset = 100;
-        const elementPosition = targetElement.getBoundingClientRect().top;
-        const offsetPosition =
-          elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-      }
+  // Cursor radial spotlight on .tk cards
+  const cards = document.querySelectorAll(".tk");
+  cards.forEach((t) => {
+    t.addEventListener("mousemove", (e) => {
+      const r = t.getBoundingClientRect();
+      t.style.setProperty("--x", e.clientX - r.left + "px");
+      t.style.setProperty("--y", e.clientY - r.top + "px");
     });
   });
+}
 
-  /* --- Custom Cursor (Hardware Accelerated via CSS Variables) --- */
-  const cursor = document.querySelector(".custom-cursor");
-  const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
+/* ── 5. Awards 3D Certificate Tilt & Sheen ─────────────────────────────── */
+function initCertTilt() {
+  const cd = document.getElementById("cd");
+  if (!cd) return;
 
-  if (cursor && !hasFinePointer) {
-    // Touch devices (phones/tablets) don't have mouse cursors, so remove it to save DOM footprint & layout calculation cost
-    cursor.remove();
-  } else if (cursor) {
-    document.addEventListener(
-      "mousemove",
-      (e) => {
-        cursor.style.setProperty("--cursor-x", `${e.clientX - 10}px`);
-        cursor.style.setProperty("--cursor-y", `${e.clientY - 10}px`);
-      },
-      { passive: true }
-    );
-    document.addEventListener("mousedown", () =>
-      cursor.classList.add("active")
-    );
-    document.addEventListener("mouseup", () =>
-      cursor.classList.remove("active")
-    );
-    
-    // Premium Event Delegation for hovers (handles static and dynamically fetched cards)
-    document.addEventListener("mouseover", (e) => {
-      if (e.target.closest("a, button, .nav-link, .tech-skill-item, .project-card")) {
-        cursor.classList.add("active");
-      }
-    });
-    document.addEventListener("mouseout", (e) => {
-      if (e.target.closest("a, button, .nav-link, .tech-skill-item, .project-card")) {
-        cursor.classList.remove("active");
-      }
-    });
-  }
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (still) return;
 
+  const parent = cd.parentNode;
+  if (!parent) return;
 
-  /* --- GSAP Animations --- */
-  // Moved into idle-time init
+  parent.addEventListener("mousemove", (e) => {
+    const r = cd.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    cd.style.transform = `rotateY(${x * 16}deg) rotateX(${-y * 16}deg)`;
+    cd.style.setProperty("--sx", `${x * 120}%`);
+  });
 
-  /* --- Initial Load Fade-in --- */
-  const content = document.querySelector("main");
-  if (content) {
-    if (shouldUseLiteExperience()) {
-      content.style.opacity = "1";
-    } else {
-      content.style.opacity = "0";
+  parent.addEventListener("mouseleave", () => {
+    cd.style.transform = "";
+    cd.style.setProperty("--sx", "-30%");
+  });
+}
+
+/* ── 6. Magnetic Contact Button (.mg) ──────────────────────────────────── */
+function initMagneticButton() {
+  const mg = document.querySelector(".mg");
+  if (!mg) return;
+
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (still) return;
+
+  mg.addEventListener("mousemove", (e) => {
+    const r = mg.getBoundingClientRect();
+    const dx = e.clientX - r.left - r.width / 2;
+    const dy = e.clientY - r.top - r.height / 2;
+    mg.style.transform = `translate(${dx * 0.2}px, ${dy * 0.3}px)`;
+  });
+
+  mg.addEventListener("mouseleave", () => {
+    mg.style.transform = "";
+  });
+}
+
+/* ── 7. Copy Email with Toast Feedback ─────────────────────────────────── */
+function initCopyEmail() {
+  const cp = document.getElementById("cp");
+  if (!cp) return;
+
+  cp.addEventListener("click", function () {
+    const b = this;
+    const email = "ankit5242raj1@outlook.com";
+
+    function ok() {
+      b.textContent = "Copied";
+      setTimeout(() => {
+        b.textContent = "Copy email";
+      }, 1800);
     }
-    
-    const showContent = () => {
-      content.style.transition = "opacity 0.5s ease-in-out";
-      content.style.opacity = "1";
-    };
 
-    if (shouldUseLiteExperience()) {
-      showContent();
-    } else if (document.readyState === "complete") {
-      showContent();
-    } else {
-      window.addEventListener("load", showContent);
-    }
-  }
-
-  /* --- Visitor Geotracking Analytics --- */
-  async function trackVisit() {
-    try {
-      const payload = JSON.stringify({
-        page_path: window.location.pathname,
-        referer: document.referrer || 'Direct'
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(email).then(ok, () => {
+        b.textContent = "Select email to copy";
       });
-
-      if (navigator.sendBeacon) {
-        const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon('/api/analytics/track', blob);
-        return;
-      }
-
-      await fetch('/api/analytics/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload
-      });
-    } catch (e) {
-      console.warn('Analytics ping aborted', e);
+    } else {
+      b.textContent = "Select email to copy";
     }
-  }
+  });
+}
 
-  if ("requestIdleCallback" in window) {
-    requestIdleCallback(trackVisit, { timeout: 2500 });
-  } else {
-    setTimeout(trackVisit, shouldUseLiteExperience() ? 1200 : 300);
-  }
-});
+/* ── 8. Contact Form Handling ─────────────────────────────────────────── */
+function initContactForm() {
+  const f = document.getElementById("f");
+  const st = document.getElementById("st");
+  if (!f) return;
+
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const n = (f.n ? f.n.value : "").trim();
+    const em = (f.e ? f.e.value : "").trim();
+    const m = (f.m ? f.m.value : "").trim();
+
+    if (!n || !/^\S+@\S+\.\S+$/.test(em) || !m) {
+      if (st) st.textContent = "Please add your name, a valid email and a message.";
+      return;
+    }
+
+    if (st) st.textContent = "Opening your email app to send the message…";
+    window.location.href = `mailto:ankit5242raj1@outlook.com?subject=${encodeURIComponent(
+      "Portfolio message from " + n
+    )}&body=${encodeURIComponent(m + "\n\nFrom: " + n + " (" + em + ")")}`;
+  });
+}

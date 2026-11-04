@@ -1,0 +1,132 @@
+@use '../styles/abstracts/variables' as *;
+@use '../styles/abstracts/mixins' as *;
+@use '../styles/components/navbar';
+@use '../styles/components/divider';
+@use '../styles/sections/hero';
+@use '../styles/sections/matched_sections';
+
+// Google Fonts Imports
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --background: #{$bg-primary};
+  --background-secondary: #{$bg-secondary};
+  --surface: #{$surface};
+  --surface-hover: #{$surface-hover};
+  --foreground: #{$foreground};
+  --muted: #{$muted};
+  --subtle: #{$subtle};
+  --accent: #{$accent};
+  --accent-glow: #{$accent-glow};
+  --accent-bright: #{$accent-bright};
+  --border: #{$border};
+  --border-strong: #{$border-strong};
+  --grid-line: #{$grid-line};
+
+  --bg: #0b0a09;
+  --fg: #f0ebe3;
+  --mu: #9a9288;
+  --ac: #ff6b2c;
+  --ink: #140b05;
+  --hl: rgba(255, 255, 255, 0.11);
+  --cr: #f2efe9;
+  --cfg: #15130f;
+  --cac: #d4561a;
+  --r: 26px;
+  --rx: 40px;
+  --mw: 1160px;
+  --fn: 'Bricolage Grotesque', system-ui, sans-serif;
+  --fs: 'Instrument Serif', Georgia, serif;
+
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Bricolage Grotesque', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: clip;
+  position: relative;
+  line-height: 1.6;
+}
+
+// Architectural Vertical Grid Background
+.bg-grid-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  .grid-column-line {
+    width: 1px;
+    height: 100%;
+    background-color: var(--grid-line);
+
+    &:nth-child(2), &:nth-child(3) {
+      @include respond-to('tablet') {
+        display: none;
+      }
+    }
+  }
+}
+
+// Selection Highlight
+::selection {
+  background-color: var(--accent);
+  color: #080807;
+}
+
+// Global Links
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// Accessibility & Reduced Motion
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

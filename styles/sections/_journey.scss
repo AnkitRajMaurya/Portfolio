@@ -1,0 +1,245 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── 04. JOURNEY — Newspaper column grid with large year watermarks ───────────
+
+.journey-section {
+  position: relative;
+  width: 100%;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--grid-line);
+  overflow: hidden;
+
+  // Background watermark
+  &::after {
+    content: '04';
+    position: absolute;
+    bottom: -4rem;
+    left: -1rem;
+    font-family: $font-mono;
+    font-size: clamp(12rem, 22vw, 22rem);
+    font-weight: 700;
+    color: rgba(240, 234, 224, 0.025);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+.journey-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 7rem 2rem 0;
+  position: relative;
+  z-index: 1;
+
+  @include respond-to('tablet') {
+    padding: 5rem 1.5rem 0;
+  }
+
+  .section-label {
+    @include section-label;
+  }
+
+  .journey-title {
+    font-family: $font-display;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+
+    .title-italic {
+      font-style: italic;
+      color: var(--accent);
+    }
+  }
+
+  .journey-desc {
+    font-family: $font-body;
+    font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+    color: var(--muted);
+    max-width: 580px;
+    margin-bottom: 5rem;
+  }
+}
+
+// ── Newspaper column grid ────────────────────────────────────────────────────
+.journey-timeline-track {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 7rem;
+  z-index: 1;
+
+  @include respond-to('tablet') {
+    padding: 0 1.5rem 5rem;
+  }
+
+  // Horizontal progress line above milestones (desktop)
+  .timeline-axis-line {
+    display: none; // hidden — we use the horizontal border treatment instead
+  }
+}
+
+.timeline-milestones-list {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+
+  @include respond-to('desktop') {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include respond-to('tablet') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.timeline-milestone-item {
+  position: relative;
+  padding: 2.25rem 2rem 2.25rem 0;
+  border-right: 1px solid var(--grid-line);
+
+  &:last-child {
+    border-right: none;
+
+    @include respond-to('tablet') {
+      border-bottom: none;
+    }
+  }
+
+  // Top border rule on each column item — acts as horizontal timeline
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--border);
+    transition: background 0.3s ease;
+  }
+
+  &:hover::before {
+    background: var(--accent);
+  }
+
+  @include respond-to('desktop') {
+    &:nth-child(3) {
+      border-right: none;
+    }
+
+    &:nth-child(4),
+    &:nth-child(5) {
+      border-top: 1px solid var(--grid-line);
+
+      &::before { display: none; }
+    }
+  }
+
+  @include respond-to('tablet') {
+    padding: 2rem 0;
+    border-right: none;
+    border-bottom: 1px solid var(--grid-line);
+  }
+
+  // The dot marker becomes a top corner accent
+  .milestone-marker {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    .marker-core {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      flex-shrink: 0;
+    }
+  }
+
+  .milestone-content-card {
+    // In newspaper layout, no card background — just editorial typography
+    background: transparent;
+    border: none;
+    padding: 0;
+
+    &:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .milestone-top-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      margin-bottom: 0.85rem;
+
+      .milestone-period {
+        font-family: $font-mono;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--accent);
+        display: block;
+      }
+
+      .milestone-category {
+        @include mono-eyebrow;
+        color: var(--subtle);
+        font-size: 0.62rem;
+      }
+    }
+
+    .milestone-heading {
+      font-family: $font-display;
+      font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+      line-height: 1.2;
+      font-weight: 400;
+      color: var(--foreground);
+      margin-bottom: 0.35rem;
+    }
+
+    .milestone-context {
+      font-family: $font-body;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      font-weight: 450;
+      font-style: italic;
+    }
+
+    .milestone-bullet-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      li {
+        font-family: $font-body;
+        font-size: 0.83rem;
+        line-height: 1.55;
+        color: var(--subtle);
+        position: relative;
+        padding-left: 1rem;
+
+        &::before {
+          content: '—';
+          position: absolute;
+          left: 0;
+          color: var(--accent);
+          font-family: $font-mono;
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+}
+
+// Hidden progress fill (GSAP still animates it but we hide the axis line)
+.timeline-progress-fill {
+  display: none;
+}

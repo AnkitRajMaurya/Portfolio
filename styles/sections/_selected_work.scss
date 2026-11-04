@@ -1,0 +1,374 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── 02. SELECTED WORK — Editorial project showcases with index watermarks ─────
+
+.selected-work-section {
+  position: relative;
+  width: 100%;
+  background: var(--background);
+  overflow: hidden;
+
+  // Large "02" watermark
+  &::before {
+    content: '02';
+    position: absolute;
+    top: -2rem;
+    right: -1rem;
+    font-family: $font-mono;
+    font-size: clamp(12rem, 20vw, 20rem);
+    font-weight: 700;
+    color: rgba(240, 234, 224, 0.025);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+.work-header-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 7rem 2rem 0;
+  position: relative;
+  z-index: 1;
+
+  @include respond-to('tablet') {
+    padding: 5rem 1.5rem 0;
+  }
+
+  .section-label {
+    @include section-label;
+  }
+
+  .work-section-title {
+    font-family: $font-display;
+    font-size: clamp(3rem, 7vw, 6rem);
+    line-height: 1.0;
+    font-weight: 400;
+    color: var(--foreground);
+    margin-bottom: 1.25rem;
+
+    .title-serif-italic {
+      font-style: italic;
+      color: var(--accent);
+    }
+  }
+
+  .work-section-desc {
+    font-family: $font-body;
+    font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 5rem;
+  }
+}
+
+.projects-editorial-list {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+
+  @include respond-to('tablet') {
+    padding: 0 1.5rem 5rem;
+  }
+}
+
+// Each project block is separated by a full-width border rule
+.project-editorial-block {
+  display: grid;
+  align-items: center;
+  gap: 4rem;
+  border-top: 1px solid var(--grid-line);
+  padding: 5rem 0;
+  position: relative;
+
+  // Project index watermark behind each entry
+  &::before {
+    position: absolute;
+    left: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: $font-mono;
+    font-size: clamp(6rem, 12vw, 12rem);
+    font-weight: 700;
+    color: rgba(240, 234, 224, 0.035);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  &:nth-child(1)::before { content: '01'; }
+  &:nth-child(2)::before { content: '02'; }
+  &:nth-child(3)::before { content: '03'; }
+  &:nth-child(4)::before { content: '04'; }
+
+  &:last-child {
+    border-bottom: 1px solid var(--grid-line);
+  }
+
+  @include respond-to('tablet') {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem;
+    padding: 3.5rem 0;
+  }
+
+  // Layout 1: Flagship Widescreen (Codex Monarch) — full bleed image
+  &.layout-flagship-widescreen {
+    grid-template-columns: 1.35fr 1fr;
+  }
+
+  // Layout 2: Split Duo (ReadyToGo) — large number on left
+  &.layout-split-duo {
+    grid-template-columns: 1fr 1.25fr;
+
+    .project-visual-stage { order: 2; @include respond-to('tablet') { order: 1; } }
+    .project-info-stage   { order: 1; @include respond-to('tablet') { order: 2; } }
+  }
+
+  // Layout 3: Browser Window (Orbit UI)
+  &.layout-browser-window {
+    grid-template-columns: 1.2fr 1fr;
+  }
+
+  // Layout 4: Asymmetric Card (Weather App)
+  &.layout-asymmetric-card {
+    grid-template-columns: 1fr 1.15fr;
+
+    .project-visual-stage { order: 2; @include respond-to('tablet') { order: 1; } }
+    .project-info-stage   { order: 1; @include respond-to('tablet') { order: 2; } }
+  }
+}
+
+.project-visual-stage {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+
+  .visual-link-wrapper {
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s $ease-cinematic;
+
+    &:hover {
+      border-color: var(--border-strong);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+      transform: translateY(-4px);
+
+      .project-screenshot {
+        transform: scale(1.025);
+      }
+    }
+
+    .project-browser-bar {
+      height: 36px;
+      background: rgba(21, 20, 17, 0.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+
+      .browser-dots {
+        display: flex;
+        gap: 6px;
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          &.red    { background: #ff5f56; }
+          &.yellow { background: #ffbd2e; }
+          &.green  { background: #27c93f; }
+        }
+      }
+
+      .browser-address {
+        font-family: $font-mono;
+        font-size: 0.7rem;
+        color: var(--subtle);
+      }
+
+      .live-status-pill {
+        font-family: $font-mono;
+        font-size: 0.65rem;
+        color: var(--accent);
+        font-weight: 500;
+      }
+    }
+
+    .image-frame {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      overflow: hidden;
+      background: #000;
+
+      @include respond-to('tablet') {
+        height: 240px;
+      }
+
+      .project-screenshot {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s $ease-cinematic;
+      }
+
+      .image-overlay-glow {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 60%, rgba(8, 8, 7, 0.35) 100%);
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+.project-info-stage {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+
+  .info-top-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 0.85rem;
+
+    .project-number {
+      font-family: $font-mono;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .project-category {
+      @include mono-eyebrow;
+      color: var(--muted);
+    }
+  }
+
+  .project-title {
+    font-family: $font-display;
+    font-size: clamp(2.25rem, 4vw, 3.75rem);
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--foreground);
+    margin-bottom: 0.75rem;
+
+    a {
+      color: inherit;
+      &:hover { color: var(--accent); }
+    }
+  }
+
+  .project-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: $font-mono;
+    font-size: 0.72rem;
+    margin-bottom: 1.5rem;
+    background: rgba(240, 234, 224, 0.05);
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    align-self: flex-start;
+    border: 1px solid var(--border);
+
+    .role-label  { color: var(--accent); font-weight: 600; }
+    .role-value  { color: var(--foreground); }
+  }
+
+  .project-description {
+    font-family: $font-body;
+    font-size: 0.97rem;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .project-tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 2.25rem;
+
+    .tech-tag {
+      font-family: $font-mono;
+      font-size: 0.7rem;
+      padding: 0.28rem 0.65rem;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: border-color 0.2s ease, color 0.2s ease;
+
+      &:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+    }
+  }
+
+  .project-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .btn-launch-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      background: var(--accent);
+      color: #080807;
+      font-family: $font-body;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: var(--accent-bright);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(217, 119, 69, 0.4);
+      }
+
+      .arrow-diag { transition: transform 0.25s ease; }
+      &:hover .arrow-diag { transform: translate(2px, -2px); }
+    }
+
+    .btn-view-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+      font-family: $font-body;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: var(--foreground);
+        color: var(--accent);
+      }
+    }
+  }
+}

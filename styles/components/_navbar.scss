@@ -1,0 +1,227 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.site-header {
+  position: fixed;
+  top: 1.25rem;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding: 0 1.5rem;
+  pointer-events: none;
+}
+
+.floating-navbar {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 1100px;
+  height: 54px;
+  padding: 0 1.5rem;
+  border-radius: 14px;
+  @include glass-panel;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s $ease-cinematic;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+  &.is-scrolled {
+    max-width: 960px;
+    height: 50px;
+    background: rgba(14, 13, 12, 0.88);
+    border-color: rgba(240, 234, 224, 0.16);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .nav-brandmark {
+    display: flex;
+    align-items: center;
+    color: var(--foreground);
+    text-decoration: none;
+
+    .brand-name {
+      font-family: $font-display;
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--foreground);
+    }
+  }
+
+  .nav-links-desktop {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    @include respond-to('tablet') {
+      display: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-family: $font-body;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      transition: color 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+
+      &:hover {
+        color: var(--foreground);
+      }
+
+      &.is-active {
+        color: var(--foreground);
+        font-weight: 500;
+      }
+
+      .active-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+      }
+    }
+  }
+
+  .nav-action {
+    display: flex;
+    align-items: center;
+
+    @include respond-to('tablet') {
+      display: none;
+    }
+
+    .btn-lets-talk {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1.15rem;
+      border-radius: 8px;
+      font-family: $font-body;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--foreground);
+      background: rgba(240, 234, 224, 0.05);
+      border: 1px solid var(--border);
+      transition: border-color 0.28s ease;
+      text-decoration: none;
+
+      span {
+        display: inline-block;
+        transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+
+      svg {
+        transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+
+      &:hover {
+        border-color: rgba(240, 234, 224, 0.35);
+
+        span {
+          transform: translateX(3px);
+        }
+
+        svg {
+          transform: translate(3px, -3px);
+        }
+      }
+    }
+  }
+
+  .mobile-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    @include respond-to('tablet') {
+      display: flex;
+    }
+
+    .hamburger-bar {
+      width: 20px;
+      height: 2px;
+      background-color: var(--foreground);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+
+      &.open-1 {
+        transform: translateY(3.5px) rotate(45deg);
+      }
+
+      &.open-2 {
+        transform: translateY(-3.5px) rotate(-45deg);
+      }
+    }
+  }
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  pointer-events: auto;
+  border-radius: 1.25rem;
+  @include glass-panel;
+  background: rgba(14, 13, 12, 0.95);
+  padding: 2rem 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  animation: fadeInDown 0.3s $ease-cinematic;
+
+  .mobile-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    .mobile-link {
+      font-family: $font-display;
+      font-size: 1.75rem;
+      color: var(--foreground);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+
+      &:hover {
+        color: var(--accent);
+      }
+    }
+
+    .mobile-cta-btn {
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem;
+      border-radius: 9999px;
+      background: var(--accent);
+      color: #080807;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -69,14 +69,14 @@ export default function AwardsSection() {
             Certificates <em>&amp; awards.</em>
           </h2>
           <div className="meta rv" style={{ display: 'flex', gap: '12px', alignItems: 'center', margin: '14px 0' }} suppressHydrationWarning>
-            <span style={{ textTransform: 'capitalize', padding: '4px 10px', background: 'rgba(255, 107, 44, 0.1)', border: '1px solid rgba(255, 107, 44, 0.3)', borderRadius: '20px', fontSize: '12px', color: '#ff6b2c' }}>
+            <span style={{ textTransform: 'capitalize', padding: '4px 10px', background: 'rgba(255, 107, 44, 0.1)', border: '1px solid rgba(255, 107, 44, 0.3)', borderRadius: 'var(--radius-2xl)', fontSize: 'var(--type-sm)', color: 'var(--text-bright-accent)' }}>
               {activeCert.type || 'Certificate'}
             </span>
-            <span style={{ fontSize: '13px', color: 'var(--mute)' }}>
+            <span style={{ fontSize: 'var(--type-base)', color: 'var(--mute)' }}>
               {activeCert.issue_date || 'Apr 2026'}
             </span>
           </div>
-          <p className="lede rv" style={{ marginTop: 0, color: 'var(--fg)', fontSize: '24px', fontWeight: 600 }} suppressHydrationWarning>
+          <p className="lede rv" style={{ marginTop: 0, color: 'var(--fg)', fontSize: 'var(--type-2xl)', fontWeight: 600 }} suppressHydrationWarning>
             {activeCert.title}
           </p>
           <p className="lede rv" style={{ marginTop: '6px', color: 'var(--mute)' }} suppressHydrationWarning>
@@ -99,7 +99,7 @@ export default function AwardsSection() {
 
           {certs.length > 1 && (
             <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--mute)' }}>All Credentials</span>
+              <span style={{ fontSize: 'var(--type-sm)', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--mute)' }}>All Credentials</span>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {certs.map((c) => (
                   <button
@@ -109,16 +109,16 @@ export default function AwardsSection() {
                     style={{
                       background: 'rgba(255,255,255,0.04)',
                       border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '8px',
+                      borderRadius: 'var(--radius-md)',
                       padding: '8px 12px',
                       color: 'var(--fg)',
-                      fontSize: '13px',
+                      fontSize: 'var(--type-base)',
                       cursor: 'pointer',
                       textAlign: 'left'
                     }}
                   >
                     <strong>{c.title}</strong>
-                    <span style={{ display: 'block', fontSize: '11px', color: 'var(--mute)' }}>{c.issuer}</span>
+                    <span style={{ display: 'block', fontSize: 'var(--type-xs)', color: 'var(--mute)' }}>{c.issuer}</span>
                   </button>
                 ))}
               </div>
@@ -168,7 +168,7 @@ export default function AwardsSection() {
               maxWidth: '850px',
               width: '100%',
               background: '#161920',
-              borderRadius: '16px',
+              borderRadius: 'var(--radius-xl)',
               border: '1px solid rgba(255, 107, 44, 0.3)',
               overflow: 'hidden',
               boxShadow: '0 25px 60px rgba(0,0,0,0.7)',
@@ -177,8 +177,8 @@ export default function AwardsSection() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--fg)' }}>{selectedCert.title}</h3>
-                <span style={{ fontSize: '13px', color: 'var(--mute)' }}>{selectedCert.issuer} • {selectedCert.issue_date}</span>
+                <h3 style={{ margin: 0, fontSize: 'var(--type-lg)', color: 'var(--fg)' }}>{selectedCert.title}</h3>
+                <span style={{ fontSize: 'var(--type-base)', color: 'var(--mute)' }}>{selectedCert.issuer} • {selectedCert.issue_date}</span>
               </div>
               <button
                 type="button"
@@ -187,7 +187,7 @@ export default function AwardsSection() {
                   background: 'none',
                   border: 'none',
                   color: 'var(--fg)',
-                  fontSize: '24px',
+                  fontSize: 'var(--type-2xl)',
                   cursor: 'pointer',
                   padding: '4px 10px',
                 }}
@@ -200,7 +200,7 @@ export default function AwardsSection() {
                 <img
                   src={selectedCert.image_url}
                   alt={selectedCert.title}
-                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '8px' }}
+                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: 'var(--radius-md)' }}
                 />
               ) : (
                 <div style={{ padding: '60px 20px', color: 'var(--mute)' }}>No preview image available</div>
@@ -212,7 +212,7 @@ export default function AwardsSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn o"
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                style={{ padding: '8px 16px', fontSize: 'var(--type-base)' }}
               >
                 Open in Full Resolution
               </a>
@@ -220,7 +220,7 @@ export default function AwardsSection() {
                 type="button"
                 className="btn"
                 onClick={() => setSelectedCert(null)}
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                style={{ padding: '8px 16px', fontSize: 'var(--type-base)' }}
               >
                 Close
               </button>

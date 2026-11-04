@@ -52,7 +52,7 @@ export default function Hero() {
           <span className="mono-text">FULL-STACK DEVELOPER &bull; PRODUCT BUILDER &bull; CREATIVE ENGINEER</span>
         </div>
         <div className="hero-meta-item right">
-          <span className="mono-text">BASED IN MUZAFFARPUR, INDIA &bull; OPEN TO WORLDWIDE IMPACT</span>
+          <span className="mono-text">Based in Muzaffarpur, India &bull; Open to worldwide impact</span>
         </div>
       </div>
 

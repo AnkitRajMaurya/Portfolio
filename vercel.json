@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "redirects": [
     {
       "source": "/Portfolio",
@@ -15,12 +14,6 @@
       "source": "/admin",
       "destination": "/admin/",
       "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
     }
   ]
 }

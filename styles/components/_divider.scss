@@ -52,7 +52,7 @@
 
   .crosshair-mark {
     font-family: $font-mono;
-    font-size: 0.85rem;
+    font-size: var(--type-base);
     color: var(--accent);
     flex-shrink: 0;
     line-height: 1;
@@ -60,7 +60,7 @@
 
   .divider-num {
     font-family: $font-mono;
-    font-size: 0.68rem;
+    font-size: var(--type-xs);
     font-weight: 700;
     color: var(--accent);
     letter-spacing: 0.08em;
@@ -69,14 +69,14 @@
 
   .divider-slash {
     font-family: $font-mono;
-    font-size: 0.62rem;
+    font-size: var(--type-xs);
     color: var(--subtle);
     flex-shrink: 0;
   }
 
   .divider-title {
     font-family: $font-mono;
-    font-size: 0.62rem;
+    font-size: var(--type-xs);
     font-weight: 500;
     letter-spacing: 0.12em;
     color: var(--muted);
@@ -108,7 +108,7 @@
 
   .divider-tag {
     font-family: $font-mono;
-    font-size: 0.6rem;
+    font-size: var(--type-xs);
     color: var(--subtle);
     letter-spacing: 0.1em;
     white-space: nowrap;
@@ -119,7 +119,7 @@
 
   .crosshair-mark {
     font-family: $font-mono;
-    font-size: 0.85rem;
+    font-size: var(--type-base);
     color: var(--accent);
     flex-shrink: 0;
     line-height: 1;

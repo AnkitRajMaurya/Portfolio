@@ -41,13 +41,18 @@
 
     .mono-text {
       font-family: $font-mono;
-      font-size: 0.72rem;
+      font-size: var(--type-sm);
       color: var(--muted);
       letter-spacing: 0.16em;
       text-transform: uppercase;
     }
 
     &.right {
+      .mono-text {
+        text-transform: none;
+        letter-spacing: 0.1em;
+      }
+
       @include respond-to('tablet') {
         display: none;
       }
@@ -141,7 +146,7 @@
 
     span {
       font-family: $font-mono;
-      font-size: 0.72rem;
+      font-size: var(--type-sm);
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: rgba(240, 234, 224, 0.75);
@@ -151,7 +156,7 @@
 
   .hero-main-title {
     font-family: $font-display;
-    font-size: clamp(3.2rem, 7.3vw, 7rem);
+    font-size: var(--type-display);
     line-height: 0.98;
     font-weight: 400;
     color: var(--foreground);
@@ -165,11 +170,12 @@
 
     @include respond-to('tablet') {
       flex-wrap: wrap;
-      font-size: clamp(3rem, 6vw, 5rem);
+      font-size: var(--type-4xl);
     }
 
     @include respond-to('mobile') {
-      font-size: clamp(2.35rem, 10.5vw, 3.4rem);
+      --type-display: clamp(2.35rem, 10.5vw, 3.4rem);
+      font-size: var(--type-display);
       gap: 0 0.35rem;
       margin-bottom: 0.75rem;
     }
@@ -187,7 +193,7 @@
 
   .hero-description {
     font-family: $font-body;
-    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    font-size: var(--type-lg);
     line-height: 1.65;
     color: rgba(240, 234, 224, 0.78);
     max-width: 620px;
@@ -196,7 +202,7 @@
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
 
     @include respond-to('mobile') {
-      font-size: 0.95rem;
+      font-size: var(--type-md);
       line-height: 1.5;
       max-width: 34rem;
       margin-bottom: 1rem;
@@ -219,12 +225,12 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.75rem 1.35rem;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       background: rgba(240, 234, 224, 0.06);
       border: 1px solid rgba(240, 234, 224, 0.15);
       color: var(--foreground);
       font-family: $font-body;
-      font-size: 0.88rem;
+      font-size: var(--type-base);
       font-weight: 500;
       letter-spacing: 0.02em;
       text-decoration: none;
@@ -250,10 +256,10 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.75rem 0.75rem;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       color: var(--muted);
       font-family: $font-body;
-      font-size: 0.88rem;
+      font-size: var(--type-base);
       text-decoration: none;
       background: transparent;
       border: 1px solid transparent;
@@ -291,7 +297,7 @@
 
   .bottom-meta-col {
     font-family: $font-mono;
-    font-size: 0.72rem;
+    font-size: var(--type-sm);
     color: var(--muted);
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -300,7 +306,7 @@
       text-align: center;
 
       @include respond-to('tablet') {
-        font-size: 0.64rem;
+        font-size: var(--type-xs);
         letter-spacing: 0.1em;
       }
 

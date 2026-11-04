@@ -20,7 +20,7 @@ export default function NotFound() {
       <span
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.8rem',
+          fontSize: 'var(--type-sm)',
           letterSpacing: '0.25em',
           color: '#d97745',
           textTransform: 'uppercase',
@@ -32,7 +32,7 @@ export default function NotFound() {
       <h1
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(3rem, 8vw, 6.5rem)',
+          fontSize: 'var(--type-display)',
           fontWeight: 400,
           margin: '0 0 1rem',
           lineHeight: 1,
@@ -46,7 +46,7 @@ export default function NotFound() {
           color: '#a69d91',
           maxWidth: '460px',
           marginBottom: '2.5rem',
-          fontSize: '1rem',
+          fontSize: 'var(--type-md)',
           lineHeight: 1.6,
         }}
       >
@@ -56,11 +56,11 @@ export default function NotFound() {
         href="/"
         style={{
           padding: '0.85rem 1.85rem',
-          borderRadius: '9999px',
+          borderRadius: 'var(--radius-pill)',
           background: '#f0eae0',
           color: '#080807',
           fontFamily: 'var(--font-body)',
-          fontSize: '0.85rem',
+          fontSize: 'var(--type-base)',
           fontWeight: 600,
           textDecoration: 'none',
         }}

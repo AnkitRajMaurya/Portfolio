@@ -25,7 +25,7 @@
   max-width: 1100px;
   height: 54px;
   padding: 0 1.5rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   @include glass-panel;
   display: flex;
   align-items: center;
@@ -49,7 +49,7 @@
 
     .brand-name {
       font-family: $font-display;
-      font-size: 1.25rem;
+      font-size: var(--type-xl);
       font-weight: 400;
       letter-spacing: 0.02em;
       color: var(--foreground);
@@ -68,7 +68,7 @@
     .nav-link {
       position: relative;
       font-family: $font-body;
-      font-size: 0.85rem;
+      font-size: var(--type-base);
       color: var(--muted);
       letter-spacing: 0.04em;
       transition: color 0.25s ease;
@@ -108,9 +108,9 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.45rem 1.15rem;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       font-family: $font-body;
-      font-size: 0.82rem;
+      font-size: var(--type-base);
       font-weight: 500;
       color: var(--foreground);
       background: rgba(240, 234, 224, 0.06);
@@ -172,7 +172,7 @@
   left: 1.5rem;
   right: 1.5rem;
   pointer-events: auto;
-  border-radius: 1.25rem;
+  border-radius: var(--radius-2xl);
   @include glass-panel;
   background: rgba(14, 13, 12, 0.95);
   padding: 2rem 1.5rem;
@@ -188,7 +188,7 @@
 
     .mobile-link {
       font-family: $font-display;
-      font-size: 1.75rem;
+      font-size: var(--type-2xl);
       color: var(--foreground);
       border-bottom: 1px solid var(--border);
       padding-bottom: 0.75rem;
@@ -204,11 +204,11 @@
       align-items: center;
       justify-content: center;
       padding: 0.85rem;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       background: var(--accent);
       color: #080807;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: var(--type-md);
       transition: letter-spacing 0.28s ease;
 
       &:hover {

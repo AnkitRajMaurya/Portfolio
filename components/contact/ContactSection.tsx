@@ -193,7 +193,7 @@ export default function ContactSection() {
               </button>
             </div>
             {status && (
-              <p id="st" role="status" style={{ color: isError ? '#ff4d4d' : '#4ade80', marginTop: '12px', fontSize: '14px' }}>
+              <p id="st" role="status" style={{ color: isError ? 'var(--text-error)' : 'var(--text-success)', marginTop: '12px', fontSize: 'var(--type-base)' }}>
                 {status}
               </p>
             )}

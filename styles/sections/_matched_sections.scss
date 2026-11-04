@@ -5,14 +5,14 @@
 
 :root {
   --bg: #0b0a09;
-  --fg: #f0ebe3;
-  --mute: #9a9288;
-  --acc: #ff6b2c;
-  --ink: #140b05;
+  --fg: var(--foreground);
+  --mute: var(--muted);
+  --acc: var(--text-bright-accent);
+  --ink: var(--text-inverse);
   --ln: rgba(255, 255, 255, 0.11);
-  --d: "Bricolage Grotesque", system-ui, sans-serif;
-  --s: "Instrument Serif", Georgia, serif;
-  --m: ui-monospace, Menlo, monospace;
+  --d: var(--font-body);
+  --s: var(--font-display);
+  --m: var(--font-mono);
 }
 
 ::selection {
@@ -59,7 +59,7 @@ section {
 }
 
 .h {
-  font: 700 clamp(40px, 7.4vw, 104px)/0.95 var(--d);
+  font: 700 var(--type-display)/0.95 var(--d);
   letter-spacing: -0.035em;
   margin: 0;
   color: var(--fg);
@@ -73,7 +73,7 @@ section {
 }
 
 .sm {
-  font: 700 clamp(34px, 5vw, 64px)/1 var(--d);
+  font: 700 var(--type-4xl)/1 var(--d);
   letter-spacing: -0.03em;
   margin: 0;
   color: var(--fg);
@@ -88,12 +88,12 @@ section {
 
 .btn {
   display: inline-block;
-  font: 700 15px var(--d);
+  font: 700 var(--type-base) var(--d);
   text-decoration: none;
   background: var(--acc);
   color: var(--ink);
   padding: 14px 26px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 0;
   cursor: pointer;
   margin: 6px 10px 0 0;
@@ -108,7 +108,7 @@ section {
 .btn.o {
   background: none;
   color: var(--fg);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   box-shadow: inset 0 0 0 1px var(--ln);
   transition: color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -142,7 +142,7 @@ section {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--ln);
-  border-radius: 26px;
+  border-radius: var(--radius-2xl);
 }
 
 /* 01. About Section */
@@ -163,7 +163,7 @@ section {
 
 .ab p {
   margin: 0 0 16px;
-  color: #d4cdc2;
+  color: var(--text-primary);
   max-width: 54ch;
   line-height: 1.65;
 }
@@ -172,10 +172,10 @@ section {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font: 500 14px var(--d);
+  font: 500 var(--type-base) var(--d);
   color: var(--mute);
   border: 1px solid var(--ln);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 6px 14px;
   margin-bottom: 26px;
 }
@@ -194,7 +194,7 @@ section {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  font-size: 15px;
+  font-size: var(--type-base);
 }
 
 .fx div:last-child {
@@ -228,8 +228,8 @@ section {
 }
 
 .tags span {
-  font-size: 13px;
-  border-radius: 6px;
+  font-size: var(--type-base);
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.07);
   padding: 5px 13px;
   color: var(--fg);
@@ -238,14 +238,14 @@ section {
 /* 02. Work Section (Sticky Stacking Cards) */
 #work {
   background: var(--bg);
-  border-radius: 40px 40px 0 0;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   position: relative;
 }
 
 .pc {
   position: sticky;
   top: calc(88px + var(--i) * 26px);
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   padding: clamp(24px, 4vw, 48px);
   display: grid;
   grid-template-columns: 1fr 1.15fr;
@@ -258,7 +258,7 @@ section {
 }
 
 .pc .k {
-  font: 500 14px var(--d);
+  font: 500 var(--type-base) var(--d);
   opacity: 0.7;
   margin: 0 0 14px;
   text-transform: uppercase;
@@ -266,7 +266,7 @@ section {
 }
 
 .pc h3 {
-  font: 700 clamp(34px, 5vw, 62px)/0.98 var(--d);
+  font: 700 var(--type-4xl)/0.98 var(--d);
   letter-spacing: -0.03em;
   margin: 0 0 16px;
 }
@@ -284,9 +284,9 @@ section {
 
 .pc .b {
   display: inline-block;
-  font: 700 14px var(--d);
+  font: 700 var(--type-base) var(--d);
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 11px 22px;
   margin: 0 8px 8px 0;
   background: currentColor;
@@ -323,7 +323,7 @@ section {
 }
 
 .fr {
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
   transform: rotate(2deg);
@@ -360,7 +360,7 @@ section {
 }
 
 .mk h4 {
-  font: 800 clamp(18px, 3.2vw, 40px)/1 var(--d);
+  font: 800 var(--type-3xl)/1 var(--d);
   letter-spacing: -0.02em;
   text-transform: uppercase;
   margin: 0;
@@ -375,7 +375,7 @@ section {
 .mk .r b {
   height: 24px;
   width: 84px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   background: var(--acc);
   display: inline-block;
 }
@@ -383,7 +383,7 @@ section {
 .mk .r s {
   height: 24px;
   width: 64px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   box-shadow: inset 0 0 0 1.5px currentColor;
   opacity: 0.4;
   display: inline-block;
@@ -397,7 +397,7 @@ section {
 
 .mk .bl b {
   height: 42px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: currentColor;
   opacity: 0.12;
   display: block;
@@ -414,7 +414,7 @@ section {
   flex: 1;
   background: currentColor;
   opacity: 0.3;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   display: block;
 }
 
@@ -430,32 +430,32 @@ section {
 
 .c1 {
   background: #f1ede6;
-  color: #101827;
+  color: var(--text-theme-dark);
   --c: #f1ede6;
 }
 
 .c1 .b {
-  color: #101827;
+  color: var(--text-theme-dark);
 }
 
 .c2 {
   background: #161c66;
-  color: #eef0ff;
+  color: var(--text-theme-light);
   --c: #161c66;
 }
 
 .c2 .b {
-  color: #eef0ff;
+  color: var(--text-theme-light);
 }
 
 .c3 {
   background: #0e2b30;
-  color: #d6f0f2;
+  color: var(--text-theme-cool);
   --c: #0e2b30;
 }
 
 .c3 .b {
-  color: #d6f0f2;
+  color: var(--text-theme-cool);
 }
 
 /* 03. Angled Marquee */
@@ -477,7 +477,7 @@ section {
 }
 
 .mq span {
-  font: 800 clamp(30px, 5vw, 60px)/1 var(--d);
+  font: 800 var(--type-4xl)/1 var(--d);
   letter-spacing: -0.02em;
   white-space: nowrap;
   padding-right: 40px;
@@ -501,18 +501,18 @@ section {
   display: inline-flex;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--ln);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 4px;
   margin: 40px 0 28px;
 }
 
 [role=tab] {
-  font: 500 15px var(--d);
+  font: 500 var(--type-base) var(--d);
   color: var(--mute);
   background: none;
   border: 0;
   padding: 10px 24px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: color 0.25s ease, background 0.25s ease;
 }
@@ -538,7 +538,7 @@ section {
 
 .tk {
   position: relative;
-  border-radius: 20px;
+  border-radius: var(--radius-2xl);
   padding: 22px;
   background: rgba(20, 17, 14, 0.6);
   border: 1px solid var(--ln);
@@ -583,17 +583,17 @@ section {
 /* 05. Journey */
 #journey {
   background: #f2efe9;
-  color: #15130f;
-  border-radius: 40px;
+  color: var(--text-inverse);
+  border-radius: var(--radius-2xl);
   margin: 0 clamp(0px, 1.5vw, 20px);
 }
 
 #journey .h {
-  color: #15130f;
+  color: var(--text-inverse);
 }
 
 #journey .h em {
-  color: #d4561a;
+  color: var(--text-accent-strong);
 }
 
 .cols {
@@ -604,10 +604,10 @@ section {
 }
 
 .cols h3 {
-  font: 500 14px var(--d);
+  font: 500 var(--type-base) var(--d);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6f695f;
+  color: var(--text-theme-muted);
   margin: 0 0 36px;
 }
 
@@ -656,25 +656,25 @@ section {
 .tl li.in::before,
 .tl li.vis::before {
   background: #d4561a;
-  border-color: #d4561a;
+  border-color: var(--text-accent);
 }
 
 .tl time {
-  font: 500 14px var(--d);
-  color: #d4561a;
+  font: 500 var(--type-base) var(--d);
+  color: var(--text-accent-strong);
   display: block;
 }
 
 .tl b {
   display: block;
-  font: 700 clamp(26px, 3vw, 36px)/1.1 var(--d);
+  font: 700 var(--type-3xl)/1.1 var(--d);
   letter-spacing: -0.025em;
   margin: 6px 0 4px;
-  color: #15130f;
+  color: var(--text-inverse);
 }
 
 .tl span {
-  color: #6f695f;
+  color: var(--text-theme-muted);
 }
 
 /* 06. Awards */
@@ -691,7 +691,7 @@ section {
 
 .cd {
   aspect-ratio: 1.45;
-  border-radius: 20px;
+  border-radius: var(--radius-2xl);
   padding: 9% 9%;
   background: linear-gradient(135deg, #1b1713, #2a2018);
   border: 1px solid rgba(255, 107, 44, 0.45);
@@ -712,27 +712,27 @@ section {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 20px;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.1) 50%, transparent 65%);
   transform: translateX(var(--sx, -30%));
   pointer-events: none;
 }
 
 .cd small {
-  font: 500 11px var(--d);
+  font: 500 var(--type-xs) var(--d);
   letter-spacing: 0.2em;
   color: var(--mute);
   text-transform: uppercase;
 }
 
 .cd b {
-  font: 700 clamp(24px, 3.6vw, 42px)/1 var(--d);
+  font: 700 var(--type-3xl)/1 var(--d);
   letter-spacing: -0.03em;
   color: var(--fg);
 }
 
 .cd em {
-  font: italic 400 clamp(20px, 2.6vw, 30px) var(--s);
+  font: italic 400 var(--type-2xl) var(--s);
   color: var(--acc);
 }
 
@@ -744,9 +744,9 @@ section {
 }
 
 .meta span {
-  font-size: 14px;
+  font-size: var(--type-base);
   border: 1px solid var(--ln);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 6px 16px;
   color: var(--mute);
 }
@@ -765,7 +765,7 @@ section {
 }
 
 .fl {
-  border-radius: 26px;
+  border-radius: var(--radius-2xl);
   overflow: hidden;
 }
 
@@ -785,7 +785,7 @@ summary {
   justify-content: space-between;
   gap: 20px;
   padding: 26px 0;
-  font: 500 clamp(18px, 2.2vw, 22px)/1.3 var(--d);
+  font: 500 var(--type-lg)/1.3 var(--d);
   color: var(--fg);
 }
 
@@ -795,7 +795,7 @@ summary::-webkit-details-marker {
 
 summary::after {
   content: "+";
-  font: 300 30px/1 var(--d);
+  font: 300 var(--type-2xl)/1 var(--d);
   color: var(--acc);
   transition: transform 0.3s;
 }
@@ -815,7 +815,7 @@ details p {
 #contact {
   background: var(--acc);
   color: var(--ink);
-  border-radius: 40px 40px 0 0;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
 #contact .h {
@@ -827,7 +827,7 @@ details p {
 }
 
 #contact .lede {
-  color: rgba(20, 11, 5, 0.75);
+  color: var(--text-theme-muted);
 }
 
 .cg {
@@ -838,7 +838,7 @@ details p {
 }
 
 .mail {
-  font: 700 clamp(22px, 3vw, 34px)/1.2 var(--d);
+  font: 700 var(--type-3xl)/1.2 var(--d);
   letter-spacing: -0.02em;
   text-decoration: none;
   border-bottom: 2px solid var(--ink);
@@ -849,11 +849,11 @@ details p {
 .cp {
   display: inline-block;
   margin-top: 20px;
-  font: 700 14px var(--d);
+  font: 700 var(--type-base) var(--d);
   background: var(--ink);
   color: var(--acc);
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 10px 20px;
   cursor: pointer;
   transition: letter-spacing 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -883,9 +883,9 @@ details p {
   padding: 8px 16px;
   background: rgba(20, 11, 5, 0.08);
   border: 1px solid rgba(20, 11, 5, 0.2);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   color: var(--ink);
-  font: 600 13px var(--d);
+  font: 600 var(--type-base) var(--d);
   text-decoration: none;
   transition: all 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -899,7 +899,7 @@ details p {
 
 .social-pill:hover {
   background: var(--ink);
-  color: #ff6b2c;
+  color: var(--text-bright-accent);
   transform: translateY(-2px);
   border-color: var(--ink);
 }
@@ -912,13 +912,13 @@ form {
 label {
   display: grid;
   gap: 2px;
-  font: 500 14px var(--d);
-  color: rgba(20, 11, 5, 0.7);
+  font: 500 var(--type-base) var(--d);
+  color: var(--text-theme-muted);
 }
 
 input,
 textarea {
-  font: 500 19px var(--d);
+  font: 500 var(--type-xl) var(--d);
   color: var(--ink);
   background: none;
   border: 0;
@@ -944,9 +944,9 @@ textarea {
   background: var(--ink);
   color: var(--acc);
   padding: 18px 34px;
-  font-size: 17px;
+  font-size: var(--type-lg);
   margin: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 0;
   cursor: pointer;
   font-weight: 700;
@@ -960,7 +960,7 @@ textarea {
 
 #st {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--type-base);
   min-height: 1.4em;
   color: var(--ink);
   font-weight: 500;
@@ -969,9 +969,9 @@ textarea {
 /* 09. Footer */
 footer {
   background: var(--ink);
-  color: #bdb3a6;
+    color: var(--text-muted);
   padding: 36px 0 44px;
-  font-size: 15px;
+  font-size: var(--type-base);
 }
 
 footer .w {
@@ -988,7 +988,7 @@ footer div {
 
 footer a {
   text-decoration: none;
-  color: #bdb3a6;
+  color: var(--text-muted);
   transition: color 0.2s;
 }
 
@@ -1021,7 +1021,7 @@ footer a:hover {
     transform: rotate(-1deg);
   }
   #journey {
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
   }
 }
 

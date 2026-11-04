@@ -123,10 +123,10 @@ export default function SelectedWork() {
                         <span
                           key={tIdx}
                           style={{
-                            fontSize: '11px',
+                            fontSize: 'var(--type-xs)',
                             padding: '3px 8px',
                             background: 'rgba(255, 255, 255, 0.06)',
-                            borderRadius: '4px',
+                            borderRadius: 'var(--radius-sm)',
                             color: 'var(--mute)',
                           }}
                         >

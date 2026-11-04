@@ -27,7 +27,7 @@ export default function Loading() {
       <span
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
+          fontSize: 'var(--type-sm)',
           letterSpacing: '0.2em',
           color: '#a69d91',
           textTransform: 'uppercase',

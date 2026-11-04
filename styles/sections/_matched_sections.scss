@@ -869,6 +869,41 @@ details p {
   color: var(--ink);
 }
 
+.contact-social-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(20, 11, 5, 0.08);
+  border: 1px solid rgba(20, 11, 5, 0.2);
+  border-radius: 24px;
+  color: var(--ink);
+  font: 600 13px var(--d);
+  text-decoration: none;
+  transition: all 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.social-pill svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.social-pill:hover {
+  background: var(--ink);
+  color: #ff6b2c;
+  transform: translateY(-2px);
+  border-color: var(--ink);
+}
+
 form {
   display: grid;
   gap: 22px;

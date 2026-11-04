@@ -1,9 +1,48 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+
+interface Certificate {
+  id: number;
+  title: string;
+  issuer: string;
+  issue_date: string;
+  credential_url: string;
+  image_url: string;
+  type: string;
+  sort_order: number;
+}
+
+const DEFAULT_CERTS: Certificate[] = [
+  {
+    id: 1,
+    title: 'AI Prompt War – Runner-Up',
+    issuer: 'Oriental Group of Institutes',
+    issue_date: 'Apr 2026',
+    credential_url: 'https://res.cloudinary.com/duhw4pa8k/image/upload/v1778675301/WhatsApp_Image_2026-05-13_at_17.56.14_pvgthh.jpg',
+    image_url: 'https://res.cloudinary.com/duhw4pa8k/image/upload/v1778675301/WhatsApp_Image_2026-05-13_at_17.56.14_pvgthh.jpg',
+    type: 'certificate',
+    sort_order: 1,
+  },
+];
 
 export default function AwardsSection() {
+  const [certs, setCerts] = useState<Certificate[]>(DEFAULT_CERTS);
+  const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    fetch('/api/certificates')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCerts(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const activeCert = certs[0] || DEFAULT_CERTS[0];
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const cd = cardRef.current;
@@ -29,30 +68,166 @@ export default function AwardsSection() {
           <h2 className="sm rv" suppressHydrationWarning>
             Certificates <em>&amp; awards.</em>
           </h2>
-          <div className="meta rv" suppressHydrationWarning>
-            <span>Certificate</span>
-            <span>Apr 2026</span>
+          <div className="meta rv" style={{ display: 'flex', gap: '12px', alignItems: 'center', margin: '14px 0' }} suppressHydrationWarning>
+            <span style={{ textTransform: 'capitalize', padding: '4px 10px', background: 'rgba(255, 107, 44, 0.1)', border: '1px solid rgba(255, 107, 44, 0.3)', borderRadius: '20px', fontSize: '12px', color: '#ff6b2c' }}>
+              {activeCert.type || 'Certificate'}
+            </span>
+            <span style={{ fontSize: '13px', color: 'var(--mute)' }}>
+              {activeCert.issue_date || 'Apr 2026'}
+            </span>
           </div>
-          <p className="lede rv" style={{ marginTop: 0, color: 'var(--fg)' }} suppressHydrationWarning>
-            AI Prompt War, Runner-up
+          <p className="lede rv" style={{ marginTop: 0, color: 'var(--fg)', fontSize: '24px', fontWeight: 600 }} suppressHydrationWarning>
+            {activeCert.title}
           </p>
-          <p className="lede rv" style={{ marginTop: '4px' }} suppressHydrationWarning>
-            Oriental Group of Institutes
+          <p className="lede rv" style={{ marginTop: '6px', color: 'var(--mute)' }} suppressHydrationWarning>
+            {activeCert.issuer}
           </p>
-          <a className="btn o rv" href="#" style={{ marginTop: '24px' }} suppressHydrationWarning>
-            View credential
-          </a>
+
+          {activeCert.image_url && (
+            <div style={{ marginTop: '24px' }} suppressHydrationWarning>
+              <button
+                type="button"
+                className="btn rv"
+                onClick={() => setSelectedCert(activeCert)}
+                style={{ cursor: 'pointer' }}
+                suppressHydrationWarning
+              >
+                Inspect certificate
+              </button>
+            </div>
+          )}
+
+          {certs.length > 1 && (
+            <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <span style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--mute)' }}>All Credentials</span>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {certs.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setSelectedCert(c)}
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: 'var(--fg)',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <strong>{c.title}</strong>
+                    <span style={{ display: 'block', fontSize: '11px', color: 'var(--mute)' }}>{c.issuer}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="ct rv" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} suppressHydrationWarning>
-          <div className="cd" id="cd" ref={cardRef} suppressHydrationWarning>
-            <small>Certificate of collaboration</small>
-            <b>AI Prompt War</b>
-            <em>Runner-up</em>
-            <small>Oriental Group of Institutes</small>
+          <div
+            className="cd"
+            id="cd"
+            ref={cardRef}
+            onClick={() => setSelectedCert(activeCert)}
+            style={{ cursor: 'pointer' }}
+            title="Click to expand credential"
+            suppressHydrationWarning
+          >
+            <small>{activeCert.type === 'award' ? 'Official Distinction' : 'Certificate of collaboration'}</small>
+            <b>{activeCert.title.split('–')[0]?.trim() || activeCert.title}</b>
+            <em>{activeCert.title.includes('–') ? activeCert.title.split('–')[1]?.trim() : 'Runner-up'}</em>
+            <small>{activeCert.issuer}</small>
           </div>
         </div>
       </div>
+
+      {/* Certificate Lightbox Modal */}
+      {selectedCert && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.88)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px',
+          }}
+          onClick={() => setSelectedCert(null)}
+        >
+          <div
+            style={{
+              position: 'relative',
+              maxWidth: '850px',
+              width: '100%',
+              background: '#161920',
+              borderRadius: '16px',
+              border: '1px solid rgba(255, 107, 44, 0.3)',
+              overflow: 'hidden',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.7)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--fg)' }}>{selectedCert.title}</h3>
+                <span style={{ fontSize: '13px', color: 'var(--mute)' }}>{selectedCert.issuer} • {selectedCert.issue_date}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedCert(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--fg)',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '4px 10px',
+                }}
+              >
+                &times;
+              </button>
+            </div>
+            <div style={{ padding: '20px', textAlign: 'center', background: '#0a0d12' }}>
+              {selectedCert.image_url ? (
+                <img
+                  src={selectedCert.image_url}
+                  alt={selectedCert.title}
+                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '8px' }}
+                />
+              ) : (
+                <div style={{ padding: '60px 20px', color: 'var(--mute)' }}>No preview image available</div>
+              )}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <a
+                href={selectedCert.credential_url || selectedCert.image_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn o"
+                style={{ padding: '8px 16px', fontSize: '14px' }}
+              >
+                Open in Full Resolution
+              </a>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setSelectedCert(null)}
+                style={{ padding: '8px 16px', fontSize: '14px' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,13 +1,39 @@
 const { createClient } = require("@libsql/client");
 require("dotenv").config();
 
-const db = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+let db;
+function getClient() {
+  if (!db) {
+    try {
+      const url = process.env.TURSO_DATABASE_URL;
+      const authToken = process.env.TURSO_AUTH_TOKEN;
+      if (url && (url.startsWith("libsql://") || url.startsWith("https://"))) {
+        db = createClient({ url, authToken });
+      } else {
+        db = createClient({ url: "file:local.db" });
+      }
+    } catch {
+      db = createClient({ url: "file:local.db" });
+    }
+  }
+  return db;
+}
+
+db = getClient();
 
 async function initDB() {
-  await db.executeMultiple(`
+  try {
+    await runInit(db);
+  } catch (err) {
+    console.warn("⚠️ Remote Turso init failed, falling back to local SQLite:", err.message);
+    db = createClient({ url: "file:local.db" });
+    await runInit(db);
+  }
+  console.log("✅ Database initialized successfully");
+}
+
+async function runInit(database) {
+  await database.executeMultiple(`
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
@@ -78,7 +104,7 @@ async function initDB() {
     );
   `);
 
-  // Add missing columns to older tables (ignores error if column already exists)
+  // Alter statements for safety
   const alterStatements = [
     "ALTER TABLE projects ADD COLUMN description TEXT",
     "ALTER TABLE projects ADD COLUMN image_url TEXT",
@@ -96,23 +122,25 @@ async function initDB() {
     "ALTER TABLE messages ADD COLUMN read INTEGER DEFAULT 0",
   ];
   for (const sql of alterStatements) {
-    try { await db.execute(sql); } catch (e) { /* column already exists, ignore */ }
+    try { await database.execute(sql); } catch (e) { /* ignore */ }
   }
 
-  // Seed default content if empty
-  const proj = await db.execute("SELECT COUNT(*) as c FROM projects");
-  if (proj.rows[0].c === 0) {
-    await db.executeMultiple(`
+  // Seed projects
+  const proj = await database.execute("SELECT COUNT(*) as c FROM projects");
+  if (Number(proj.rows[0].c) === 0) {
+    await database.executeMultiple(`
       INSERT INTO projects (title, description, image_url, demo_url, github_url, tech_tags, badge, sort_order) VALUES
-        ('Codex Monarch', 'A premier student-led technical community platform for national-level hackathons and collaborative engineering projects. Features time-gated coding arenas and a LeetCode-style IDE.', '', 'https://www.codexmonarch.me/', '', 'Node.js,MongoDB,JavaScript', 'Live', 1),
-        ('Orbit UI', 'A modern component library and UI showcase built with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use.', '', 'https://orbitui-eta.vercel.app/', 'https://github.com/AnkitRajMaurya/ORBITUI', 'HTML5,CSS3,JavaScript', 'Live', 2),
-        ('Weather Application', 'A full-featured weather application providing real-time weather data using the OpenWeather API, including current conditions and forecasts.', '', 'https://weather-project-lovat-five.vercel.app/', 'https://github.com/AnkitRajMaurya/weather-project', 'React,OpenWeather,CSS Modules', 'Live', 3);
+        ('Codex Monarch', 'A premier student-led technical community platform for national-level hackathons and collaborative engineering projects.', '/img/projects/codex-monarch.png', 'https://www.codexmonarch.me/', '', 'Node.js,MongoDB,JavaScript', 'Lead & Co-Founder', 1),
+        ('ReadyToGo', 'Career-readiness and placement preparation platform that helps students prepare and get hired.', '/img/projects/readytogo.png', 'https://readytogo.codexmonarch.me/', '', 'HTML5,CSS3,JavaScript', 'Career Platform', 2),
+        ('Orbit UI', 'A modern component library and UI showcase built with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use.', '/img/projects/orbit-ui.png', 'https://orbitui-eta.vercel.app/', 'https://github.com/AnkitRajMaurya/ORBITUI', 'HTML5,CSS3,JavaScript', 'UI System', 3),
+        ('Weather Application', 'A full-featured weather application providing real-time weather data using the OpenWeather API, including current conditions and forecasts.', '/img/projects/weather-app.png', 'https://weather-project-lovat-five.vercel.app/', 'https://github.com/AnkitRajMaurya/weather-project', 'React,OpenWeather,CSS Modules', 'Utility App', 4);
     `);
   }
 
-  const skills = await db.execute("SELECT COUNT(*) as c FROM skills");
-  if (skills.rows[0].c === 0) {
-    await db.executeMultiple(`
+  // Seed skills
+  const skills = await database.execute("SELECT COUNT(*) as c FROM skills");
+  if (Number(skills.rows[0].c) === 0) {
+    await database.executeMultiple(`
       INSERT INTO skills (name, icon_class, category, sort_order) VALUES
         ('JavaScript', 'fa-brands fa-js', 'frontend', 1),
         ('React.js', 'fa-brands fa-react', 'frontend', 2),
@@ -130,45 +158,59 @@ async function initDB() {
         ('PHP', 'fa-brands fa-php', 'backend', 6),
         ('REST APIs', 'fa-solid fa-plug', 'backend', 7),
         ('Turso/SQLite', 'fa-solid fa-database', 'backend', 8),
-        ('Git', 'fa-brands fa-git-alt', 'others', 1),
-        ('GitHub', 'fa-brands fa-github', 'others', 2),
-        ('Docker', 'fa-brands fa-docker', 'others', 3),
-        ('Figma', 'fa-brands fa-figma', 'others', 4),
-        ('Flutter', 'fa-solid fa-mobile-screen', 'others', 5),
-        ('Android SDK', 'fa-brands fa-android', 'others', 6),
-        ('Java', 'fa-brands fa-java', 'others', 7),
-        ('Python', 'fa-brands fa-python', 'others', 8);
+        ('Git', 'fa-brands fa-git-alt', 'tools', 1),
+        ('GitHub', 'fa-brands fa-github', 'tools', 2),
+        ('Docker', 'fa-brands fa-docker', 'tools', 3),
+        ('Figma', 'fa-brands fa-figma', 'tools', 4),
+        ('Flutter', 'fa-solid fa-mobile-screen', 'mobile', 1),
+        ('Android SDK', 'fa-brands fa-android', 'mobile', 2),
+        ('Java', 'fa-brands fa-java', 'languages', 1),
+        ('Python', 'fa-brands fa-python', 'languages', 2);
     `);
   }
 
-  const content = await db.execute("SELECT COUNT(*) as c FROM portfolio_content");
-  if (content.rows[0].c === 0) {
-    await db.executeMultiple(`
+  // Seed certificates including Prompt War
+  const certs = await database.execute("SELECT COUNT(*) as c FROM certificates");
+  if (Number(certs.rows[0].c) === 0) {
+    await database.executeMultiple(`
+      INSERT INTO certificates (title, issuer, issue_date, credential_url, image_url, type, sort_order, visible) VALUES
+        ('AI Prompt War – Runner-Up', 'Oriental Group of Institutes', 'Apr 2026', 'https://res.cloudinary.com/duhw4pa8k/image/upload/v1778675301/WhatsApp_Image_2026-05-13_at_17.56.14_pvgthh.jpg', 'https://res.cloudinary.com/duhw4pa8k/image/upload/v1778675301/WhatsApp_Image_2026-05-13_at_17.56.14_pvgthh.jpg', 'certificate', 1, 1);
+    `);
+  }
+
+  // Seed content
+  const content = await database.execute("SELECT COUNT(*) as c FROM portfolio_content");
+  if (Number(content.rows[0].c) === 0) {
+    await database.executeMultiple(`
       INSERT INTO portfolio_content (key, value) VALUES
         ('hero_greeting', 'Hello, I''m'),
         ('hero_name', 'Ankit Raj Maurya'),
         ('hero_tagline', 'From Problem to Production-Ready.'),
-        ('hero_description', 'A results-driven Full-Stack Developer and Co-founder at Codex Monarch specializing in high-performance web and mobile solutions. I transform complex problems into seamless production-ready applications.'),
+        ('hero_description', 'A results-driven Full-Stack Developer and Co-founder at Codex Monarch specializing in high-performance web and mobile solutions.'),
         ('status_pill', 'Available for new opportunities'),
         ('about_slogan', 'Building Digital Ecosystems'),
-        ('about_description', 'Hello! I''m Ankit, a dedicated Full-Stack Developer and Co-founder at Codex Monarch based in Muzaffarpur, Bihar. I specialize in building highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.'),
+        ('about_description', 'Hello! I''m Ankit, a dedicated Full-Stack Developer and Co-founder at Codex Monarch based in Muzaffarpur, Bihar. I specialize in building highly scalable, production-ready applications.'),
         ('location', 'Muzaffarpur, Bihar, India'),
-        ('email', 'ankit5242raj1@outlook.com');
+        ('email', 'ankit5242raj1@outlook.com'),
+        ('resume_url', 'https://drive.google.com/file/d/1359Lhc3l75iBDmdHSWJDFBz4O8sG33MJ/view?usp=drivesdk');
     `);
   }
 
-  const users = await db.execute("SELECT COUNT(*) as c FROM admin_users");
-  if (users.rows[0].c === 0 && process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD) {
+  // Seed admin user
+  const users = await database.execute("SELECT COUNT(*) as c FROM admin_users");
+  if (Number(users.rows[0].c) === 0) {
     const bcrypt = require("bcryptjs");
-    const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
-    await db.execute({
+    const u = process.env.ADMIN_USERNAME || "admin";
+    const p = process.env.ADMIN_PASSWORD || "admin123";
+    const hash = await bcrypt.hash(p, 10);
+    await database.execute({
       sql: "INSERT INTO admin_users (username, password_hash) VALUES (?, ?)",
-      args: [process.env.ADMIN_USERNAME, hash]
+      args: [u, hash]
     });
-    console.log("👤 Default admin user seeded");
   }
-
-  console.log("✅ Turso DB initialized");
 }
 
-module.exports = { db, initDB };
+module.exports = {
+  get db() { return db; },
+  initDB
+};

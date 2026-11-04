@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initMagneticButton();
   initCopyEmail();
   initContactForm();
+  initDynamicContent();
+  initAnalyticsTracking();
 });
 
 /* ── 1. WebGL Procedural Background Shader (#gl) ───────────────────────── */
@@ -499,20 +501,97 @@ function initContactForm() {
   const st = document.getElementById("st");
   if (!f) return;
 
-  f.addEventListener("submit", (e) => {
+  f.addEventListener("submit", async (e) => {
     e.preventDefault();
     const n = (f.n ? f.n.value : "").trim();
     const em = (f.e ? f.e.value : "").trim();
     const m = (f.m ? f.m.value : "").trim();
 
     if (!n || !/^\S+@\S+\.\S+$/.test(em) || !m) {
-      if (st) st.textContent = "Please add your name, a valid email and a message.";
+      if (st) {
+        st.textContent = "Please add your name, a valid email and a message.";
+        st.style.color = "#ff4d4d";
+      }
       return;
     }
 
-    if (st) st.textContent = "Opening your email app to send the message…";
-    window.location.href = `mailto:ankit5242raj1@outlook.com?subject=${encodeURIComponent(
-      "Portfolio message from " + n
-    )}&body=${encodeURIComponent(m + "\n\nFrom: " + n + " (" + em + ")")}`;
+    const btn = f.querySelector("button[type='submit']");
+    const originalText = btn ? btn.textContent : "Send message";
+
+    try {
+      if (btn) btn.textContent = "Sending...";
+      if (st) {
+        st.textContent = "Sending message...";
+        st.style.color = "var(--mute)";
+      }
+
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: n, email: em, message: m }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        if (st) {
+          st.textContent = "Thank you! Your message has been sent successfully.";
+          st.style.color = "#4ade80";
+        }
+        f.reset();
+      } else {
+        if (st) {
+          st.textContent = data.error || "Failed to send message. Please try again.";
+          st.style.color = "#ff4d4d";
+        }
+      }
+    } catch (err) {
+      if (st) {
+        st.textContent = "Network error. Please try again or email ankit5242raj1@outlook.com directly.";
+        st.style.color = "#ff4d4d";
+      }
+    } finally {
+      if (btn) btn.textContent = originalText;
+    }
   });
+}
+
+/* ── 9. Dynamic Data Sync with Admin Panel Core ────────────────────────── */
+async function initDynamicContent() {
+  try {
+    // 1. Content & Bio sync
+    const contentRes = await fetch("/api/content").then(r => r.json()).catch(() => null);
+    if (contentRes) {
+      const cvBtn = document.getElementById("cv-btn");
+      if (cvBtn && contentRes.resume_url) {
+        cvBtn.href = contentRes.resume_url;
+      }
+    }
+
+    // 2. Certificates & Awards sync
+    const certsRes = await fetch("/api/certificates").then(r => r.json()).catch(() => null);
+    if (Array.isArray(certsRes) && certsRes.length > 0) {
+      const certLink = document.getElementById("cert-link");
+      const active = certsRes[0];
+      if (certLink && (active.credential_url || active.image_url)) {
+        certLink.href = active.credential_url || active.image_url;
+      }
+    }
+  } catch (e) {
+    // Graceful fallback to static HTML content
+  }
+}
+
+/* ── 10. Visitor Analytics Beacon ──────────────────────────────────────── */
+function initAnalyticsTracking() {
+  try {
+    fetch("/api/analytics/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        page_path: window.location.pathname || "/",
+        referer: document.referrer || "Direct",
+      }),
+    }).catch(() => {});
+  } catch (e) {}
 }

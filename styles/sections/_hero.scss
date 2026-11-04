@@ -252,7 +252,14 @@
     text-transform: uppercase;
 
     &.center {
-      @include respond-to('desktop') {
+      text-align: center;
+
+      @include respond-to('tablet') {
+        font-size: 0.64rem;
+        letter-spacing: 0.1em;
+      }
+
+      @include respond-to('mobile-sm') {
         display: none;
       }
     }

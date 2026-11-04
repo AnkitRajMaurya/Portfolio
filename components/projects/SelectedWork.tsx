@@ -1,6 +1,92 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  image_url: string;
+  demo_url: string;
+  github_url: string;
+  tech_tags: string[];
+  badge: string;
+  sort_order: number;
+  visible: number;
+}
+
+const DEFAULT_PROJECTS: Project[] = [
+  {
+    id: 1,
+    title: 'Codex Monarch',
+    description: 'A student-led technical community platform for events, workshops and collaboration. Co-founded and led by me.',
+    image_url: '/img/projects/codex-monarch.png',
+    demo_url: 'https://www.codexmonarch.me/',
+    github_url: '',
+    tech_tags: ['Node.js', 'MongoDB', 'JavaScript'],
+    badge: 'Community platform',
+    sort_order: 1,
+    visible: 1,
+  },
+  {
+    id: 2,
+    title: 'ReadyToGo',
+    description: 'Career-readiness and placement preparation platform that helps students prepare and get hired.',
+    image_url: '/img/projects/readytogo.png',
+    demo_url: 'https://readytogo.codexmonarch.me/',
+    github_url: '',
+    tech_tags: ['Next.js', 'DSA Prep', 'Full-Stack'],
+    badge: 'Career platform',
+    sort_order: 2,
+    visible: 1,
+  },
+  {
+    id: 3,
+    title: 'Orbit UI',
+    description: 'A lightweight, zero-dependency component library for fast, accessible interfaces.',
+    image_url: '/img/projects/orbit-ui.png',
+    demo_url: 'https://orbitui-eta.vercel.app/',
+    github_url: 'https://github.com/AnkitRajMaurya/ORBITUI',
+    tech_tags: ['HTML5', 'CSS3', 'JavaScript'],
+    badge: 'Component library',
+    sort_order: 3,
+    visible: 1,
+  },
+  {
+    id: 4,
+    title: 'Weather App',
+    description: 'Live conditions and forecasts in a clean, minimal interface.',
+    image_url: '/img/projects/weather-app.png',
+    demo_url: 'https://weather-project-lovat-five.vercel.app/',
+    github_url: 'https://github.com/AnkitRajMaurya/weather-project',
+    tech_tags: ['React', 'OpenWeather', 'CSS Modules'],
+    badge: 'Web app',
+    sort_order: 4,
+    visible: 1,
+  },
+];
+
+const CARD_STYLES = [
+  { bg: '#1a110a', color: '#f4e9dc', quote: 'We build what others only imagine.' },
+  { bg: '#fff', color: '#101827', quote: 'Make strategy and demonstrate potential.' },
+  { bg: 'linear-gradient(135deg,#0b1030,#2b3bb0)', color: '#eef0ff', quote: 'Book your seat to space.' },
+  { bg: 'linear-gradient(160deg,#12343a,#0a1417)', color: '#d6f0f2', quote: '24°' },
+];
 
 export default function SelectedWork() {
+  const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="work" aria-label="Selected work">
       <div className="w" suppressHydrationWarning>
@@ -12,136 +98,95 @@ export default function SelectedWork() {
         </p>
 
         <div style={{ marginTop: '56px' }} suppressHydrationWarning>
-          {/* Card 0: Codex Monarch */}
-          <article className="pc c0" style={{ '--i': 0 } as React.CSSProperties} suppressHydrationWarning>
-            <div>
-              <p className="k">Community platform</p>
-              <h3>
-                Codex <em>Monarch</em>
-              </h3>
-              <p>
-                A student-led technical community platform for events, workshops and collaboration. Co-founded and led by me.
-              </p>
-              <a className="b" href="https://www.codexmonarch.me/" target="_blank" rel="noopener noreferrer">
-                <span>Live project</span>
-              </a>
-            </div>
-            <div className="fr">
-              <div className="cr">
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="mk" style={{ background: '#1a110a', color: '#f4e9dc' }}>
-                <h4>We build what others only imagine.</h4>
-                <div className="r">
-                  <b />
-                  <s />
-                </div>
-              </div>
-            </div>
-          </article>
+          {projects.map((p, index) => {
+            const cardTheme = CARD_STYLES[index % CARD_STYLES.length];
+            const words = p.title.split(' ');
+            const firstWord = words[0];
+            const remaining = words.slice(1).join(' ');
 
-          {/* Card 1: ReadyToGo */}
-          <article className="pc c1" style={{ '--i': 1 } as React.CSSProperties} suppressHydrationWarning>
-            <div>
-              <p className="k">Career platform</p>
-              <h3>
-                Ready<em>ToGo</em>
-              </h3>
-              <p>
-                Career-readiness and placement preparation platform that helps students prepare and get hired.
-              </p>
-              <a className="b" href="https://readytogo.codexmonarch.me/" target="_blank" rel="noopener noreferrer">
-                <span>Live project</span>
-              </a>
-            </div>
-            <div className="fr">
-              <div className="cr">
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="mk" style={{ background: '#fff', color: '#101827' }}>
-                <h4>Make strategy and demonstrate potential.</h4>
-                <div className="bl">
-                  <b />
-                  <b />
-                  <b />
+            return (
+              <article
+                key={p.id || index}
+                className={`pc c${index % 4}`}
+                style={{ '--i': index } as React.CSSProperties}
+                suppressHydrationWarning
+              >
+                <div>
+                  <p className="k">{p.badge || 'Project'}</p>
+                  <h3>
+                    {firstWord} {remaining ? <em>{remaining}</em> : null}
+                  </h3>
+                  <p>{p.description}</p>
+                  {p.tech_tags && p.tech_tags.length > 0 && (
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '14px 0 20px' }}>
+                      {p.tech_tags.map((tag, tIdx) => (
+                        <span
+                          key={tIdx}
+                          style={{
+                            fontSize: '11px',
+                            padding: '3px 8px',
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            borderRadius: '4px',
+                            color: 'var(--mute)',
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    {p.demo_url && (
+                      <a className="b" href={p.demo_url} target="_blank" rel="noopener noreferrer">
+                        <span>Live project</span>
+                      </a>
+                    )}
+                    {p.github_url && (
+                      <a className="b o" href={p.github_url} target="_blank" rel="noopener noreferrer">
+                        <span>Source code</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
-          </article>
 
-          {/* Card 2: Orbit UI */}
-          <article className="pc c2" style={{ '--i': 2 } as React.CSSProperties} suppressHydrationWarning>
-            <div>
-              <p className="k">Component library</p>
-              <h3>
-                Orbit <em>UI</em>
-              </h3>
-              <p>
-                A lightweight, zero-dependency component library for fast, accessible interfaces.
-              </p>
-              <a className="b" href="https://orbitui-eta.vercel.app/" target="_blank" rel="noopener noreferrer">
-                <span>Live project</span>
-              </a>
-              <a className="b o" href="https://github.com/AnkitRajMaurya/ORBITUI" target="_blank" rel="noopener noreferrer">
-                <span>Source code</span>
-              </a>
-            </div>
-            <div className="fr">
-              <div className="cr">
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="mk" style={{ background: 'linear-gradient(135deg,#0b1030,#2b3bb0)', color: '#eef0ff' }}>
-                <h4>Book your seat to space.</h4>
-                <div className="r">
-                  <b />
-                  <s />
+                <div className="fr">
+                  <div className="cr">
+                    <i />
+                    <i />
+                    <i />
+                  </div>
+                  {p.image_url ? (
+                    <div
+                      className="mk"
+                      style={{
+                        padding: 0,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#0e1117',
+                      }}
+                    >
+                      <img
+                        src={p.image_url}
+                        alt={p.title}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="mk" style={{ background: cardTheme.bg, color: cardTheme.color }}>
+                      <h4>{cardTheme.quote}</h4>
+                      <div className="r">
+                        <b />
+                        <s />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Card 3: Weather App */}
-          <article className="pc c3" style={{ '--i': 3 } as React.CSSProperties} suppressHydrationWarning>
-            <div>
-              <p className="k">Web app</p>
-              <h3>
-                Weather <em>App</em>
-              </h3>
-              <p>
-                Live conditions and forecasts in a clean, minimal interface.
-              </p>
-              <a className="b" href="https://ankitrajmaurya.github.io/PRODIGY_WD_02/" target="_blank" rel="noopener noreferrer">
-                <span>Live project</span>
-              </a>
-              <a className="b o" href="https://github.com/AnkitRajMaurya/PRODIGY_WD_02" target="_blank" rel="noopener noreferrer">
-                <span>Source code</span>
-              </a>
-            </div>
-            <div className="fr">
-              <div className="cr">
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="mk" style={{ background: 'linear-gradient(160deg,#12343a,#0a1417)', color: '#d6f0f2' }}>
-                <h4 style={{ fontSize: 'clamp(44px,8vw,96px)' }}>24°</h4>
-                <div className="wx">
-                  <b style={{ height: '55%' }} />
-                  <b style={{ height: '80%' }} />
-                  <b style={{ height: '45%' }} />
-                  <b style={{ height: '100%' }} />
-                  <b style={{ height: '70%' }} />
-                  <b style={{ height: '60%' }} />
-                </div>
-              </div>
-            </div>
-          </article>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

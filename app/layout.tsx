@@ -27,7 +27,11 @@ export const metadata: Metadata = {
     canonical: 'https://ankitrajmaurya.vercel.app/',
   },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/apple-icon.png',
   },
   openGraph: {
     type: 'website',
@@ -63,7 +67,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
       <body>
         {/* Interactive WebGL Shader Background */}

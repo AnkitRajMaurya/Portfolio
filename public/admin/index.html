@@ -1,764 +1,597 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <!-- Redirect to vercel domain if on github pages -->
-  <script>
-    if (window.location.hostname === "ankitrajmaurya.github.io/Portfolio") {
-      window.location.replace("https://ankitrajmaurya.vercel.app" + window.location.pathname + window.location.search + window.location.hash);
-    }
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[ ROOT@SYSTEM ] - Control Panel</title>
+  <title>Admin Workspace — Ankit Raj Maurya</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
 
-<!-- MATRIX RAIN CANVAS -->
-<canvas id="matrix-rain"></canvas>
-
-<!-- SCANLINE OVERLAY -->
-<div class="scanlines"></div>
-
-<!-- BOOT SEQUENCE -->
-<div id="boot-screen" class="boot-screen">
-  <div class="boot-terminal">
-    <div class="boot-lines" id="boot-lines"></div>
-    <div class="boot-cursor">[]</div>
-  </div>
-</div>
-
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="login-screen">
-  <div class="login-card">
-    <div class="terminal-bar">
-      <span class="terminal-dot red"></span>
-      <span class="terminal-dot yellow"></span>
-      <span class="terminal-dot green"></span>
-      <span class="terminal-title">root@darknet:~/auth</span>
-    </div>
-    <div class="login-body">
-      <div class="login-logo">
-        <div class="skull-icon">
-          <i class="fa-solid fa-skull-crossbones"></i>
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="brand-badge">
+          <i class="fa-solid fa-cube"></i>
         </div>
-        <div class="glitch-text" data-text="ACCESS TERMINAL">ACCESS TERMINAL</div>
+        <h1>Admin Workspace</h1>
+        <p>Sign in to manage portfolio content, projects, skills, certificates &amp; inquiries.</p>
       </div>
-      <p class="login-sub">[<span class="blink">!</span>] UNAUTHORIZED ACCESS WILL BE TRACED AND PROSECUTED</p>
+
       <form id="login-form" class="login-form">
-        <div class="field-group">
-          <label><i class="fa-solid fa-terminal"></i> root@login:~$ username</label>
-          <input type="text" id="login-username" placeholder="enter_username" autocomplete="username" required />
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-user"></i>
+            <input type="text" id="login-username" placeholder="Enter username" autocomplete="username" required />
+          </div>
         </div>
-        <div class="field-group">
-          <label><i class="fa-solid fa-key"></i> root@login:~$ password</label>
-          <input type="password" id="login-password" placeholder="**********" autocomplete="current-password" required />
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password" required />
+            <button type="button" id="toggle-password" class="btn-icon" aria-label="Toggle password visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
         </div>
+
         <div id="login-error" class="alert alert-error hidden"></div>
-        <button type="submit" class="btn-login" id="login-btn">
-          <i class="fa-solid fa-right-to-bracket"></i>
-          <span>INITIATE ACCESS</span>
-          <div class="btn-glitch"></div>
+
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+          <span>Sign In to Dashboard</span>
+          <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
-      <div class="login-footer-info">
-        <span><i class="fa-solid fa-shield-halved"></i> AES-256 ENCRYPTED</span>
-        <span><i class="fa-solid fa-satellite-dish"></i> TOR ROUTED</span>
+
+      <div class="login-footer">
+        <span><i class="fa-solid fa-shield-halved"></i> JWT Authenticated Session</span>
+        <span><i class="fa-solid fa-database"></i> Live Database Sync</span>
       </div>
     </div>
   </div>
-</div>
 
-<div id="threat-overlay" class="threat-overlay hidden" aria-hidden="true">
-  <div class="threat-panel">
-    <div class="threat-kicker">INTRUSION DETECTED</div>
-    <h2 id="threat-title">UNAUTHORIZED ACCESS</h2>
-    <p id="threat-copy" class="threat-copy">Countermeasures active. Device signature captured.</p>
-    <div class="threat-grid">
-      <div class="threat-cell">
-        <span>ATTEMPT</span>
-        <strong id="threat-attempt">01</strong>
+  <!-- DASHBOARD SHELL -->
+  <div id="dashboard" class="dashboard-shell hidden">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="brand-icon"><i class="fa-solid fa-cube"></i></span>
+          <div class="brand-info">
+            <strong>Portfolio Studio</strong>
+            <small>Production CMS</small>
+          </div>
+        </div>
       </div>
-      <div class="threat-cell">
-        <span>BROWSER</span>
-        <strong id="threat-browser">UNKNOWN</strong>
-      </div>
-      <div class="threat-cell">
-        <span>DEVICE</span>
-        <strong id="threat-device">UNKNOWN</strong>
-      </div>
-      <div class="threat-cell">
-        <span>TIME MARK</span>
-        <strong id="threat-time">00:00:00</strong>
-      </div>
-    </div>
-    <div class="threat-footer">
-      <span>[!] Session route burned</span>
-      <span id="threat-reason">Credential mismatch detected</span>
-    </div>
-  </div>
-</div>
 
-<div id="success-overlay" class="success-overlay hidden" aria-hidden="true">
-  <div class="success-panel">
-    <div class="success-kicker">AUTHENTICATION COMPLETE</div>
-    <h2 id="success-title">ACCESS GRANTED</h2>
-    <p id="success-copy" class="success-copy">Root credentials verified. Secure channel unlocked.</p>
-    <div class="success-grid">
-      <div class="success-cell">
-        <span>OPERATOR</span>
-        <strong id="success-operator">ROOT</strong>
-      </div>
-      <div class="success-cell">
-        <span>NODE</span>
-        <strong id="success-node">PRIMARY CORE</strong>
-      </div>
-      <div class="success-cell">
-        <span>STATUS</span>
-        <strong id="success-status">CHANNEL OPEN</strong>
-      </div>
-      <div class="success-cell">
-        <span>TIME MARK</span>
-        <strong id="success-time">00:00:00</strong>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="dashboard hidden">
-
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <i class="fa-solid fa-skull"></i>
-      <span>ROOT PANEL</span>
-    </div>
-    <div class="sidebar-status">
-      <div class="status-dot"></div>
-      <span>SYSTEM ACTIVE</span>
-    </div>
-    <nav class="sidebar-nav">
-      <button class="nav-btn active" data-section="overview">
-        <i class="fa-solid fa-satellite-dish"></i>
-        <span>OVERVIEW</span>
-        <div class="nav-indicator"></div>
-      </button>
-      <button class="nav-btn" data-section="projects">
-        <i class="fa-solid fa-code"></i>
-        <span>PROJECTS</span>
-        <div class="nav-indicator"></div>
-      </button>
-      <button class="nav-btn" data-section="skills">
-        <i class="fa-solid fa-microchip"></i>
-        <span>SKILLS</span>
-        <div class="nav-indicator"></div>
-      </button>
-      <button class="nav-btn" data-section="messages">
-        <i class="fa-solid fa-tower-broadcast"></i>
-        <span>INTERCEPTS</span>
-        <span class="badge" id="unread-badge" style="display:none"></span>
-        <div class="nav-indicator"></div>
-      </button>
-      <button class="nav-btn" data-section="certificates">
-        <i class="fa-solid fa-fingerprint"></i>
-        <span>CERTS</span>
-        <div class="nav-indicator"></div>
-      </button>
-      <button class="nav-btn" data-section="content">
-        <i class="fa-solid fa-file-code"></i>
-        <span>PAYLOAD</span>
-        <div class="nav-indicator"></div>
-      </button>
-      <button class="nav-btn" data-section="security">
-        <i class="fa-solid fa-key"></i>
-        <span>SECURITY</span>
-        <div class="nav-indicator"></div>
-      </button>
-    </nav>
-    <div class="sidebar-footer">
-      <a href="/" target="_blank" class="view-site-btn">
-        <i class="fa-solid fa-globe"></i> SURFACE WEB
-      </a>
-      <button class="logout-btn" id="logout-btn">
-        <i class="fa-solid fa-power-off"></i> KILL SESSION
-      </button>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Header -->
-    <header class="dash-header">
-      <div class="dash-header-left">
-        <button class="sidebar-toggle" id="sidebar-toggle">
-          <i class="fa-solid fa-bars"></i>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="overview">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Overview</span>
         </button>
-        <div>
-          <h2 id="section-title" class="glitch-text-sm" data-text="OVERVIEW">OVERVIEW</h2>
-          <p id="section-sub" class="dash-sub">root@system:~$ status --all</p>
-        </div>
+        <button class="nav-item" data-section="projects">
+          <i class="fa-solid fa-folder-open"></i>
+          <span>Projects</span>
+        </button>
+        <button class="nav-item" data-section="skills">
+          <i class="fa-solid fa-code"></i>
+          <span>Skills</span>
+        </button>
+        <button class="nav-item" data-section="certificates">
+          <i class="fa-solid fa-award"></i>
+          <span>Certificates &amp; Awards</span>
+        </button>
+        <button class="nav-item" data-section="messages">
+          <i class="fa-solid fa-envelope"></i>
+          <span>Inquiries</span>
+          <span id="unread-badge" class="badge-count hidden">0</span>
+        </button>
+        <button class="nav-item" data-section="content">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Content &amp; Profile</span>
+        </button>
+        <button class="nav-item" data-section="security">
+          <i class="fa-solid fa-key"></i>
+          <span>Security</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" rel="noopener noreferrer" class="sidebar-action-btn">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>View Live Site</span>
+        </a>
+        <button id="logout-btn" class="sidebar-action-btn logout">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Sign Out</span>
+        </button>
       </div>
-      <div class="dash-header-right">
-        <div class="header-stats">
-          <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false">
-            <i class="fa-solid fa-volume-xmark"></i>
-            <span id="sound-toggle-label">MUTED</span>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="sidebar-toggle" class="btn-icon mobile-menu-btn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
           </button>
-          <span class="uptime-chip"><i class="fa-solid fa-clock"></i> <span id="uptime">00:00:00</span></span>
-          <span class="admin-chip"><i class="fa-solid fa-user-secret"></i> ROOT</span>
+          <div>
+            <h2 id="topbar-title">Overview</h2>
+            <p id="topbar-sub" class="text-muted">Real-time portfolio metrics and platform control.</p>
+          </div>
         </div>
-      </div>
-    </header>
 
-    <!-- Sections -->
-    <div class="sections-wrap">
+        <div class="topbar-right">
+          <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>System Online</span>
+          </div>
+          <div class="admin-profile">
+            <div class="avatar"><i class="fa-solid fa-user"></i></div>
+            <span id="admin-user-display">admin</span>
+          </div>
+        </div>
+      </header>
 
-      <!-- OVERVIEW -->
-      <section id="section-overview" class="section active">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-eye" style="color: #57f7ff;"></i>
-            <div>
-              <span class="stat-num" id="stat-views">--</span>
-              <span class="stat-label">TOTAL VIEWS</span>
+      <!-- VIEW CONTAINER -->
+      <main class="content-body">
+
+        <!-- 01. OVERVIEW SECTION -->
+        <section id="section-overview" class="view-section active">
+          <div class="stats-row">
+            <div class="metric-card">
+              <div class="metric-icon blue"><i class="fa-regular fa-eye"></i></div>
+              <div class="metric-data">
+                <span id="stat-views" class="metric-num">--</span>
+                <span class="metric-label">Total Views</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon purple"><i class="fa-solid fa-users"></i></div>
+              <div class="metric-data">
+                <span id="stat-visitors" class="metric-num">--</span>
+                <span class="metric-label">Unique Visitors</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon orange"><i class="fa-solid fa-laptop-code"></i></div>
+              <div class="metric-data">
+                <span id="stat-projects" class="metric-num">--</span>
+                <span class="metric-label">Active Projects</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon green"><i class="fa-solid fa-inbox"></i></div>
+              <div class="metric-data">
+                <span id="stat-messages" class="metric-num">--</span>
+                <span class="metric-label">Total Messages</span>
+              </div>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-users" style="color: #7d57ff;"></i>
-            <div>
-              <span class="stat-num" id="stat-visitors">--</span>
-              <span class="stat-label">VISITORS</span>
+
+          <div class="two-col-grid">
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
+              </div>
+              <div class="quick-actions-grid">
+                <button type="button" class="qa-item" onclick="switchSection('projects'); openProjectModal();">
+                  <i class="fa-solid fa-plus"></i>
+                  <span>Add Project</span>
+                </button>
+                <button type="button" class="qa-item" onclick="switchSection('skills'); openSkillModal();">
+                  <i class="fa-solid fa-code-commit"></i>
+                  <span>Add Skill</span>
+                </button>
+                <button type="button" class="qa-item" onclick="switchSection('certificates'); openCertModal();">
+                  <i class="fa-solid fa-award"></i>
+                  <span>Add Certificate</span>
+                </button>
+                <button type="button" class="qa-item" onclick="switchSection('messages');">
+                  <i class="fa-regular fa-envelope-open"></i>
+                  <span>Read Inquiries</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3>
+              </div>
+              <div id="recent-activity-list" class="activity-feed">
+                <div class="empty-state">Loading recent activity...</div>
+              </div>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-code"></i>
-            <div>
-              <span class="stat-num" id="stat-projects">--</span>
-              <span class="stat-label">PROJECTS</span>
+        </section>
+
+        <!-- 02. PROJECTS SECTION -->
+        <section id="section-projects" class="view-section hidden">
+          <div class="section-actions-bar">
+            <div class="search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="project-search" placeholder="Search projects by title or tag..." oninput="filterProjects()" />
             </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-tower-broadcast"></i>
-            <div>
-              <span class="stat-num" id="stat-messages">--</span>
-              <span class="stat-label">INTERCEPTS</span>
-            </div>
-          </div>
-        </div>
-        <div class="stats-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 1.5rem;">
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-inbox" style="color: #ff5e7a;"></i>
-            <div>
-              <span class="stat-num" id="stat-unread">--</span>
-              <span class="stat-label">UNREAD</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-microchip"></i>
-            <div>
-              <span class="stat-num" id="stat-skills">--</span>
-              <span class="stat-label">EXPLOITS</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-glow"></div>
-            <i class="fa-solid fa-fingerprint"></i>
-            <div>
-              <span class="stat-num" id="stat-certs">--</span>
-              <span class="stat-label">CERTIFICATES</span>
-            </div>
-          </div>
-        </div>
-        <div class="quick-actions">
-          <h3><i class="fa-solid fa-bolt"></i> QUICK DEPLOY</h3>
-          <div class="qa-buttons">
-            <button onclick="switchSection('projects');openProjectModal()" class="qa-btn">
-              <i class="fa-solid fa-plus"></i> Deploy Project
+            <button type="button" class="btn btn-primary" onclick="openProjectModal()">
+              <i class="fa-solid fa-plus"></i>
+              <span>New Project</span>
             </button>
-            <button onclick="switchSection('skills');openSkillModal()" class="qa-btn">
-              <i class="fa-solid fa-plus"></i> Add Exploit
-            </button>
-            <button onclick="switchSection('certificates');openCertModal()" class="qa-btn">
-              <i class="fa-solid fa-plus"></i> Add Cert
-            </button>
-            <button onclick="switchSection('messages')" class="qa-btn">
-              <i class="fa-solid fa-inbox"></i> View Intercepts
-            </button>
-            <button onclick="switchSection('content')" class="qa-btn">
-              <i class="fa-solid fa-file-pen"></i> Edit Payload
+          </div>
+
+          <div id="projects-grid" class="projects-grid">
+            <!-- Dynamic project cards injected here -->
+          </div>
+        </section>
+
+        <!-- 03. SKILLS SECTION -->
+        <section id="section-skills" class="view-section hidden">
+          <div class="section-actions-bar">
+            <div class="category-filter-pills" id="skills-filter-bar">
+              <button class="filter-pill active" onclick="filterSkills('all')">All</button>
+              <button class="filter-pill" onclick="filterSkills('frontend')">Frontend</button>
+              <button class="filter-pill" onclick="filterSkills('backend')">Backend</button>
+              <button class="filter-pill" onclick="filterSkills('databases')">Databases</button>
+              <button class="filter-pill" onclick="filterSkills('languages')">Languages</button>
+              <button class="filter-pill" onclick="filterSkills('mobile')">Mobile</button>
+              <button class="filter-pill" onclick="filterSkills('tools')">Tools</button>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="openSkillModal()">
+              <i class="fa-solid fa-plus"></i>
+              <span>New Skill</span>
             </button>
           </div>
-        </div>
-        <div class="intel-grid">
-          <article class="intel-panel trace-panel">
+
+          <div id="skills-grid" class="skills-grid">
+            <!-- Dynamic skills injected here -->
+          </div>
+        </section>
+
+        <!-- 04. CERTIFICATES SECTION -->
+        <section id="section-certificates" class="view-section hidden">
+          <div class="section-actions-bar">
+            <div>
+              <h3>Certificates &amp; Credentials</h3>
+              <p class="text-muted">Manage awards, hackathons and certifications displayed on your portfolio.</p>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="openCertModal()">
+              <i class="fa-solid fa-plus"></i>
+              <span>New Certificate</span>
+            </button>
+          </div>
+
+          <div id="certificates-grid" class="certificates-list-grid">
+            <!-- Dynamic certificate cards injected here -->
+          </div>
+        </section>
+
+        <!-- 05. MESSAGES SECTION -->
+        <section id="section-messages" class="view-section hidden">
+          <div class="section-actions-bar">
+            <div>
+              <h3>Contact Inquiries</h3>
+              <p class="text-muted">Messages received directly from the portfolio contact form.</p>
+            </div>
+          </div>
+
+          <div id="messages-list" class="messages-container">
+            <!-- Dynamic messages injected here -->
+          </div>
+        </section>
+
+        <!-- 06. CONTENT & PROFILE SECTION -->
+        <section id="section-content" class="view-section hidden">
+          <div class="panel-card max-w-700">
             <div class="panel-header">
-              <h3><i class="fa-solid fa-terminal"></i> LIVE CONSOLE</h3>
-              <span class="panel-chip">EXEC</span>
+              <h3>Portfolio Copy &amp; Bio Information</h3>
+              <p class="text-muted">Update headline copy, bio text, and downloadable resume link in real time.</p>
             </div>
-            <div class="command-console">
-              <div class="command-console-bar">
-                <span class="terminal-dot red"></span>
-                <span class="terminal-dot yellow"></span>
-                <span class="terminal-dot green"></span>
-                <span class="command-console-title">root@system:~</span>
+
+            <form id="content-form" class="standard-form">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="cnt-hero-greeting">Hero Greeting</label>
+                  <input type="text" id="cnt-hero-greeting" />
+                </div>
+                <div class="form-group">
+                  <label for="cnt-hero-name">Full Name</label>
+                  <input type="text" id="cnt-hero-name" />
+                </div>
               </div>
-              <div id="command-stream" class="command-stream"></div>
-            </div>
-            <div class="console-examples">
-              <span class="console-example">scan --ports</span>
-              <span class="console-example">decrypt payload.enc</span>
-              <span class="console-example">access --secure-channel</span>
-              <span class="console-example">status --all</span>
-            </div>
-            <div class="trace-subhead">
-              <span>SYSTEM LOG</span>
-              <span>LIVE</span>
-            </div>
-            <div id="trace-feed" class="trace-feed compact-trace-feed"></div>
-          </article>
-          <article class="intel-panel network-panel">
+
+              <div class="form-group">
+                <label for="cnt-hero-tagline">Hero Headline / Tagline</label>
+                <input type="text" id="cnt-hero-tagline" />
+              </div>
+
+              <div class="form-group">
+                <label for="cnt-hero-desc">Hero Description</label>
+                <textarea id="cnt-hero-desc" rows="3"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="cnt-about-desc">About Section Bio</label>
+                <textarea id="cnt-about-desc" rows="4"></textarea>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="cnt-email">Contact Email</label>
+                  <input type="email" id="cnt-email" />
+                </div>
+                <div class="form-group">
+                  <label for="cnt-location">Location</label>
+                  <input type="text" id="cnt-location" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cnt-resume">Downloadable CV / Resume URL</label>
+                <input type="url" id="cnt-resume" placeholder="https://drive.google.com/..." />
+                <small class="field-hint">Direct link or Google Drive link for the &quot;Download CV&quot; button.</small>
+              </div>
+
+              <div id="content-alert" class="alert hidden"></div>
+
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Portfolio Content</span>
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- 07. SECURITY SECTION -->
+        <section id="section-security" class="view-section hidden">
+          <div class="panel-card max-w-500">
             <div class="panel-header">
-              <h3><i class="fa-solid fa-diagram-project"></i> NETWORK CORE</h3>
-              <span class="panel-chip">ARMED</span>
+              <h3>Admin Password</h3>
+              <p class="text-muted">Update your workspace authentication credentials.</p>
             </div>
-            <div class="network-shell">
-              <div class="network-ring ring-outer"></div>
-              <div class="network-ring ring-middle"></div>
-              <div class="network-ring ring-inner"></div>
-              <div class="network-core-node">ROOT</div>
-              <div class="network-node node-api">API</div>
-              <div class="network-node node-db">DB</div>
-              <div class="network-node node-ui">UI</div>
-              <div class="network-node node-msg">MSG</div>
-            </div>
-            <div class="network-meta">
-              <div class="network-meta-card">
-                <span>FIREWALL</span>
-                <strong>ACTIVE</strong>
-              </div>
-              <div class="network-meta-card">
-                <span>ENCRYPTION</span>
-                <strong>AES-256</strong>
-              </div>
-              <div class="network-meta-card">
-                <span>THREAT LVL</span>
-                <strong id="threat-level">LOW</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-        <div class="system-monitor">
-          <div class="panel-header">
-            <h3><i class="fa-solid fa-sliders"></i> SYSTEM MONITOR</h3>
-            <span class="panel-chip">LIVE</span>
-          </div>
-          <div class="monitor-grid">
-            <div class="monitor-card">
-              <div class="monitor-head">
-                <span>DECRYPTION</span>
-                <strong id="monitor-decryption-value">72%</strong>
-              </div>
-              <div class="monitor-bar"><div id="monitor-decryption-bar" class="monitor-fill"></div></div>
-            </div>
-            <div class="monitor-card">
-              <div class="monitor-head">
-                <span>SIGNAL MASKING</span>
-                <strong id="monitor-masking-value">81%</strong>
-              </div>
-              <div class="monitor-bar"><div id="monitor-masking-bar" class="monitor-fill cyan"></div></div>
-            </div>
-            <div class="monitor-card">
-              <div class="monitor-head">
-                <span>PACKET SHIELD</span>
-                <strong id="monitor-shield-value">94%</strong>
-              </div>
-              <div class="monitor-bar"><div id="monitor-shield-bar" class="monitor-fill"></div></div>
-            </div>
-            <div class="monitor-card">
-              <div class="monitor-head">
-                <span>CORE TEMP</span>
-                <strong id="monitor-temp-value">41C</strong>
-              </div>
-              <div class="monitor-bar"><div id="monitor-temp-bar" class="monitor-fill warn"></div></div>
-            </div>
-          </div>
-        </div>
-        <div class="system-monitor" style="margin-top: 1.5rem;">
-          <div class="panel-header">
-            <h3><i class="fa-solid fa-clock-rotate-left"></i> RECENT SYSTEM ACTIVITY</h3>
-            <span class="panel-chip">REALTIME</span>
-          </div>
-          <div id="recent-activity-feed" class="trace-feed compact-trace-feed" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
-            <!-- Rendered by admin.js -->
-            <div class="empty-state">
-              <i class="fa-solid fa-spinner fa-spin"></i>
-              <p>Synchronizing activity feed logs...</p>
-            </div>
-          </div>
-        </div>
 
-        <div class="global-map-panel" style="margin-top: 1.5rem;">
-          <div class="panel-header">
-            <h3><i class="fa-solid fa-earth-asia"></i> REALWORLD SIGNAL TRACKER</h3>
-            <span class="panel-chip">GEOLOCATED</span>
+            <form id="password-form" class="standard-form">
+              <div class="form-group">
+                <label for="pwd-current">Current Password</label>
+                <input type="password" id="pwd-current" required />
+              </div>
+
+              <div class="form-group">
+                <label for="pwd-new">New Password</label>
+                <input type="password" id="pwd-new" minlength="6" required />
+              </div>
+
+              <div class="form-group">
+                <label for="pwd-confirm">Confirm New Password</label>
+                <input type="password" id="pwd-confirm" minlength="6" required />
+              </div>
+
+              <div id="password-alert" class="alert hidden"></div>
+
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-key"></i>
+                <span>Update Password</span>
+              </button>
+            </form>
           </div>
-          <div id="real-world-map" style="height: 400px; width: 100%; border-radius: 18px; border: 1px solid rgba(77,255,156,0.12); background: #030a07; z-index: 1;"></div>
-          <div class="map-legend" style="margin-top: 0.95rem;">
-            <div class="map-legend-item"><span class="legend-dot active" style="background: #00ffd5; box-shadow: 0 0 12px rgba(0, 255, 213, 0.6);"></span> Visitor Ping</div>
-            <div class="map-legend-item"><span class="legend-dot relay" style="background: #7d57ff; box-shadow: 0 0 12px rgba(125, 87, 255, 0.6);"></span> Surface Access</div>
-            <div class="map-legend-item"><span class="legend-dot ghost" style="background: #57f7ff; box-shadow: 0 0 12px rgba(87, 247, 255, 0.6);"></span> Secure Core Node</div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- PROJECTS -->
-      <section id="section-projects" class="section hidden">
-        <div class="section-actions">
-          <h3><i class="fa-solid fa-code"></i> ALL PROJECTS</h3>
-          <button class="btn-primary" onclick="openProjectModal()">
-            <i class="fa-solid fa-plus"></i> DEPLOY NEW
-          </button>
-        </div>
-        <div id="projects-list" class="card-list"></div>
-      </section>
-
-      <!-- SKILLS -->
-      <section id="section-skills" class="section hidden">
-        <div class="section-actions">
-          <h3><i class="fa-solid fa-microchip"></i> EXPLOIT DATABASE</h3>
-          <button class="btn-primary" onclick="openSkillModal()">
-            <i class="fa-solid fa-plus"></i> ADD EXPLOIT
-          </button>
-        </div>
-        <div class="skill-tabs">
-          <button class="skill-tab active" data-cat="frontend">FRONTEND</button>
-          <button class="skill-tab" data-cat="backend">BACKEND</button>
-          <button class="skill-tab" data-cat="others">MISC</button>
-        </div>
-        <div id="skills-list" class="skills-admin-grid"></div>
-      </section>
-
-      <!-- MESSAGES -->
-      <section id="section-messages" class="section hidden">
-        <div class="section-actions">
-          <h3><i class="fa-solid fa-tower-broadcast"></i> INTERCEPTED TRANSMISSIONS</h3>
-          <span id="messages-count" class="count-chip"></span>
-        </div>
-        <div id="messages-list" class="messages-list"></div>
-      </section>
-
-      <!-- CONTENT -->
-      <section id="section-content" class="section hidden">
-        <div class="section-actions">
-          <h3><i class="fa-solid fa-file-code"></i> PAYLOAD EDITOR</h3>
-        </div>
-        <form id="content-form" class="content-form">
-          <div class="content-grid">
-            <div class="field-group">
-              <label>Status Pill Text</label>
-              <input type="text" name="status_pill" placeholder="Available for new opportunities" />
-            </div>
-            <div class="field-group">
-              <label>Hero Tagline</label>
-              <input type="text" name="hero_tagline" placeholder="From Problem to Production-Ready." />
-            </div>
-            <div class="field-group full">
-              <label>Hero Description</label>
-              <textarea name="hero_description" rows="3"></textarea>
-            </div>
-            <div class="field-group">
-              <label>About Slogan</label>
-              <input type="text" name="about_slogan" placeholder="Building Digital Ecosystems" />
-            </div>
-            <div class="field-group full">
-              <label>About Description</label>
-              <textarea name="about_description" rows="4"></textarea>
-            </div>
-            <div class="field-group">
-              <label>Email</label>
-              <input type="email" name="email" />
-            </div>
-            <div class="field-group">
-              <label>Location</label>
-              <input type="text" name="location" />
-            </div>
-          </div>
-          <div id="content-alert" class="alert hidden"></div>
-          <button type="submit" class="btn-primary">
-            <i class="fa-solid fa-upload"></i> INJECT PAYLOAD
-          </button>
-        </form>
-      </section>
-
-      <!-- CERTIFICATES -->
-      <section id="section-certificates" class="section hidden">
-        <div class="section-actions">
-          <h3><i class="fa-solid fa-fingerprint"></i> CERTIFICATES & CREDENTIALS</h3>
-          <button class="btn-primary" onclick="openCertModal()">
-            <i class="fa-solid fa-plus"></i> ADD CERT
-          </button>
-        </div>
-        <div id="certificates-list" class="card-list"></div>
-      </section>
-      <!-- SECURITY / PASSWORD CHANGE -->
-      <section id="section-security" class="section hidden">
-        <div class="section-actions">
-          <h3><i class="fa-solid fa-key"></i> SYSTEM SECURITY CREDENTIALS</h3>
-        </div>
-        <form id="password-change-form" class="content-form">
-          <div class="content-grid" style="grid-template-columns: 1fr; max-width: 500px;">
-            <div class="field-group">
-              <label><i class="fa-solid fa-lock"></i> CURRENT PASSWORD</label>
-              <input type="password" id="current-password" required placeholder="Enter current admin password..." />
-            </div>
-            <div class="field-group">
-              <label><i class="fa-solid fa-unlock-keyhole"></i> NEW PASSWORD</label>
-              <input type="password" id="new-password" required placeholder="Enter new admin password..." />
-            </div>
-            <div class="field-group">
-              <label><i class="fa-solid fa-check-double"></i> CONFIRM NEW PASSWORD</label>
-              <input type="password" id="confirm-new-password" required placeholder="Confirm new admin password..." />
-            </div>
-          </div>
-          <div id="password-change-alert" class="alert hidden" style="margin-top: 15px;"></div>
-          <button type="submit" class="btn-primary" id="change-pass-btn" style="margin-top: 15px;">
-            <i class="fa-solid fa-shield-halved"></i> UPDATE ACCESS KEY
-          </button>
-        </form>
-      </section>
-
+      </main>
     </div>
-  </main>
-</div>
+  </div>
 
-<!-- PROJECT MODAL -->
-<div id="project-modal" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="terminal-bar">
-      <span class="terminal-dot red"></span>
-      <span class="terminal-dot yellow"></span>
-      <span class="terminal-dot green"></span>
-      <span class="terminal-title" id="project-modal-bar-title">root@projects:~/new</span>
-    </div>
-    <div class="modal-inner">
+  <!-- PROJECT MODAL -->
+  <div id="project-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
       <div class="modal-header">
-        <h3 id="project-modal-title">Deploy Project</h3>
-        <button class="modal-close" onclick="closeProjectModal()"><i class="fa-solid fa-xmark"></i></button>
+        <h3 id="project-modal-title">Add Project</h3>
+        <button type="button" class="btn-icon" onclick="closeProjectModal()">&times;</button>
       </div>
+
       <form id="project-form" class="modal-form">
-        <input type="hidden" id="project-id" />
-        <div class="form-row">
-          <div class="field-group">
-            <label>Title *</label>
+        <input type="hidden" id="p-id" />
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="p-title">Project Title *</label>
             <input type="text" id="p-title" required />
           </div>
-          <div class="field-group">
-            <label>Badge</label>
-            <input type="text" id="p-badge" value="Live" />
+          <div class="form-group">
+            <label for="p-badge">Badge / Category</label>
+            <input type="text" id="p-badge" placeholder="e.g. Lead & Co-Founder, Live, System" />
           </div>
         </div>
-        <div class="field-group">
-          <label>Description</label>
-          <textarea id="p-description" rows="3"></textarea>
+
+        <div class="form-group">
+          <label for="p-desc">Description</label>
+          <textarea id="p-desc" rows="3" placeholder="Key highlights and engineering overview..."></textarea>
         </div>
-        <div class="field-group">
-          <label><i class="fa-solid fa-image"></i> Image URL</label>
-          <input type="url" id="p-image" placeholder="https://... or leave blank for icon" />
-          <div id="img-preview" class="img-preview"></div>
-        </div>
-        <div class="form-row">
-          <div class="field-group">
-            <label><i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo URL</label>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="p-demo">Live Demo URL</label>
             <input type="url" id="p-demo" placeholder="https://..." />
           </div>
-          <div class="field-group">
-            <label><i class="fa-brands fa-github"></i> GitHub URL</label>
+          <div class="form-group">
+            <label for="p-github">GitHub Repository URL</label>
             <input type="url" id="p-github" placeholder="https://github.com/..." />
           </div>
         </div>
-        <div class="field-group">
-          <label>Tech Tags (comma separated)</label>
-          <input type="text" id="p-tags" placeholder="React, Node.js, MongoDB" />
-        </div>
-        <div class="form-row">
-          <div class="field-group">
-            <label>Sort Order</label>
-            <input type="number" id="p-order" value="0" min="0" />
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="p-image">Screenshot Image URL</label>
+            <input type="text" id="p-image" placeholder="/img/projects/... or https://..." />
           </div>
-          <div class="field-group">
-            <label>Visible</label>
-            <select id="p-visible">
-              <option value="1">Yes</option>
-              <option value="0">No (Hidden)</option>
-            </select>
+          <div class="form-group">
+            <label for="p-tags">Tech Tags (comma separated)</label>
+            <input type="text" id="p-tags" placeholder="React, Node.js, MongoDB" />
           </div>
         </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="p-order">Sort Order</label>
+            <input type="number" id="p-order" value="0" />
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="p-visible" checked />
+              <span>Visible on Portfolio</span>
+            </label>
+          </div>
+        </div>
+
         <div id="project-alert" class="alert hidden"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" onclick="closeProjectModal()">ABORT</button>
-          <button type="submit" class="btn-primary" id="project-submit-btn">
-            <i class="fa-solid fa-upload"></i> DEPLOY
-          </button>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Project</button>
         </div>
       </form>
     </div>
   </div>
-</div>
 
-<!-- SKILL MODAL -->
-<div id="skill-modal" class="modal-overlay hidden">
-  <div class="modal" style="max-width:520px">
-    <div class="terminal-bar">
-      <span class="terminal-dot red"></span>
-      <span class="terminal-dot yellow"></span>
-      <span class="terminal-dot green"></span>
-      <span class="terminal-title">root@exploits:~/add</span>
-    </div>
-    <div class="modal-inner">
+  <!-- SKILL MODAL -->
+  <div id="skill-modal" class="modal-backdrop hidden">
+    <div class="modal-card modal-sm">
       <div class="modal-header">
-        <h3 id="skill-modal-title">Add Exploit</h3>
-        <button class="modal-close" onclick="closeSkillModal()"><i class="fa-solid fa-xmark"></i></button>
+        <h3 id="skill-modal-title">Add Skill</h3>
+        <button type="button" class="btn-icon" onclick="closeSkillModal()">&times;</button>
       </div>
+
       <form id="skill-form" class="modal-form">
-        <input type="hidden" id="skill-id" />
-        <div class="field-group">
-          <label>Skill Name *</label>
-          <input type="text" id="s-name" required placeholder="e.g. React.js" />
+        <input type="hidden" id="s-id" />
+
+        <div class="form-group">
+          <label for="s-name">Skill Name *</label>
+          <input type="text" id="s-name" placeholder="e.g. Next.js, Docker, Java" required />
         </div>
-        <div class="field-group">
-          <label>Font Awesome Icon Class</label>
-          <input type="text" id="s-icon" placeholder="e.g. fa-brands fa-react" />
-          <p class="field-hint">Find icons at <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com</a></p>
-        </div>
-        <div class="field-group">
-          <label>OR Custom Icon Image URL</label>
-          <input type="url" id="s-icon-url" placeholder="https://cdn.../react.svg" />
-        </div>
-        <div class="form-row">
-          <div class="field-group">
-            <label>Category</label>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="s-category">Category</label>
             <select id="s-category">
               <option value="frontend">Frontend</option>
               <option value="backend">Backend</option>
-              <option value="others">Others</option>
+              <option value="databases">Databases</option>
+              <option value="languages">Languages</option>
+              <option value="mobile">Mobile</option>
+              <option value="tools">Tools &amp; DevOps</option>
             </select>
           </div>
-          <div class="field-group">
-            <label>Sort Order</label>
-            <input type="number" id="s-order" value="0" min="0" />
+          <div class="form-group">
+            <label for="s-order">Sort Order</label>
+            <input type="number" id="s-order" value="0" />
           </div>
         </div>
+
+        <div class="form-group">
+          <label for="s-icon">FontAwesome Icon Class</label>
+          <input type="text" id="s-icon" placeholder="e.g. fa-brands fa-react" />
+          <small class="field-hint">Example: fa-brands fa-js, fa-solid fa-server</small>
+        </div>
+
         <div id="skill-alert" class="alert hidden"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" onclick="closeSkillModal()">ABORT</button>
-          <button type="submit" class="btn-primary">
-            <i class="fa-solid fa-upload"></i> INJECT
-          </button>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeSkillModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Skill</button>
         </div>
       </form>
     </div>
   </div>
-</div>
 
-<!-- CERTIFICATE MODAL -->
-<div id="cert-modal" class="modal-overlay hidden">
-  <div class="modal" style="max-width:560px">
-    <div class="terminal-bar">
-      <span class="terminal-dot red"></span>
-      <span class="terminal-dot yellow"></span>
-      <span class="terminal-dot green"></span>
-      <span class="terminal-title">root@certs:~/add</span>
-    </div>
-    <div class="modal-inner">
+  <!-- CERTIFICATE MODAL -->
+  <div id="cert-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
       <div class="modal-header">
         <h3 id="cert-modal-title">Add Certificate</h3>
-        <button class="modal-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="btn-icon" onclick="closeCertModal()">&times;</button>
       </div>
+
       <form id="cert-form" class="modal-form">
-        <input type="hidden" id="cert-id" />
-        <div class="field-group">
-          <label>Title *</label>
-          <input type="text" id="c-title" required placeholder="e.g. AWS Cloud Practitioner" />
+        <input type="hidden" id="c-id" />
+
+        <div class="form-group">
+          <label for="c-title">Certificate / Award Title *</label>
+          <input type="text" id="c-title" placeholder="e.g. AI Prompt War – Runner-Up" required />
         </div>
-        <div class="form-row">
-          <div class="field-group">
-            <label>Issuer</label>
-            <input type="text" id="c-issuer" placeholder="e.g. Amazon Web Services" />
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="c-issuer">Issuing Organization</label>
+            <input type="text" id="c-issuer" placeholder="e.g. Oriental Group of Institutes" />
           </div>
-          <div class="field-group">
-            <label>Issue Date</label>
-            <input type="text" id="c-date" placeholder="e.g. Jan 2025" />
+          <div class="form-group">
+            <label for="c-date">Issue Date</label>
+            <input type="text" id="c-date" placeholder="e.g. Apr 2026" />
           </div>
         </div>
-        <div class="form-row">
-          <div class="field-group">
-            <label>Type</label>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="c-type">Credential Type</label>
             <select id="c-type">
               <option value="certificate">Certificate</option>
-              <option value="award">Award</option>
+              <option value="award">Distinction / Award</option>
+              <option value="hackathon">Hackathon</option>
             </select>
           </div>
-          <div class="field-group">
-            <label>Sort Order</label>
-            <input type="number" id="c-order" value="0" min="0" />
+          <div class="form-group">
+            <label for="c-order">Sort Order</label>
+            <input type="number" id="c-order" value="0" />
           </div>
         </div>
-        <div class="field-group">
-          <label><i class="fa-solid fa-link"></i> Credential URL</label>
-          <input type="url" id="c-url" placeholder="https://verify.credential.net/..." />
+
+        <div class="form-group">
+          <label for="c-url">Credential Verification URL</label>
+          <input type="url" id="c-url" placeholder="https://..." />
         </div>
-        <div class="field-group">
-          <label><i class="fa-solid fa-image"></i> Image URL (optional)</label>
-          <input type="url" id="c-image" placeholder="https://..." />
+
+        <div class="form-group">
+          <label for="c-image">Certificate Image URL</label>
+          <input type="url" id="c-image" placeholder="https://res.cloudinary.com/..." />
         </div>
+
         <div id="cert-alert" class="alert hidden"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" onclick="closeCertModal()">ABORT</button>
-          <button type="submit" class="btn-primary">
-            <i class="fa-solid fa-upload"></i> INJECT
-          </button>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCertModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Certificate</button>
         </div>
       </form>
     </div>
   </div>
-</div>
 
-<!-- CONFIRM MODAL -->
-<div id="confirm-modal" class="modal-overlay hidden">
-  <div class="modal" style="max-width:420px;text-align:center">
-    <div class="terminal-bar">
-      <span class="terminal-dot red"></span>
-      <span class="terminal-dot yellow"></span>
-      <span class="terminal-dot green"></span>
-      <span class="terminal-title">root@system:~/confirm</span>
-    </div>
-    <div class="modal-inner">
-      <div class="confirm-icon">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
-      <h3 class="confirm-title">[!] CONFIRM TERMINATION</h3>
-      <p id="confirm-msg" class="confirm-msg"></p>
-      <div class="modal-actions" style="justify-content:center">
-        <button class="btn-ghost" onclick="closeConfirm()">ABORT</button>
-        <button class="btn-danger" id="confirm-ok-btn">TERMINATE</button>
+  <!-- CONFIRM MODAL -->
+  <div id="confirm-modal" class="modal-backdrop hidden">
+    <div class="modal-card modal-sm text-center">
+      <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 id="confirm-title">Confirm Deletion</h3>
+      <p id="confirm-msg" class="text-muted">Are you sure you want to proceed? This cannot be undone.</p>
+      <div class="modal-footer center">
+        <button type="button" class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+        <button type="button" id="confirm-ok-btn" class="btn btn-danger">Confirm Delete</button>
       </div>
     </div>
   </div>
-</div>
 
-<script src="admin.js"></script>
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="/admin/admin.js"></script>
 </body>
 </html>

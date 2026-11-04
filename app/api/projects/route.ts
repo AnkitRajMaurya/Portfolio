@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getDb, ProjectRecord } from '@/lib/db/turso';
+import { ensureDbInitialized } from '@/lib/db/turso';
 
 export async function GET() {
   try {
-    const db = getDb();
-    const result = await db.execute('SELECT * FROM projects WHERE visible=1 ORDER BY sort_order ASC');
+    const db = await ensureDbInitialized();
+    const result = await db.execute('SELECT * FROM projects WHERE visible=1 ORDER BY sort_order ASC, id ASC');
     const projects = result.rows.map((row: any) => ({
       ...row,
       tech_tags: typeof row.tech_tags === 'string'
@@ -14,7 +14,6 @@ export async function GET() {
     return NextResponse.json(projects);
   } catch (error) {
     console.error('Projects API error:', error);
-    // Return verified fallback projects if DB is not reachable
     return NextResponse.json([
       {
         id: 1,
@@ -24,7 +23,7 @@ export async function GET() {
         demo_url: 'https://www.codexmonarch.me/',
         github_url: '',
         tech_tags: ['Node.js', 'MongoDB', 'JavaScript', 'Community Engine'],
-        badge: 'Lead & Core Team',
+        badge: 'Lead & Co-Founder',
         sort_order: 1,
       },
       {
@@ -35,7 +34,7 @@ export async function GET() {
         demo_url: 'https://readytogo.codexmonarch.me/',
         github_url: '',
         tech_tags: ['Full-Stack', 'Next.js', 'DSA Prep', 'Algorithms'],
-        badge: 'Flagship Platform',
+        badge: 'Career Platform',
         sort_order: 2,
       },
       {

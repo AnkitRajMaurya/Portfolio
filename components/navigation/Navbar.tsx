@@ -15,11 +15,24 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    let lastY = window.scrollY;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      const currentY = window.scrollY;
+      setIsScrolled(currentY > 40);
+
+      // Auto-hide when scrolling down, show when scrolling up
+      if (currentY > 100 && currentY > lastY + 8 && !mobileMenuOpen) {
+        setIsHidden(true);
+      } else if (currentY < lastY - 8 || currentY <= 50) {
+        setIsHidden(false);
+      }
+
+      lastY = currentY;
 
       // Scroll-spy active section detection
       const sections = ['about', 'work', 'stack', 'journey', 'awards', 'faq', 'contact'];
@@ -37,10 +50,10 @@ export default function Navbar() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [mobileMenuOpen]);
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${isHidden ? 'is-hidden' : ''}`}>
       <nav
         className={`floating-navbar ${isScrolled ? 'is-scrolled' : ''}`}
         aria-label="Main Navigation"

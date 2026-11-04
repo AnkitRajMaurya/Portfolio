@@ -98,14 +98,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    padding: 0.38rem 0.85rem;
-    border-radius: 6px;
-    background: rgba(14, 14, 12, 0.75);
-    border: 1px solid rgba(240, 234, 224, 0.14);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
     margin-bottom: 1.25rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 
     .eyebrow-dot {
       width: 5px;
@@ -118,9 +115,9 @@
     span {
       font-family: $font-mono;
       font-size: 0.72rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: rgba(240, 234, 224, 0.88);
+      color: rgba(240, 234, 224, 0.75);
       font-weight: 500;
     }
   }
@@ -182,35 +179,27 @@
       gap: 0.75rem;
       padding: 0.85rem 1.75rem;
       border-radius: 8px;
-      background: rgba(240, 234, 224, 0.05);
-      border: 1px solid var(--border-strong);
+      background: rgba(240, 234, 224, 0.06);
+      border: 1px solid rgba(240, 234, 224, 0.15);
       color: var(--foreground);
       font-family: $font-body;
       font-size: 0.88rem;
       font-weight: 500;
       letter-spacing: 0.02em;
-      transition: border-color 0.3s ease;
       text-decoration: none;
-
-      > span:first-child {
-        display: inline-block;
-        transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
-      }
+      transition: background 0.25s ease, border-color 0.25s ease;
 
       .btn-arrow {
         display: inline-block;
-        transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+        transition: transform 0.25s ease;
       }
 
       &:hover {
-        border-color: rgba(240, 234, 224, 0.35);
-
-        > span:first-child {
-          transform: translateX(4px);
-        }
+        background: rgba(240, 234, 224, 0.12);
+        border-color: rgba(240, 234, 224, 0.32);
 
         .btn-arrow {
-          transform: translateY(3px);
+          transform: translateY(2px);
         }
       }
     }
@@ -225,26 +214,20 @@
       font-family: $font-body;
       font-size: 0.88rem;
       text-decoration: none;
-
-      > span:first-child {
-        display: inline-block;
-        transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.25s ease;
-      }
+      background: transparent;
+      border: 1px solid transparent;
+      transition: color 0.25s ease;
 
       .btn-arrow {
         display: inline-block;
-        transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.25s ease;
+        transition: transform 0.25s ease;
       }
 
       &:hover {
-        > span:first-child {
-          transform: translateX(4px);
-          color: var(--foreground);
-        }
+        color: var(--foreground);
 
         .btn-arrow {
-          transform: translate(3px, -3px);
-          color: var(--accent);
+          transform: translate(2px, -2px);
         }
       }
     }

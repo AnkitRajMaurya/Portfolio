@@ -232,20 +232,35 @@ function initPortraitCanvas() {
 /* ── 3. Navigation, Scroll Progress & Section Spy ──────────────────────── */
 function initNavigation() {
   const nav = document.getElementById("main-nav");
+  const navWrapper = document.querySelector(".floating-nav-wrapper");
   const mobileToggle = document.getElementById("mobile-toggle");
   const navMenu = document.getElementById("nav-menu");
 
-  if (nav) {
-    const handleScroll = () => {
-      if (window.scrollY > 40) {
+  let lastY = window.scrollY;
+
+  const handleScroll = () => {
+    const currentY = window.scrollY;
+
+    if (nav) {
+      if (currentY > 40) {
         nav.classList.add("scrolled");
       } else {
         nav.classList.remove("scrolled");
       }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-  }
+    }
+
+    if (navWrapper && (!navMenu || !navMenu.classList.contains("open"))) {
+      if (currentY > 100 && currentY > lastY + 8) {
+        navWrapper.classList.add("is-hidden");
+      } else if (currentY < lastY - 8 || currentY <= 50) {
+        navWrapper.classList.remove("is-hidden");
+      }
+    }
+
+    lastY = currentY;
+  };
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  handleScroll();
 
   if (mobileToggle && navMenu) {
     mobileToggle.addEventListener("click", () => {

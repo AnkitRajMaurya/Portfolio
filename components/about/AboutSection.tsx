@@ -11,10 +11,6 @@ export default function AboutSection() {
         </h2>
         <div className="ab" suppressHydrationWarning>
           <div className="gl rv" suppressHydrationWarning>
-            <span className="pill">
-              <i aria-hidden="true" />
-              Available for new opportunities
-            </span>
             <p>
               Hello, I&apos;m Ankit, a Full-Stack Developer and Co-founder at Codex Monarch, based in Muzaffarpur, Bihar. I build highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.
             </p>

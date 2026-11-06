@@ -61,7 +61,7 @@
     align-items: center;
     gap: 2rem;
 
-    @include respond-to('tablet') {
+    @media (max-width: 920px) {
       display: none;
     }
 
@@ -99,7 +99,7 @@
     display: flex;
     align-items: center;
 
-    @include respond-to('tablet') {
+    @media (max-width: 920px) {
       display: none;
     }
 
@@ -145,7 +145,7 @@
     border: none;
     cursor: pointer;
 
-    @include respond-to('tablet') {
+    @media (max-width: 920px) {
       display: flex;
     }
 
@@ -215,6 +215,47 @@
         letter-spacing: 0.04em;
       }
     }
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    top: 0.75rem;
+    padding-inline: 0.75rem;
+  }
+
+  .floating-navbar,
+  .floating-navbar.is-scrolled {
+    height: 50px;
+    padding-inline: 0.85rem;
+    border-radius: var(--radius-md);
+  }
+
+  .floating-navbar .nav-brandmark .brand-name {
+    font-size: clamp(1.05rem, 5vw, 1.25rem);
+  }
+
+  .floating-navbar .mobile-toggle {
+    flex: 0 0 36px;
+  }
+
+  .mobile-drawer {
+    top: 4.5rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    max-height: calc(100dvh - 5.25rem);
+    overflow-y: auto;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+  }
+
+  .mobile-drawer .mobile-links {
+    gap: 0.9rem;
+  }
+
+  .mobile-drawer .mobile-links .mobile-link {
+    font-size: clamp(1.4rem, 7vw, 1.75rem);
+    padding-bottom: 0.6rem;
   }
 }
 

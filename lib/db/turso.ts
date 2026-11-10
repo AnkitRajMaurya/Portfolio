@@ -136,7 +136,7 @@ async function runMigrations(db: Client) {
   if (Number(projRes.rows[0]?.c || 0) === 0) {
     await db.executeMultiple(`
       INSERT INTO projects (title, description, image_url, demo_url, github_url, tech_tags, badge, sort_order) VALUES
-        ('Codex Monarch', 'A premier student-led technical community platform for national-level hackathons and collaborative engineering projects. Features time-gated coding arenas and a LeetCode-style IDE.', '/img/projects/codex-monarch.png', 'https://www.codexmonarch.me/', '', 'Node.js,MongoDB,JavaScript,Community Engine', 'Lead & Co-Founder', 1),
+        ('Codex Monarch', 'A premier student-led technical community platform for national-level hackathons and collaborative engineering projects. Features time-gated coding arenas and a LeetCode-style IDE.', '/img/projects/codex-monarch.png', 'https://www.codexmonarch.me/', '', 'Node.js,MongoDB,JavaScript,Community Engine', 'Team Lead', 1),
         ('ReadyToGo', 'Comprehensive programming and placement preparation ecosystem featuring DSA sheet tracking, topic guides, and practice tests.', '/img/projects/readytogo.png', 'https://readytogo.codexmonarch.me/', '', 'Full-Stack,Next.js,DSA Prep,Algorithms', 'Career Platform', 2),
         ('Orbit UI', 'A lightweight, zero-dependency component library and UI showcase engineered with vanilla JavaScript. Clean, accessible, and lightweight design system ready for production use.', '/img/projects/orbit-ui.png', 'https://orbitui-eta.vercel.app/', 'https://github.com/AnkitRajMaurya/ORBITUI', 'HTML5,CSS3,JavaScript,Design System', 'UI System', 3),
         ('Weather Application', 'A full-featured meteorological dashboard providing real-time weather data using the OpenWeather API, including dynamic condition animations and forecasts.', '/img/projects/weather-app.png', 'https://weather-project-lovat-five.vercel.app/', 'https://github.com/AnkitRajMaurya/weather-project', 'React,OpenWeather,CSS Modules', 'Live', 4);
@@ -193,10 +193,10 @@ async function runMigrations(db: Client) {
         ('hero_greeting', 'Hello, I''m'),
         ('hero_name', 'Ankit Raj Maurya'),
         ('hero_tagline', 'From Problem to Production-Ready.'),
-        ('hero_description', 'A results-driven Full-Stack Developer and Co-founder at Codex Monarch specializing in high-performance web and mobile solutions. I transform complex problems into seamless production-ready applications.'),
+        ('hero_description', 'A results-driven Full-Stack Developer and Team Lead at Codex Monarch specializing in high-performance web and mobile solutions. I transform complex problems into seamless production-ready applications.'),
         ('status_pill', 'Available for new opportunities'),
         ('about_slogan', 'Building Digital Ecosystems'),
-        ('about_description', 'Hello! I''m Ankit, a dedicated Full-Stack Developer and Co-founder at Codex Monarch based in Muzaffarpur, Bihar. I build highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.'),
+        ('about_description', 'Hello! I''m Ankit, a dedicated Full-Stack Developer and Team Lead at Codex Monarch based in Muzaffarpur, Bihar. I build highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.'),
         ('location', 'Muzaffarpur, Bihar, India'),
         ('email', 'ankit5242raj1@outlook.com'),
         ('resume_url', 'https://drive.google.com/file/d/1359Lhc3l75iBDmdHSWJDFBz4O8sG33MJ/view?usp=drivesdk');

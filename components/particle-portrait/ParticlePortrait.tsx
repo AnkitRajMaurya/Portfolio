@@ -148,7 +148,7 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
-      camera.position.z = 700;
+      camera.position.z = width < 768 ? 520 : 700;
 
       renderer = new THREE.WebGLRenderer({
         alpha: true,
@@ -200,8 +200,8 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
 
         // Preserve the source portrait's natural proportions while sizing it
         // for the hero composition.
-        const scaleX = window.innerWidth < 768 ? 1.65 : 2.2;
-        const scaleY = window.innerWidth < 768 ? 1.85 : 2.45;
+        const scaleX = window.innerWidth < 768 ? 2.35 : 2.2;
+        const scaleY = window.innerWidth < 768 ? 2.6 : 2.45;
         const centerX = targetW / 2;
         const centerY = targetH * 0.42; // Center on Ankit's face
 
@@ -301,6 +301,7 @@ export default function ParticlePortrait({ className = '', onScrollProgress }: P
       const newW = container.clientWidth;
       const newH = container.clientHeight;
       camera.aspect = newW / newH;
+      camera.position.z = newW < 768 ? 520 : 700;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
       uniforms.uResolution.value.set(newW, newH);

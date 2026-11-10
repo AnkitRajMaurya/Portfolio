@@ -17,7 +17,7 @@ export default function FaqSection() {
           <details open suppressHydrationWarning>
             <summary suppressHydrationWarning>Who is Ankit Raj Maurya?</summary>
             <p>
-              A full-stack developer in Muzaffarpur, Bihar, India. He builds production-ready web and mobile applications and co-founded Codex Monarch.
+              A full-stack developer in Muzaffarpur, Bihar, India. He builds production-ready web and mobile applications and is Team Lead at Codex Monarch.
             </p>
           </details>
 

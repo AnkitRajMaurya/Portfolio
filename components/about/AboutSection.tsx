@@ -6,7 +6,7 @@ export default function AboutSection() {
   const [content, setContent] = useState({
     about_slogan: 'From problem to production-ready.',
     about_description:
-      "Hello, I'm Ankit, a Full-Stack Developer and Co-founder at Codex Monarch, based in Muzaffarpur, Bihar. I build highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.",
+      "Hello, I'm Ankit, a Full-Stack Developer and Team Lead at Codex Monarch, based in Muzaffarpur, Bihar. I build highly scalable, production-ready applications that merge technical efficiency with elegant user experiences.",
     location: 'Muzaffarpur, Bihar, India',
     email: 'ankit5242raj1@outlook.com',
     resume_url: 'https://drive.google.com/file/d/1359Lhc3l75iBDmdHSWJDFBz4O8sG33MJ/view?usp=drivesdk',
@@ -53,10 +53,10 @@ export default function AboutSection() {
               Let&apos;s talk
             </a>
           </div>
-          <dl className="gl fx rv" style={{ padding: '12px 30px', alignSelf: 'start' }} suppressHydrationWarning>
+          <dl className="gl fx rv" suppressHydrationWarning>
             <div>
               <dt>Role</dt>
-              <dd>Co-founder, Codex Monarch</dd>
+              <dd>Team Lead, Codex Monarch</dd>
             </div>
             <div>
               <dt>Based in</dt>

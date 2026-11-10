@@ -23,7 +23,7 @@ export async function GET() {
         demo_url: 'https://www.codexmonarch.me/',
         github_url: '',
         tech_tags: ['Node.js', 'MongoDB', 'JavaScript', 'Community Engine'],
-        badge: 'Lead & Co-Founder',
+        badge: 'Team Lead',
         sort_order: 1,
       },
       {

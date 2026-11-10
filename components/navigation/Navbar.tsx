@@ -95,6 +95,7 @@ export default function Navbar() {
           className="mobile-toggle"
           aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
           aria-expanded={mobileMenuOpen}
+          suppressHydrationWarning
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           <span className={`hamburger-bar ${mobileMenuOpen ? 'open-1' : ''}`} />

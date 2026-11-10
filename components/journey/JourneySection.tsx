@@ -15,7 +15,7 @@ export default function JourneySection() {
             <ol className="tl" suppressHydrationWarning>
               <li className="rv" suppressHydrationWarning>
                 <time>2024 – Present</time>
-                <b>Co-founder</b>
+                <b>Team Lead</b>
                 <span>Codex Monarch</span>
               </li>
               <li className="rv" suppressHydrationWarning>

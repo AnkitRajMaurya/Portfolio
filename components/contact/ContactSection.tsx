@@ -91,12 +91,14 @@ export default function ContactSection() {
 
         <div className="cg" suppressHydrationWarning>
           <div className="rv" suppressHydrationWarning>
-            <a className="mail" href="mailto:ankit5242raj1@outlook.com">
-              ankit5242raj1@outlook.com
-            </a>
-            <button className="cp" id="cp" type="button" onClick={handleCopy} suppressHydrationWarning>
-              {copied ? 'Copied' : 'Copy email'}
-            </button>
+            <div className="contact-mail-box" suppressHydrationWarning>
+              <a className="mail" href="mailto:ankit5242raj1@outlook.com">
+                ankit5242raj1@outlook.com
+              </a>
+              <button className="cp" id="cp" type="button" onClick={handleCopy} suppressHydrationWarning>
+                {copied ? 'Copied' : 'Copy email'}
+              </button>
+            </div>
             <p className="loc">Muzaffarpur, Bihar, India</p>
 
             <div className="contact-social-links" suppressHydrationWarning>

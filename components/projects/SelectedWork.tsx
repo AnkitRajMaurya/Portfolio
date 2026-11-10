@@ -19,7 +19,7 @@ const DEFAULT_PROJECTS: Project[] = [
   {
     id: 1,
     title: 'Codex Monarch',
-    description: 'A student-led technical community platform for events, workshops and collaboration. Co-founded and led by me.',
+    description: 'A student-led technical community platform for events, workshops and collaboration. Led by me as Team Lead.',
     image_url: '/img/projects/codex-monarch.png',
     demo_url: 'https://www.codexmonarch.me/',
     github_url: '',
@@ -118,18 +118,9 @@ export default function SelectedWork() {
                   </h3>
                   <p>{p.description}</p>
                   {p.tech_tags && p.tech_tags.length > 0 && (
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '14px 0 20px' }}>
+                    <div className="pc-tags-list">
                       {p.tech_tags.map((tag, tIdx) => (
-                        <span
-                          key={tIdx}
-                          style={{
-                            fontSize: 'var(--type-xs)',
-                            padding: '3px 8px',
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            borderRadius: 'var(--radius-sm)',
-                            color: 'var(--mute)',
-                          }}
-                        >
+                        <span key={tIdx} className="pc-tag-pill">
                           {tag}
                         </span>
                       ))}

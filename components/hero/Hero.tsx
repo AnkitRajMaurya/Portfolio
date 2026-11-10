@@ -21,12 +21,6 @@ export default function Hero() {
         { opacity: 1, y: 0, duration: 1.0, stagger: 0.15, delay: 0.2 }
       )
       .fromTo(
-        '.hero-eyebrow',
-        { opacity: 0, letterSpacing: '0.35em' },
-        { opacity: 1, letterSpacing: '0.22em', duration: 1.2 },
-        '-=0.6'
-      )
-      .fromTo(
         '.hero-title-part',
         { opacity: 0, y: 40, skewY: 2 },
         { opacity: 1, y: 0, skewY: 0, duration: 1.4, stagger: 0.2 },
@@ -49,10 +43,10 @@ export default function Hero() {
       <div ref={metadataRef} className="hero-top-meta">
         <div className="hero-meta-item left">
           <span className="live-pulse" />
-          <span className="mono-text">FULL-STACK DEVELOPER &bull; PRODUCT BUILDER &bull; CREATIVE ENGINEER</span>
+          <span className="mono-text">FULL-STACK DEVELOPER<span className="hero-meta-extra"> &bull; PRODUCT BUILDER &bull; CREATIVE ENGINEER</span></span>
         </div>
         <div className="hero-meta-item right">
-          <span className="mono-text">Based in Muzaffarpur, India &bull; Open to worldwide impact</span>
+          <span className="mono-text">Based in Muzaffarpur, India<span className="hero-meta-extra"> &bull; Open to worldwide impact</span></span>
         </div>
       </div>
 
@@ -63,10 +57,6 @@ export default function Hero() {
 
       {/* Layered Foreground Typography */}
       <div className="hero-foreground-content">
-        <div className="hero-eyebrow">
-          <span className="eyebrow-dot" />
-          <span>A HUMAN PERSPECTIVE ON TECHNOLOGY</span>
-        </div>
 
         <h1 ref={headlineRef} className="hero-main-title">
           <span className="hero-title-part upright">Ankit</span>

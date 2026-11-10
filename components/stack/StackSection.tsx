@@ -350,6 +350,7 @@ export default function StackSection() {
 
         <div className="tabs" role="tablist" aria-label="Skill categories" suppressHydrationWarning>
           <button
+            type="button"
             role="tab"
             id="t0"
             aria-selected={activeTab === 0}
@@ -361,6 +362,7 @@ export default function StackSection() {
             Frontend
           </button>
           <button
+            type="button"
             role="tab"
             id="t1"
             aria-selected={activeTab === 1}
@@ -372,6 +374,7 @@ export default function StackSection() {
             Backend &amp; DB
           </button>
           <button
+            type="button"
             role="tab"
             id="t2"
             aria-selected={activeTab === 2}
@@ -385,7 +388,7 @@ export default function StackSection() {
         </div>
 
         {/* Panel 0: Frontend */}
-        <div className="tp" id="p0" role="tabpanel" aria-labelledby="t0" hidden={activeTab !== 0}>
+        <div className="tp" id="p0" role="tabpanel" aria-labelledby="t0" hidden={activeTab !== 0} style={activeTab !== 0 ? { display: 'none' } : undefined}>
           {frontendSkills.map((s, idx) => (
             <div key={s.id || idx} className="tk" onMouseMove={handleMouseMove}>
               {renderTechLogo(s.name)}
@@ -395,7 +398,7 @@ export default function StackSection() {
         </div>
 
         {/* Panel 1: Backend */}
-        <div className="tp" id="p1" role="tabpanel" aria-labelledby="t1" hidden={activeTab !== 1}>
+        <div className="tp" id="p1" role="tabpanel" aria-labelledby="t1" hidden={activeTab !== 1} style={activeTab !== 1 ? { display: 'none' } : undefined}>
           {backendSkills.map((s, idx) => (
             <div key={s.id || idx} className="tk" onMouseMove={handleMouseMove}>
               {renderTechLogo(s.name)}
@@ -405,7 +408,7 @@ export default function StackSection() {
         </div>
 
         {/* Panel 2: Others */}
-        <div className="tp" id="p2" role="tabpanel" aria-labelledby="t2" hidden={activeTab !== 2}>
+        <div className="tp" id="p2" role="tabpanel" aria-labelledby="t2" hidden={activeTab !== 2} style={activeTab !== 2 ? { display: 'none' } : undefined}>
           {otherSkills.map((s, idx) => (
             <div key={s.id || idx} className="tk" onMouseMove={handleMouseMove}>
               {renderTechLogo(s.name)}

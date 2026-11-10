@@ -15,6 +15,12 @@
   @include respond-to('tablet') {
     padding: 5rem 1.25rem 1rem;
   }
+
+  @include respond-to('mobile') {
+    padding: 4.5rem 1rem 0.85rem;
+    min-height: 100svh;
+    justify-content: space-between;
+  }
 }
 
 .hero-top-meta {
@@ -25,6 +31,47 @@
   align-items: center;
   z-index: 10;
   padding: 0 0.5rem;
+
+  @include respond-to('mobile') {
+    width: auto;
+    margin: 0 auto 0.5rem;
+    padding: 0;
+    justify-content: center;
+
+    .hero-meta-item.left {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px;
+      background: rgba(255, 107, 44, 0.08);
+      border: 1px solid rgba(255, 107, 44, 0.28);
+      border-radius: 9999px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+      .live-pulse {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+      }
+
+      .mono-text {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #f0eae0;
+        white-space: nowrap;
+      }
+    }
+
+    .hero-meta-item.right {
+      display: none !important;
+    }
+  }
 
   .hero-meta-item {
     display: flex;
@@ -37,6 +84,7 @@
       border-radius: 50%;
       background-color: var(--accent);
       box-shadow: 0 0 8px var(--accent);
+      flex-shrink: 0;
     }
 
     .mono-text {
@@ -45,16 +93,20 @@
       color: var(--muted);
       letter-spacing: 0.16em;
       text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .hero-meta-extra {
+      @include respond-to('tablet') {
+        display: none;
+      }
     }
 
     &.right {
       .mono-text {
         text-transform: none;
         letter-spacing: 0.1em;
-      }
-
-      @include respond-to('tablet') {
-        display: none;
+        text-align: right;
       }
     }
   }
@@ -79,8 +131,28 @@
   }
 
   @include respond-to('mobile') {
+    position: absolute;
+    top: 3.25rem;
     width: 100%;
-    height: 390px;
+    max-width: 440px;
+    height: min(345px, 46svh);
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 107, 44, 0.25) 0%, rgba(217, 119, 69, 0.08) 50%, transparent 75%);
+      filter: blur(28px);
+      pointer-events: none;
+      z-index: -1;
+    }
   }
 }
 
@@ -109,6 +181,9 @@
   transition: opacity 300ms ease;
   mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+  @include respond-to('mobile') {
+    width: min(290px, 82vw);
+  }
 }
 
 .hero-foreground-content {
@@ -124,6 +199,12 @@
 
   @include respond-to('tablet') {
     margin-top: clamp(110px, 18svh, 150px);
+  }
+
+  @include respond-to('mobile') {
+    margin-top: clamp(235px, 32svh, 275px);
+    padding-inline: 0.5rem;
+    width: 100%;
   }
 
   .hero-eyebrow {
@@ -174,10 +255,12 @@
     }
 
     @include respond-to('mobile') {
-      --type-display: clamp(2.35rem, 10.5vw, 3.4rem);
+      --type-display: clamp(2.15rem, 9.5vw, 2.75rem);
       font-size: var(--type-display);
+      line-height: 1.08;
+      letter-spacing: -0.015em;
       gap: 0 0.35rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.65rem;
     }
 
     .hero-title-part {
@@ -202,10 +285,11 @@
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
 
     @include respond-to('mobile') {
-      font-size: var(--type-md);
-      line-height: 1.5;
-      max-width: 34rem;
-      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: rgba(240, 234, 224, 0.82);
+      max-width: 310px;
+      margin: 0 auto 1.35rem;
     }
   }
 
@@ -215,9 +299,14 @@
     gap: 1.25rem;
 
     @include respond-to('mobile') {
+      display: flex;
       flex-direction: row;
-      width: auto;
-      gap: 0.5rem;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 330px;
+      margin: 0 auto;
     }
 
     .btn-hero-primary {
@@ -235,6 +324,22 @@
       letter-spacing: 0.02em;
       text-decoration: none;
       transition: background 0.25s ease, border-color 0.25s ease;
+
+      @include respond-to('mobile') {
+        flex: 1;
+        min-height: 44px;
+        padding: 0.65rem 1.15rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        gap: 0.45rem;
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #ff7438 0%, #e0551c 100%);
+        border: 0;
+        color: #090807 !important;
+        box-shadow: 0 4px 18px rgba(255, 107, 44, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        justify-content: center;
+        white-space: nowrap;
+      }
 
       .btn-arrow {
         display: inline-block;
@@ -263,7 +368,25 @@
       text-decoration: none;
       background: transparent;
       border: 1px solid transparent;
-      transition: color 0.25s ease;
+      transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+
+      @include respond-to('mobile') {
+        flex: 1;
+        min-height: 44px;
+        padding: 0.65rem 1.15rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        gap: 0.4rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #f0eae0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        justify-content: center;
+        white-space: nowrap;
+      }
 
       .btn-arrow {
         display: inline-block;
@@ -292,7 +415,20 @@
   padding: 0.85rem 0.5rem 0;
 
   @include respond-to('mobile') {
-    padding-top: 0.55rem;
+    padding-top: 0.5rem;
+    justify-content: center;
+
+    .bottom-meta-col.center,
+    .bottom-meta-col.right {
+      display: none !important;
+    }
+
+    .bottom-meta-col {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
   }
 
   .bottom-meta-col {

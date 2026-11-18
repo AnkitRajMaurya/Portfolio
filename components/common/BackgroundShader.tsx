@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function BackgroundShader() {
+  const pathname = usePathname();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (pathname?.startsWith('/admin')) return;
     const c = canvasRef.current;
     if (!c) return;
 
@@ -117,7 +120,11 @@ export default function BackgroundShader() {
       window.removeEventListener('resize', size);
       window.removeEventListener('pointermove', handlePointerMove);
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return <canvas id="gl" ref={canvasRef} aria-hidden="true" suppressHydrationWarning />;
 }

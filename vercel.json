@@ -12,11 +12,6 @@
       "source": "/Portfolio/(.*)",
       "destination": "/$1",
       "permanent": true
-    },
-    {
-      "source": "/admin",
-      "destination": "/admin/",
-      "permanent": true
     }
   ]
 }

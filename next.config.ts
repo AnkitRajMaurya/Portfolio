@@ -23,18 +23,6 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: '/admin',
-        destination: '/admin/index.html',
-      },
-      {
-        source: '/admin/',
-        destination: '/admin/index.html',
-      },
-    ];
-  },
 };
 
 export default nextConfig;

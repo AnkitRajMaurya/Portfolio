@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function ScrollManager() {
+  const pathname = usePathname();
   const pgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (pathname?.startsWith('/admin')) return;
     document.documentElement.classList.add('js');
 
     const updateScrollAndReveals = () => {
@@ -146,7 +149,11 @@ export default function ScrollManager() {
       if (sectionObserver) sectionObserver.disconnect();
       if (mutationObserver) mutationObserver.disconnect();
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return <div id="pg" ref={pgRef} aria-hidden="true" suppressHydrationWarning />;
 }

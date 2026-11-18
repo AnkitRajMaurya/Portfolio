@@ -54,7 +54,7 @@ main {
   padding: 0 clamp(20px, 4vw, 40px);
 }
 
-section {
+#main-content > section:not([id^="section-"]) {
   padding: clamp(88px, 12vw, 168px) 0;
 }
 
@@ -1160,7 +1160,7 @@ textarea:focus-visible {
 
 /* Responsive Media Queries */
 @media (max-width: 960px) {
-  section:not(.hero-section) {
+  #main-content > section:not(.hero-section):not([id^="section-"]) {
     padding-block: clamp(72px, 10vw, 112px);
   }
 
@@ -1200,7 +1200,7 @@ textarea:focus-visible {
     padding-inline: 1rem;
   }
 
-  section:not(.hero-section) {
+  #main-content > section:not(.hero-section):not([id^="section-"]) {
     padding-block: clamp(36px, 7vw, 48px);
   }
 

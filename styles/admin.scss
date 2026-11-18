@@ -1319,9 +1319,24 @@ label {
   max-width: 1140px;
   margin: 0 auto;
   padding: 1.25rem 1.4rem 2.5rem;
+
+  section,
+  .section,
+  [id^="section-"] {
+    padding: 0 !important;
+    padding-block: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+  }
 }
 
 .section {
+  padding: 0 !important;
+  padding-block: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
   animation: sectionEnter 0.34s ease;
 }
 
@@ -2654,11 +2669,11 @@ label {
   }
 
   .dash-header {
-    padding: 1.15rem 1.2rem;
+    padding: 0.95rem 1.1rem;
   }
 
   .sections-wrap {
-    padding: 1.3rem 1.1rem 1.8rem;
+    padding: 1rem 1.1rem 1.8rem;
   }
 
   .dash-header-right {

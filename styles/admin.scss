@@ -25,10 +25,20 @@
   --shadow-bright: 0 0 35px rgba(77, 255, 156, 0.12);
 }
 
-.admin-root-container {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
   position: relative;
   min-height: 100vh;
-  width: 100%;
   overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(46, 148, 97, 0.16), transparent 28%),
@@ -37,15 +47,10 @@
   color: var(--text);
   font-family: 'Share Tech Mono', monospace;
   -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-
-  * {
-    box-sizing: border-box;
-  }
 }
 
-.admin-root-container::before,
-.admin-root-container::after {
+body::before,
+body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -53,7 +58,7 @@
   z-index: 0;
 }
 
-.admin-root-container::before {
+body::before {
   background:
     linear-gradient(rgba(77, 255, 156, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(77, 255, 156, 0.04) 1px, transparent 1px);
@@ -61,7 +66,7 @@
   mask-image: radial-gradient(circle at center, black 44%, transparent 100%);
 }
 
-.admin-root-container::after {
+body::after {
   background:
     radial-gradient(circle at center, rgba(77, 255, 156, 0.14), transparent 62%),
     radial-gradient(circle at 50% 140%, rgba(0, 0, 0, 0.55), transparent 58%);
@@ -69,8 +74,7 @@
   opacity: 0.45;
 }
 
-body.threat-mode::after,
-.admin-root-container.threat-mode::after {
+body.threat-mode::after {
   background:
     radial-gradient(circle at center, rgba(255, 94, 122, 0.18), transparent 58%),
     radial-gradient(circle at 50% 140%, rgba(0, 0, 0, 0.68), transparent 62%);
@@ -1209,7 +1213,7 @@ label {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.35rem 2.3rem;
+  padding: 0.95rem 1.6rem;
   border-bottom: 1px solid var(--border-soft);
   background:
     linear-gradient(180deg, rgba(5, 17, 12, 0.93), rgba(5, 17, 12, 0.82));
@@ -1311,9 +1315,10 @@ label {
 }
 
 .sections-wrap {
-  width: min(1380px, 100%);
+  width: 100%;
+  max-width: 1140px;
   margin: 0 auto;
-  padding: 2rem 2.3rem 2.5rem;
+  padding: 1.25rem 1.4rem 2.5rem;
 }
 
 .section {
@@ -2182,26 +2187,26 @@ label {
 .card-list,
 .messages-list {
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .admin-card {
-  border-radius: 20px;
-  padding: 1.15rem 1.25rem;
+  border-radius: 16px;
+  padding: 0.95rem 1.15rem;
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1.1rem;
   overflow: hidden;
 }
 
 .admin-card-img {
-  width: 102px;
-  height: 72px;
+  width: 90px;
+  height: 64px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  border-radius: 16px;
-  border: 1px solid rgba(77, 255, 156, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(77, 255, 156, 0.12);
   background: rgba(77, 255, 156, 0.04);
   color: var(--accent-strong);
   overflow: hidden;
@@ -2220,24 +2225,32 @@ label {
 
 .admin-card-title {
   color: var(--text-strong);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .admin-card-desc {
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   color: var(--text-muted);
-  font-size: 0.82rem;
-  line-height: 1.55;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .admin-card-tags {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.8rem;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
 }
 
 .tag,
@@ -2246,9 +2259,9 @@ label {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.24rem 0.58rem;
+  padding: 0.22rem 0.55rem;
   border-radius: 999px;
-  font-size: 0.67rem;
+  font-size: 0.65rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -2271,31 +2284,37 @@ label {
   border: 1px solid rgba(255, 94, 122, 0.2);
 }
 
-.admin-card-actions,
-.skill-admin-actions {
+.admin-card-actions {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
   flex-shrink: 0;
+
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 0.78rem;
+    border-radius: 10px;
+  }
 }
 
 .skill-tabs {
   display: inline-flex;
-  gap: 0.5rem;
-  margin-bottom: 1.2rem;
-  padding: 0.45rem;
-  border-radius: 18px;
+  gap: 0.4rem;
+  margin-bottom: 0;
+  padding: 0.35rem;
+  border-radius: 16px;
 }
 
 .skill-tab {
   border: 1px solid transparent;
-  border-radius: 14px;
+  border-radius: 12px;
   background: transparent;
   color: var(--text-muted);
-  padding: 0.72rem 1.15rem;
+  padding: 0.55rem 0.95rem;
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.74rem;
-  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -2309,38 +2328,38 @@ label {
 
 .skills-admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
 }
 
 .skill-admin-card {
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(6, 20, 14, 0.92), rgba(3, 11, 8, 0.92));
-  padding: 1rem 1.1rem;
+  padding: 0.65rem 0.85rem;
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.75rem;
   box-shadow: var(--shadow);
 }
 
 .skill-admin-icon {
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid rgba(77, 255, 156, 0.14);
   background: rgba(77, 255, 156, 0.06);
   color: var(--accent-strong);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   flex-shrink: 0;
 }
 
 .skill-admin-icon img {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
 
@@ -2348,15 +2367,29 @@ label {
   flex: 1;
   min-width: 0;
   color: var(--text-strong);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.skill-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+    border-radius: 9px;
+  }
+}
+
 .msg-card {
-  border-radius: 20px;
-  padding: 1.25rem 1.35rem;
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
   overflow: hidden;
 }
 
@@ -2369,8 +2402,8 @@ label {
   content: '';
   position: absolute;
   left: 0;
-  top: 14px;
-  bottom: 14px;
+  top: 12px;
+  bottom: 12px;
   width: 3px;
   border-radius: 999px;
   background: linear-gradient(180deg, var(--cyan), transparent);
@@ -2381,27 +2414,27 @@ label {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.65rem;
 }
 
 .msg-sender {
   color: var(--text-strong);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
 }
 
 .msg-email,
 .msg-date {
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
 }
 
 .msg-body {
-  padding-top: 0.95rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-soft);
   color: var(--text-muted);
-  font-size: 0.88rem;
-  line-height: 1.7;
+  font-size: 0.85rem;
+  line-height: 1.6;
 }
 
 .msg-badge.read {
@@ -2411,19 +2444,20 @@ label {
 }
 
 .content-form {
-  border-radius: 24px;
-  padding: 1.7rem;
+  border-radius: 20px;
+  padding: 1.4rem;
+  max-width: 920px;
 }
 
 .content-grid,
 .form-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.1rem;
+  gap: 0.95rem;
 }
 
 .content-grid {
-  margin-bottom: 1.3rem;
+  margin-bottom: 1.1rem;
 }
 
 .content-grid .full {

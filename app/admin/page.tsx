@@ -45,6 +45,7 @@ interface Certificate {
   credential_url?: string;
   image_url?: string;
   sort_order?: number;
+  visible?: number | boolean;
 }
 
 interface RecentActivity {
@@ -70,6 +71,24 @@ interface AnalyticsData {
   uniqueVisitors?: number;
   recentLogs?: VisitorLog[];
 }
+
+const SECTION_META: Record<string, { title: string; sub: string }> = {
+  overview: { title: 'OVERVIEW', sub: 'root@system:~$ status --all' },
+  projects: { title: 'PROJECTS', sub: 'root@projects:~$ ls --classified' },
+  skills: { title: 'SKILLS', sub: 'root@skills:~$ cat exploit-db' },
+  messages: { title: 'INTERCEPTS', sub: 'root@signals:~$ read --unread' },
+  certificates: { title: 'CERTS', sub: 'root@certs:~$ verify --chain' },
+  content: { title: 'PAYLOAD', sub: 'root@payload:~$ inject --config' },
+  security: { title: 'SECURITY', sub: 'root@security:~$ passwd --root' },
+};
+
+const FAKE_COMMANDS = [
+  { command: 'scan --ports', output: 'Ports 22, 80, 443, 8080 mapped. Secure relay intact.', state: 'ok' },
+  { command: 'decrypt payload.enc', output: 'Payload unpacked. 4 encrypted modules exposed to root memory.', state: 'secure' },
+  { command: 'access --secure-channel', output: 'Quantum tunnel accepted. Shadow link routed through node sigma.', state: 'secure' },
+  { command: 'status --all', output: 'Firewall active. Telemetry green. Intrusion grid standing by.', state: 'ok' },
+  { command: 'trace --ghost-session', output: 'Anomaly signatures mirrored into blackbox archive for review.', state: 'warn' },
+];
 
 export default function AdminPage() {
   // --- AUTH & BOOT STATE ---
@@ -97,7 +116,7 @@ export default function AdminPage() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // --- DASHBOARD NAVIGATION & TELEMETRY ---
+  // --- NAVIGATION & UPTIME ---
   const [activeSection, setActiveSection] = useState<
     'overview' | 'projects' | 'skills' | 'messages' | 'content' | 'certificates' | 'security'
   >('overview');
@@ -105,7 +124,7 @@ export default function AdminPage() {
   const [uptime, setUptime] = useState<string>('00:00:00');
   const startTimeRef = useRef<number>(Date.now());
 
-  // --- DATA STATES ---
+  // --- DATA ---
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [currentSkillTab, setCurrentSkillTab] = useState<'frontend' | 'backend' | 'others'>('frontend');
@@ -122,7 +141,7 @@ export default function AdminPage() {
     certs: 0,
   });
 
-  // --- CONTENT FORM STATE ---
+  // --- CONTENT FORM ---
   const [contentForm, setContentForm] = useState({
     status_pill: '',
     hero_tagline: '',
@@ -134,7 +153,7 @@ export default function AdminPage() {
   });
   const [contentAlert, setContentAlert] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
-  // --- SECURITY FORM STATE ---
+  // --- SECURITY FORM ---
   const [securityForm, setSecurityForm] = useState({
     current_password: '',
     new_password: '',
@@ -142,8 +161,11 @@ export default function AdminPage() {
   });
   const [securityAlert, setSecurityAlert] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
-  // --- LIVE CONSOLE & MONITOR STATE ---
-  const [consoleLogs, setConsoleLogs] = useState<Array<{ text: string; kind: string }>>([]);
+  // --- CONSOLE & SYSTEM LOG ---
+  const [consoleEntries, setConsoleEntries] = useState<Array<{ command: string; output: string; state: string }>>([
+    { command: 'status --all', output: 'Firewall active. Telemetry green. Core ready.', state: 'ok' },
+    { command: 'scan --ports', output: 'Ports 22, 80, 443, 8080 secure.', state: 'secure' },
+  ]);
   const [monitorStats, setMonitorStats] = useState({
     decryption: 72,
     masking: 81,
@@ -151,7 +173,7 @@ export default function AdminPage() {
     temp: 41,
   });
 
-  // --- MODALS STATE ---
+  // --- MODALS ---
   const [projectModal, setProjectModal] = useState<{ open: boolean; data: Partial<Project> | null }>({
     open: false,
     data: null,
@@ -298,9 +320,9 @@ export default function AdminPage() {
         current++;
       } else {
         clearInterval(interval);
-        setTimeout(() => setBooting(false), 500);
+        setTimeout(() => setBooting(false), 400);
       }
-    }, 200);
+    }, 180);
 
     return () => clearInterval(interval);
   }, []);
@@ -370,42 +392,30 @@ export default function AdminPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // --- LIVE CONSOLE STREAM & SYSTEM MONITOR OSCILLATION ---
+  // --- LIVE CONSOLE & MONITOR TIMERS ---
   useEffect(() => {
     if (!token) return;
 
-    const possibleCommands = [
-      { text: 'root@darknet:~$ scan --ports [22, 80, 443, 8080] => 0 leaks', kind: 'info' },
-      { text: 'SYSTEM: Tor relay verified. Node latency: 24ms', kind: 'success' },
-      { text: 'INTELLIGENCE: Geospatial ping intercepted from regional edge', kind: 'cyan' },
-      { text: 'DECRYPT: AES-256 session handshake confirmed', kind: 'info' },
-      { text: 'FIREWALL: Rejected spoofed SYN packet [192.168.0.x]', kind: 'warn' },
-      { text: 'TURSO: Neural synchronization state: HEALTHY', kind: 'success' },
-    ];
-
-    setConsoleLogs([
-      { text: 'root@darknet:~$ status --active', kind: 'info' },
-      { text: 'SECURE CORE: Operational on Vercel Edge', kind: 'success' },
-    ]);
-
-    const logTimer = setInterval(() => {
-      const randomCmd = possibleCommands[Math.floor(Math.random() * possibleCommands.length)];
-      setConsoleLogs((prev) => [...prev.slice(-8), randomCmd]);
+    let cmdIdx = 0;
+    const cmdInterval = setInterval(() => {
+      const nextCmd = FAKE_COMMANDS[cmdIdx % FAKE_COMMANDS.length];
+      cmdIdx++;
+      setConsoleEntries((prev) => [...prev.slice(-3), nextCmd]);
       playTone(480 + Math.random() * 80, 0.015, 'square', 0.005);
-    }, 4500);
+    }, 5000);
 
-    const monitorTimer = setInterval(() => {
+    const monInterval = setInterval(() => {
       setMonitorStats({
-        decryption: Math.floor(70 + Math.random() * 10),
-        masking: Math.floor(78 + Math.random() * 12),
-        shield: Math.floor(92 + Math.random() * 6),
-        temp: Math.floor(39 + Math.random() * 6),
+        decryption: Math.floor(70 + Math.random() * 8),
+        masking: Math.floor(78 + Math.random() * 10),
+        shield: Math.floor(92 + Math.random() * 5),
+        temp: Math.floor(40 + Math.random() * 4),
       });
-    }, 3000);
+    }, 3200);
 
     return () => {
-      clearInterval(logTimer);
-      clearInterval(monitorTimer);
+      clearInterval(cmdInterval);
+      clearInterval(monInterval);
     };
   }, [token, playTone]);
 
@@ -466,7 +476,7 @@ export default function AdminPage() {
     }
   }, [api]);
 
-  // --- LEAFLET MAP LIFECYCLE ---
+  // --- LEAFLET MAP ---
   const updateLeafletMap = (logs: VisitorLog[]) => {
     if (typeof window === 'undefined') return;
     const L = (window as any).L;
@@ -502,10 +512,10 @@ export default function AdminPage() {
         if (isNaN(lat) || isNaN(lon)) return;
 
         const pingIcon = L.divIcon({
-          className: 'map-pulse-marker',
-          html: '<span class="pulse-ring"></span><span class="pulse-core"></span>',
-          iconSize: [20, 20],
-          iconAnchor: [10, 10],
+          className: 'custom-map-ping',
+          html: '<div class="ping-circle"></div><div class="ping-core"></div>',
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
         });
 
         const marker = L.marker([lat, lon], { icon: pingIcon });
@@ -527,7 +537,7 @@ export default function AdminPage() {
     }
   };
 
-  // --- DATA LOADING ON SECTION CHANGE ---
+  // --- SECTION DATA EFFECT ---
   useEffect(() => {
     if (!token) return;
     if (activeSection === 'overview') {
@@ -606,7 +616,6 @@ export default function AdminPage() {
         return;
       }
 
-      // Success
       setToken(data.token);
       localStorage.setItem('admin_token', data.token);
       setFailedAttempts(0);
@@ -764,7 +773,7 @@ export default function AdminPage() {
     });
   };
 
-  // --- CONTENT FORM SUBMIT ---
+  // --- CONTENT SUBMIT ---
   const handleContentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setContentAlert(null);
@@ -782,7 +791,7 @@ export default function AdminPage() {
     }
   };
 
-  // --- SECURITY FORM SUBMIT ---
+  // --- SECURITY SUBMIT ---
   const handleSecuritySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSecurityAlert(null);
@@ -808,6 +817,11 @@ export default function AdminPage() {
     } catch {
       setSecurityAlert({ msg: 'Network failure.', type: 'error' });
     }
+  };
+
+  const currentMeta = SECTION_META[activeSection] || {
+    title: activeSection.toUpperCase(),
+    sub: 'root@system:~$ idle',
   };
 
   return (
@@ -840,7 +854,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* THREAT INTRUSION OVERLAY */}
+      {/* THREAT OVERLAY */}
       {threatOverlay && (
         <div id="threat-overlay" className="threat-overlay threat-show">
           <div className="threat-panel">
@@ -873,7 +887,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* SUCCESS ACCESS GRANTED OVERLAY */}
+      {/* SUCCESS OVERLAY */}
       {successOverlay && (
         <div id="success-overlay" className="success-overlay">
           <div className="success-panel">
@@ -990,90 +1004,31 @@ export default function AdminPage() {
             </div>
 
             <nav className="sidebar-nav">
-              <button
-                className={`nav-btn ${activeSection === 'overview' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('overview');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-satellite-dish" />
-                <span>OVERVIEW</span>
-                <div className="nav-indicator" />
-              </button>
-
-              <button
-                className={`nav-btn ${activeSection === 'projects' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('projects');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-code" />
-                <span>PROJECTS</span>
-                <div className="nav-indicator" />
-              </button>
-
-              <button
-                className={`nav-btn ${activeSection === 'skills' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('skills');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-microchip" />
-                <span>SKILLS</span>
-                <div className="nav-indicator" />
-              </button>
-
-              <button
-                className={`nav-btn ${activeSection === 'messages' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('messages');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-tower-broadcast" />
-                <span>INTERCEPTS</span>
-                {stats.unread > 0 && <span className="badge">{stats.unread}</span>}
-                <div className="nav-indicator" />
-              </button>
-
-              <button
-                className={`nav-btn ${activeSection === 'certificates' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('certificates');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-fingerprint" />
-                <span>CERTS</span>
-                <div className="nav-indicator" />
-              </button>
-
-              <button
-                className={`nav-btn ${activeSection === 'content' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('content');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-file-code" />
-                <span>PAYLOAD</span>
-                <div className="nav-indicator" />
-              </button>
-
-              <button
-                className={`nav-btn ${activeSection === 'security' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection('security');
-                  setSidebarOpen(false);
-                }}
-              >
-                <i className="fa-solid fa-key" />
-                <span>SECURITY</span>
-                <div className="nav-indicator" />
-              </button>
+              {(
+                [
+                  { id: 'overview' as const, icon: 'fa-solid fa-satellite-dish', label: 'OVERVIEW', badge: 0 },
+                  { id: 'projects' as const, icon: 'fa-solid fa-code', label: 'PROJECTS', badge: 0 },
+                  { id: 'skills' as const, icon: 'fa-solid fa-microchip', label: 'SKILLS', badge: 0 },
+                  { id: 'messages' as const, icon: 'fa-solid fa-tower-broadcast', label: 'INTERCEPTS', badge: stats.unread },
+                  { id: 'certificates' as const, icon: 'fa-solid fa-fingerprint', label: 'CERTS', badge: 0 },
+                  { id: 'content' as const, icon: 'fa-solid fa-file-code', label: 'PAYLOAD', badge: 0 },
+                  { id: 'security' as const, icon: 'fa-solid fa-key', label: 'SECURITY', badge: 0 },
+                ]
+              ).map((item) => (
+                <button
+                  key={item.id}
+                  className={`nav-btn ${activeSection === item.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setSidebarOpen(false);
+                  }}
+                >
+                  <i className={item.icon} />
+                  <span>{item.label}</span>
+                  {item.badge && item.badge > 0 ? <span className="badge">{item.badge}</span> : null}
+                  <div className="nav-indicator" />
+                </button>
+              ))}
             </nav>
 
             <div className="sidebar-footer">
@@ -1099,10 +1054,10 @@ export default function AdminPage() {
                   <i className="fa-solid fa-bars" />
                 </button>
                 <div>
-                  <h2 className="glitch-text-sm" data-text={activeSection.toUpperCase()}>
-                    {activeSection.toUpperCase()}
+                  <h2 className="glitch-text-sm" data-text={currentMeta.title}>
+                    {currentMeta.title}
                   </h2>
-                  <p className="dash-sub">root@system:~$ {activeSection} --active</p>
+                  <p className="dash-sub">{currentMeta.sub}</p>
                 </div>
               </div>
 
@@ -1131,366 +1086,505 @@ export default function AdminPage() {
 
             <div className="sections-wrap">
               {/* SECTION: OVERVIEW */}
-              {activeSection === 'overview' && (
-                <section className="section active">
-                  {/* METRIC STATS */}
-                  <div className="stats-grid">
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-eye" style={{ color: '#57f7ff' }} />
-                      <div>
-                        <span className="stat-num">{stats.views}</span>
-                        <span className="stat-label">TOTAL VIEWS</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-users" style={{ color: '#7d57ff' }} />
-                      <div>
-                        <span className="stat-num">{stats.visitors}</span>
-                        <span className="stat-label">VISITORS</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-code" />
-                      <div>
-                        <span className="stat-num">{stats.projects}</span>
-                        <span className="stat-label">PROJECTS</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-tower-broadcast" />
-                      <div>
-                        <span className="stat-num">{stats.messages}</span>
-                        <span className="stat-label">INTERCEPTS</span>
-                      </div>
+              <section id="section-overview" className={`section ${activeSection === 'overview' ? 'active' : 'hidden'}`}>
+                {/* METRIC STATS */}
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-eye" style={{ color: '#57f7ff' }} />
+                    <div>
+                      <span className="stat-num">{stats.views}</span>
+                      <span className="stat-label">TOTAL VIEWS</span>
                     </div>
                   </div>
-
-                  <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', marginBottom: '1.5rem' }}>
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-inbox" style={{ color: '#ff5e7a' }} />
-                      <div>
-                        <span className="stat-num">{stats.unread}</span>
-                        <span className="stat-label">UNREAD</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-microchip" />
-                      <div>
-                        <span className="stat-num">{stats.skills}</span>
-                        <span className="stat-label">EXPLOITS</span>
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="stat-card-glow" />
-                      <i className="fa-solid fa-fingerprint" />
-                      <div>
-                        <span className="stat-num">{stats.certs}</span>
-                        <span className="stat-label">CERTIFICATES</span>
-                      </div>
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-users" style={{ color: '#7d57ff' }} />
+                    <div>
+                      <span className="stat-num">{stats.visitors}</span>
+                      <span className="stat-label">VISITORS</span>
                     </div>
                   </div>
-
-                  {/* QUICK ACTIONS */}
-                  <div className="quick-actions">
-                    <h3>
-                      <i className="fa-solid fa-bolt" /> QUICK DEPLOY
-                    </h3>
-                    <div className="qa-buttons">
-                      <button
-                        onClick={() => {
-                          setProjectModal({ open: true, data: { badge: 'Team Lead', visible: 1, sort_order: 0 } });
-                        }}
-                        className="qa-btn"
-                      >
-                        <i className="fa-solid fa-plus" /> Deploy Project
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSkillModal({ open: true, data: { category: 'frontend', sort_order: 0 } });
-                        }}
-                        className="qa-btn"
-                      >
-                        <i className="fa-solid fa-plus" /> Add Exploit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCertModal({ open: true, data: { type: 'certificate', sort_order: 0 } });
-                        }}
-                        className="qa-btn"
-                      >
-                        <i className="fa-solid fa-plus" /> Add Cert
-                      </button>
-                      <button onClick={() => setActiveSection('messages')} className="qa-btn">
-                        <i className="fa-solid fa-inbox" /> View Intercepts
-                      </button>
-                      <button onClick={() => setActiveSection('content')} className="qa-btn">
-                        <i className="fa-solid fa-file-pen" /> Edit Payload
-                      </button>
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-code" />
+                    <div>
+                      <span className="stat-num">{stats.projects}</span>
+                      <span className="stat-label">PROJECTS</span>
                     </div>
                   </div>
-
-                  {/* INTEL GRID: LIVE CONSOLE & NETWORK CORE */}
-                  <div className="intel-grid">
-                    <article className="intel-panel trace-panel">
-                      <div className="panel-header">
-                        <h3>
-                          <i className="fa-solid fa-terminal" /> LIVE CONSOLE
-                        </h3>
-                        <span className="panel-chip">EXEC</span>
-                      </div>
-                      <div className="command-console">
-                        <div className="command-console-bar">
-                          <span className="terminal-dot red" />
-                          <span className="terminal-dot yellow" />
-                          <span className="terminal-dot green" />
-                          <span className="command-console-title">root@system:~</span>
-                        </div>
-                        <div className="command-stream">
-                          {consoleLogs.map((log, idx) => (
-                            <div key={idx} className={`console-line console-${log.kind}`}>
-                              {log.text}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="console-examples">
-                        <span className="console-example">scan --ports</span>
-                        <span className="console-example">decrypt payload.enc</span>
-                        <span className="console-example">access --secure-channel</span>
-                        <span className="console-example">status --all</span>
-                      </div>
-                    </article>
-
-                    <article className="intel-panel network-panel">
-                      <div className="panel-header">
-                        <h3>
-                          <i className="fa-solid fa-diagram-project" /> NETWORK CORE
-                        </h3>
-                        <span className="panel-chip">ARMED</span>
-                      </div>
-                      <div className="network-shell">
-                        <div className="network-ring ring-outer" />
-                        <div className="network-ring ring-middle" />
-                        <div className="network-ring ring-inner" />
-                        <div className="network-core-node">ROOT</div>
-                        <div className="network-node node-api">API</div>
-                        <div className="network-node node-db">DB</div>
-                        <div className="network-node node-ui">UI</div>
-                        <div className="network-node node-msg">MSG</div>
-                      </div>
-                      <div className="network-meta">
-                        <div className="network-meta-card">
-                          <span>FIREWALL</span>
-                          <strong>ACTIVE</strong>
-                        </div>
-                        <div className="network-meta-card">
-                          <span>ENCRYPTION</span>
-                          <strong>AES-256</strong>
-                        </div>
-                        <div className="network-meta-card">
-                          <span>THREAT LVL</span>
-                          <strong>LOW</strong>
-                        </div>
-                      </div>
-                    </article>
-                  </div>
-
-                  {/* SYSTEM MONITOR */}
-                  <div className="system-monitor" style={{ marginTop: '1.5rem' }}>
-                    <div className="panel-header">
-                      <h3>
-                        <i className="fa-solid fa-sliders" /> SYSTEM MONITOR
-                      </h3>
-                      <span className="panel-chip">LIVE</span>
-                    </div>
-                    <div className="monitor-grid">
-                      <div className="monitor-card">
-                        <div className="monitor-head">
-                          <span>DECRYPTION</span>
-                          <strong>{monitorStats.decryption}%</strong>
-                        </div>
-                        <div className="monitor-bar">
-                          <div className="monitor-fill" style={{ width: `${monitorStats.decryption}%` }} />
-                        </div>
-                      </div>
-                      <div className="monitor-card">
-                        <div className="monitor-head">
-                          <span>SIGNAL MASKING</span>
-                          <strong>{monitorStats.masking}%</strong>
-                        </div>
-                        <div className="monitor-bar">
-                          <div className="monitor-fill cyan" style={{ width: `${monitorStats.masking}%` }} />
-                        </div>
-                      </div>
-                      <div className="monitor-card">
-                        <div className="monitor-head">
-                          <span>PACKET SHIELD</span>
-                          <strong>{monitorStats.shield}%</strong>
-                        </div>
-                        <div className="monitor-bar">
-                          <div className="monitor-fill" style={{ width: `${monitorStats.shield}%` }} />
-                        </div>
-                      </div>
-                      <div className="monitor-card">
-                        <div className="monitor-head">
-                          <span>CORE TEMP</span>
-                          <strong>{monitorStats.temp}°C</strong>
-                        </div>
-                        <div className="monitor-bar">
-                          <div className="monitor-fill warn" style={{ width: `${monitorStats.temp + 15}%` }} />
-                        </div>
-                      </div>
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-tower-broadcast" />
+                    <div>
+                      <span className="stat-num">{stats.messages}</span>
+                      <span className="stat-label">INTERCEPTS</span>
                     </div>
                   </div>
+                </div>
 
-                  {/* RECENT SYSTEM ACTIVITY FEED */}
-                  <div className="system-monitor" style={{ marginTop: '1.5rem' }}>
-                    <div className="panel-header">
-                      <h3>
-                        <i className="fa-solid fa-clock-rotate-left" /> RECENT SYSTEM ACTIVITY
-                      </h3>
-                      <span className="panel-chip">REALTIME</span>
-                    </div>
-                    <div className="trace-feed compact-trace-feed" style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                      {activities.length === 0 ? (
-                        <div className="empty-state">
-                          <p>No recent activity detected on neural bus.</p>
-                        </div>
-                      ) : (
-                        activities.map((act, i) => (
-                          <div key={i} className="trace-item">
-                            <span className="trace-time">
-                              {act.time ? new Date(act.time).toLocaleTimeString() : '00:00:00'}
-                            </span>
-                            <span className="trace-tag">[{act.type.toUpperCase()}]</span>
-                            <span className="trace-msg">{act.description}</span>
-                          </div>
-                        ))
-                      )}
+                <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', marginBottom: '1.5rem' }}>
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-inbox" style={{ color: '#ff5e7a' }} />
+                    <div>
+                      <span className="stat-num">{stats.unread}</span>
+                      <span className="stat-label">UNREAD</span>
                     </div>
                   </div>
-
-                  {/* REALWORLD SIGNAL TRACKER MAP */}
-                  <div className="global-map-panel" style={{ marginTop: '1.5rem' }}>
-                    <div className="panel-header">
-                      <h3>
-                        <i className="fa-solid fa-earth-asia" /> REALWORLD SIGNAL TRACKER
-                      </h3>
-                      <span className="panel-chip">GEOLOCATED</span>
-                    </div>
-                    <div
-                      id="real-world-map"
-                      ref={mapContainerRef}
-                      style={{
-                        height: '400px',
-                        width: '100%',
-                        borderRadius: '18px',
-                        border: '1px solid rgba(77,255,156,0.12)',
-                        background: '#030a07',
-                        zIndex: 1,
-                      }}
-                    />
-                    <div className="map-legend" style={{ marginTop: '0.95rem' }}>
-                      <div className="map-legend-item">
-                        <span className="legend-dot active" style={{ background: '#00ffd5' }} /> Visitor Ping
-                      </div>
-                      <div className="map-legend-item">
-                        <span className="legend-dot relay" style={{ background: '#7d57ff' }} /> Surface Access
-                      </div>
-                      <div className="map-legend-item">
-                        <span className="legend-dot ghost" style={{ background: '#57f7ff' }} /> Secure Core Node
-                      </div>
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-microchip" />
+                    <div>
+                      <span className="stat-num">{stats.skills}</span>
+                      <span className="stat-label">EXPLOITS</span>
                     </div>
                   </div>
-                </section>
-              )}
+                  <div className="stat-card">
+                    <div className="stat-card-glow" />
+                    <i className="fa-solid fa-fingerprint" />
+                    <div>
+                      <span className="stat-num">{stats.certs}</span>
+                      <span className="stat-label">CERTIFICATES</span>
+                    </div>
+                  </div>
+                </div>
 
-              {/* SECTION: PROJECTS */}
-              {activeSection === 'projects' && (
-                <section className="section active">
-                  <div className="section-actions">
-                    <h3>
-                      <i className="fa-solid fa-code" /> ALL PROJECTS
-                    </h3>
+                {/* QUICK ACTIONS */}
+                <div className="quick-actions">
+                  <h3>
+                    <i className="fa-solid fa-bolt" /> QUICK DEPLOY
+                  </h3>
+                  <div className="qa-buttons">
                     <button
-                      className="btn-primary"
-                      onClick={() => setProjectModal({ open: true, data: { badge: 'Team Lead', visible: 1, sort_order: 0 } })}
+                      onClick={() => {
+                        setProjectModal({ open: true, data: { badge: 'Team Lead', visible: 1, sort_order: 0 } });
+                      }}
+                      className="qa-btn"
                     >
-                      <i className="fa-solid fa-plus" /> DEPLOY NEW
+                      <i className="fa-solid fa-plus" /> Deploy Project
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSkillModal({ open: true, data: { category: 'frontend', sort_order: 0 } });
+                      }}
+                      className="qa-btn"
+                    >
+                      <i className="fa-solid fa-plus" /> Add Exploit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCertModal({ open: true, data: { type: 'certificate', sort_order: 0 } });
+                      }}
+                      className="qa-btn"
+                    >
+                      <i className="fa-solid fa-plus" /> Add Cert
+                    </button>
+                    <button onClick={() => setActiveSection('messages')} className="qa-btn">
+                      <i className="fa-solid fa-inbox" /> View Intercepts
+                    </button>
+                    <button onClick={() => setActiveSection('content')} className="qa-btn">
+                      <i className="fa-solid fa-file-pen" /> Edit Payload
                     </button>
                   </div>
+                </div>
 
-                  <div className="card-list">
-                    {projects.length === 0 ? (
+                {/* INTEL GRID */}
+                <div className="intel-grid">
+                  <article className="intel-panel trace-panel">
+                    <div className="panel-header">
+                      <h3>
+                        <i className="fa-solid fa-terminal" /> LIVE CONSOLE
+                      </h3>
+                      <span className="panel-chip">EXEC</span>
+                    </div>
+                    <div className="command-console">
+                      <div className="command-console-bar">
+                        <span className="terminal-dot red" />
+                        <span className="terminal-dot yellow" />
+                        <span className="terminal-dot green" />
+                        <span className="command-console-title">root@system:~</span>
+                      </div>
+                      <div id="command-stream" className="command-stream">
+                        {consoleEntries.map((entry, idx) => (
+                          <div key={idx} className="command-entry">
+                            <div className="command-line">
+                              <span className="command-prompt">root@system:~$</span>
+                              <span className="command-typed">{entry.command}</span>
+                            </div>
+                            <div className="command-output">
+                              <span className={`command-state ${entry.state}`}>{entry.state}</span>
+                              <span>{entry.output}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="console-examples">
+                      <span className="console-example">scan --ports</span>
+                      <span className="console-example">decrypt payload.enc</span>
+                      <span className="console-example">access --secure-channel</span>
+                      <span className="console-example">status --all</span>
+                    </div>
+                    <div className="trace-subhead">
+                      <span>SYSTEM LOG</span>
+                      <span>LIVE</span>
+                    </div>
+                    <div id="trace-feed" className="trace-feed compact-trace-feed">
+                      <div className="trace-line">
+                        <span className="trace-time">{new Date().toLocaleTimeString()}</span>
+                        <span className="trace-text">{stats.projects} project payloads indexed in secure storage.</span>
+                        <span className="trace-severity stable">STABLE</span>
+                      </div>
+                      <div className="trace-line">
+                        <span className="trace-time">{new Date().toLocaleTimeString()}</span>
+                        <span className="trace-text">{stats.skills} exploit entries active in skill database.</span>
+                        <span className="trace-severity stable">STABLE</span>
+                      </div>
+                      <div className="trace-line">
+                        <span className="trace-time">{new Date().toLocaleTimeString()}</span>
+                        <span className="trace-text">{stats.unread} unread transmissions flagged out of {stats.messages} total.</span>
+                        <span className={`trace-severity ${stats.unread > 0 ? 'alert' : 'stable'}`}>
+                          {stats.unread > 0 ? 'ALERT' : 'STABLE'}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article className="intel-panel network-panel">
+                    <div className="panel-header">
+                      <h3>
+                        <i className="fa-solid fa-diagram-project" /> NETWORK CORE
+                      </h3>
+                      <span className="panel-chip">ARMED</span>
+                    </div>
+                    <div className="network-shell">
+                      <div className="network-ring ring-outer" />
+                      <div className="network-ring ring-middle" />
+                      <div className="network-ring ring-inner" />
+                      <div className="network-core-node">ROOT</div>
+                      <div className="network-node node-api">API</div>
+                      <div className="network-node node-db">DB</div>
+                      <div className="network-node node-ui">UI</div>
+                      <div className="network-node node-msg">MSG</div>
+                    </div>
+                    <div className="network-meta">
+                      <div className="network-meta-card">
+                        <span>FIREWALL</span>
+                        <strong>ACTIVE</strong>
+                      </div>
+                      <div className="network-meta-card">
+                        <span>ENCRYPTION</span>
+                        <strong>AES-256</strong>
+                      </div>
+                      <div className="network-meta-card">
+                        <span>THREAT LVL</span>
+                        <strong>LOW</strong>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                {/* SYSTEM MONITOR */}
+                <div className="system-monitor" style={{ marginTop: '1.5rem' }}>
+                  <div className="panel-header">
+                    <h3>
+                      <i className="fa-solid fa-sliders" /> SYSTEM MONITOR
+                    </h3>
+                    <span className="panel-chip">LIVE</span>
+                  </div>
+                  <div className="monitor-grid">
+                    <div className="monitor-card">
+                      <div className="monitor-head">
+                        <span>DECRYPTION</span>
+                        <strong>{monitorStats.decryption}%</strong>
+                      </div>
+                      <div className="monitor-bar">
+                        <div className="monitor-fill" style={{ width: `${monitorStats.decryption}%` }} />
+                      </div>
+                    </div>
+                    <div className="monitor-card">
+                      <div className="monitor-head">
+                        <span>SIGNAL MASKING</span>
+                        <strong>{monitorStats.masking}%</strong>
+                      </div>
+                      <div className="monitor-bar">
+                        <div className="monitor-fill cyan" style={{ width: `${monitorStats.masking}%` }} />
+                      </div>
+                    </div>
+                    <div className="monitor-card">
+                      <div className="monitor-head">
+                        <span>PACKET SHIELD</span>
+                        <strong>{monitorStats.shield}%</strong>
+                      </div>
+                      <div className="monitor-bar">
+                        <div className="monitor-fill" style={{ width: `${monitorStats.shield}%` }} />
+                      </div>
+                    </div>
+                    <div className="monitor-card">
+                      <div className="monitor-head">
+                        <span>CORE TEMP</span>
+                        <strong>{monitorStats.temp}°C</strong>
+                      </div>
+                      <div className="monitor-bar">
+                        <div className="monitor-fill warn" style={{ width: `${monitorStats.temp + 15}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RECENT SYSTEM ACTIVITY FEED */}
+                <div className="system-monitor" style={{ marginTop: '1.5rem' }}>
+                  <div className="panel-header">
+                    <h3>
+                      <i className="fa-solid fa-clock-rotate-left" /> RECENT SYSTEM ACTIVITY
+                    </h3>
+                    <span className="panel-chip">REALTIME</span>
+                  </div>
+                  <div id="recent-activity-feed" className="trace-feed compact-trace-feed" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                    {activities.length === 0 ? (
                       <div className="empty-state">
-                        <i className="fa-solid fa-code" />
-                        <p>No deployed project payloads yet.</p>
+                        <p>No recent activity detected on neural bus.</p>
                       </div>
                     ) : (
-                      projects.map((p) => {
-                        const tags = Array.isArray(p.tech_tags)
-                          ? p.tech_tags
-                          : String(p.tech_tags || '')
-                              .split(',')
-                              .map((t) => t.trim())
-                              .filter(Boolean);
+                      activities.map((act, i) => {
+                        let icon = 'fa-solid fa-circle-notch';
+                        let sevClass = 'stable';
+                        if (act.type === 'project') {
+                          icon = 'fa-solid fa-code';
+                          sevClass = 'stable';
+                        } else if (act.type === 'message') {
+                          icon = 'fa-solid fa-tower-broadcast';
+                          sevClass = 'alert';
+                        } else if (act.type === 'visitor') {
+                          icon = 'fa-solid fa-satellite-dish';
+                          sevClass = 'watch';
+                        }
+
+                        let timeString = '';
+                        if (act.time) {
+                          const d = new Date(act.time);
+                          timeString =
+                            d.toLocaleTimeString('en-IN', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: false,
+                            }) +
+                            ' ' +
+                            d.toLocaleDateString('en-IN', {
+                              day: '2-digit',
+                              month: 'short',
+                            });
+                        }
+
                         return (
-                          <div key={p.id} className="admin-card">
-                            <div className="admin-card-header">
-                              <div>
-                                <h4 className="admin-card-title">{p.title}</h4>
-                                {p.badge && <span className="chip-badge">{p.badge}</span>}
-                              </div>
-                              <div className="card-actions">
-                                <button
-                                  className="btn-icon"
-                                  onClick={() => setProjectModal({ open: true, data: { ...p } })}
-                                  aria-label="Edit project"
-                                >
-                                  <i className="fa-solid fa-pen-to-square" />
-                                </button>
-                                <button
-                                  className="btn-icon danger"
-                                  onClick={() => deleteProject(p.id, p.title)}
-                                  aria-label="Delete project"
-                                >
-                                  <i className="fa-solid fa-trash-can" />
-                                </button>
-                              </div>
+                          <div key={i} className="trace-line">
+                            <span className="trace-time">{timeString}</span>
+                            <div className="trace-text">
+                              <span className={`trace-icon-wrapper ${sevClass}`}>
+                                <i className={icon} />
+                              </span>
+                              <strong style={{ color: 'var(--text-strong)', fontWeight: 600, marginRight: '0.35rem' }}>
+                                {act.title}:
+                              </strong>
+                              <span>{act.description}</span>
                             </div>
-                            <p className="admin-card-desc">{p.description || 'No description provided.'}</p>
-                            <div className="tags-row">
-                              {tags.map((tag, idx) => (
-                                <span key={idx} className="tag-chip">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                            <div className="card-footer-meta">
-                              <span>Order: {p.sort_order ?? 0}</span>
-                              <span>Visible: {p.visible ? 'YES' : 'HIDDEN'}</span>
-                            </div>
+                            <span className={`trace-severity ${sevClass}`}>{act.type.toUpperCase()}</span>
                           </div>
                         );
                       })
                     )}
                   </div>
-                </section>
-              )}
+                </div>
+
+                {/* REALWORLD SIGNAL TRACKER MAP */}
+                <div className="global-map-panel" style={{ marginTop: '1.5rem' }}>
+                  <div className="panel-header">
+                    <h3>
+                      <i className="fa-solid fa-earth-asia" /> REALWORLD SIGNAL TRACKER
+                    </h3>
+                    <span className="panel-chip">GEOLOCATED</span>
+                  </div>
+                  <div
+                    id="real-world-map"
+                    ref={mapContainerRef}
+                    style={{
+                      height: '400px',
+                      width: '100%',
+                      borderRadius: '18px',
+                      border: '1px solid rgba(77,255,156,0.12)',
+                      background: '#030a07',
+                      zIndex: 1,
+                    }}
+                  />
+                  <div className="map-legend" style={{ marginTop: '0.95rem' }}>
+                    <div className="map-legend-item">
+                      <span className="legend-dot active" style={{ background: '#00ffd5' }} /> Visitor Ping
+                    </div>
+                    <div className="map-legend-item">
+                      <span className="legend-dot relay" style={{ background: '#7d57ff' }} /> Surface Access
+                    </div>
+                    <div className="map-legend-item">
+                      <span className="legend-dot ghost" style={{ background: '#57f7ff' }} /> Secure Core Node
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* SECTION: PROJECTS */}
+              <section id="section-projects" className={`section ${activeSection === 'projects' ? 'active' : 'hidden'}`}>
+                <div className="section-actions">
+                  <h3>
+                    <i className="fa-solid fa-code" /> ALL PROJECTS
+                  </h3>
+                  <button
+                    className="btn-primary"
+                    onClick={() => setProjectModal({ open: true, data: { badge: 'Team Lead', visible: 1, sort_order: 0 } })}
+                  >
+                    <i className="fa-solid fa-plus" /> DEPLOY NEW
+                  </button>
+                </div>
+
+                <div className="card-list" id="projects-list">
+                  {projects.length === 0 ? (
+                    <div className="empty-state">
+                      <i className="fa-solid fa-code" />
+                      <p>No deployed project payloads yet.</p>
+                    </div>
+                  ) : (
+                    projects.map((p) => {
+                      const tags = Array.isArray(p.tech_tags)
+                        ? p.tech_tags
+                        : String(p.tech_tags || '')
+                            .split(',')
+                            .map((t) => t.trim())
+                            .filter(Boolean);
+                      return (
+                        <div key={p.id} className="admin-card">
+                          <div className="admin-card-img">
+                            {p.image_url ? (
+                              <img
+                                src={p.image_url}
+                                alt={p.title}
+                                onError={(e) => {
+                                  (e.currentTarget.parentElement as HTMLElement).innerHTML =
+                                    '<i class="fa-solid fa-laptop-code"></i>';
+                                }}
+                              />
+                            ) : (
+                              <i className="fa-solid fa-laptop-code" />
+                            )}
+                          </div>
+                          <div className="admin-card-body">
+                            <div className="admin-card-title">{p.title}</div>
+                            <div className="admin-card-desc">{p.description || 'No mission notes attached.'}</div>
+                            <div className="admin-card-tags">
+                              {tags.map((tag, idx) => (
+                                <span key={idx} className="tag">
+                                  {tag}
+                                </span>
+                              ))}
+                              {p.badge && (
+                                <span
+                                  className="tag"
+                                  style={{
+                                    color: '#ffd35d',
+                                    borderColor: 'rgba(255, 211, 93, 0.35)',
+                                    background: 'rgba(255, 211, 93, 0.1)',
+                                  }}
+                                >
+                                  {p.badge}
+                                </span>
+                              )}
+                              <span className={`visibility-badge ${p.visible ? 'vis-yes' : 'vis-no'}`}>
+                                {p.visible ? 'ACTIVE' : 'HIDDEN'}
+                              </span>
+                              {p.demo_url && (
+                                <a
+                                  href={p.demo_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tag"
+                                  style={{
+                                    color: '#57f7ff',
+                                    borderColor: 'rgba(87, 247, 255, 0.3)',
+                                    textDecoration: 'none',
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <i className="fa-solid fa-arrow-up-right-from-square" /> Live
+                                </a>
+                              )}
+                              {p.github_url && (
+                                <a
+                                  href={p.github_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tag"
+                                  style={{
+                                    color: 'var(--text-muted)',
+                                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                                    textDecoration: 'none',
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <i className="fa-brands fa-github" /> Repo
+                                </a>
+                              )}
+                              <span
+                                className="tag"
+                                style={{
+                                  color: 'var(--text-dim)',
+                                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                                }}
+                              >
+                                #{p.sort_order ?? 0}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="admin-card-actions">
+                            <button
+                              className="btn-icon"
+                              onClick={() => setProjectModal({ open: true, data: { ...p } })}
+                              title="Edit"
+                            >
+                              <i className="fa-solid fa-pen" />
+                            </button>
+                            <button
+                              className="btn-icon danger"
+                              onClick={() => deleteProject(p.id, p.title)}
+                              title="Delete"
+                            >
+                              <i className="fa-solid fa-trash" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </section>
 
               {/* SECTION: SKILLS */}
-              {activeSection === 'skills' && (
-                <section className="section active">
-                  <div className="section-actions">
-                    <h3>
-                      <i className="fa-solid fa-microchip" /> EXPLOIT DATABASE
-                    </h3>
+              <section id="section-skills" className={`section ${activeSection === 'skills' ? 'active' : 'hidden'}`}>
+                <div className="section-actions" style={{ marginBottom: '1.2rem' }}>
+                  <h3>
+                    <i className="fa-solid fa-microchip" /> EXPLOIT DATABASE
+                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <div className="skill-tabs" style={{ marginBottom: 0, padding: '0.25rem' }}>
+                      {(['frontend', 'backend', 'others'] as const).map((cat) => (
+                        <button
+                          key={cat}
+                          className={`skill-tab ${currentSkillTab === cat ? 'active' : ''}`}
+                          onClick={() => setCurrentSkillTab(cat)}
+                          style={{ padding: '0.5rem 0.9rem' }}
+                        >
+                          {cat.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
                     <button
                       className="btn-primary"
                       onClick={() => setSkillModal({ open: true, data: { category: currentSkillTab, sort_order: 0 } })}
@@ -1498,333 +1592,357 @@ export default function AdminPage() {
                       <i className="fa-solid fa-plus" /> ADD EXPLOIT
                     </button>
                   </div>
+                </div>
 
-                  <div className="skill-tabs">
-                    {(['frontend', 'backend', 'others'] as const).map((cat) => (
-                      <button
-                        key={cat}
-                        className={`skill-tab ${currentSkillTab === cat ? 'active' : ''}`}
-                        onClick={() => setCurrentSkillTab(cat)}
-                      >
-                        {cat.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="skills-admin-grid">
-                    {skills
+                <div className="skills-admin-grid" id="skills-list">
+                  {skills.filter((s) => s.category === currentSkillTab).length === 0 ? (
+                    <div style={{ gridColumn: '1 / -1' }} className="empty-state">
+                      <i className="fa-solid fa-microchip" />
+                      <p>No exploits indexed in this category.</p>
+                    </div>
+                  ) : (
+                    skills
                       .filter((s) => s.category === currentSkillTab)
                       .map((s) => (
                         <div key={s.id} className="skill-admin-card">
-                          <div className="skill-icon-wrap">
+                          <div className="skill-admin-icon">
                             {s.icon_url ? (
-                              <img src={s.icon_url} alt={s.name} className="skill-custom-img" />
+                              <img src={s.icon_url} alt={s.name} />
                             ) : (
-                              <i className={s.icon_class || 'fa-solid fa-code'} />
+                              <i className={s.icon_class || 'fa-solid fa-star'} />
                             )}
                           </div>
-                          <div className="skill-meta">
-                            <h4>{s.name}</h4>
-                            <span>Order: {s.sort_order ?? 0}</span>
-                          </div>
-                          <div className="card-actions">
+                          <span className="skill-admin-name">{s.name}</span>
+                          <span
+                            className="tag"
+                            style={{
+                              color: 'var(--text-dim)',
+                              borderColor: 'rgba(255, 255, 255, 0.08)',
+                              padding: '0.12rem 0.38rem',
+                              fontSize: '0.62rem',
+                            }}
+                          >
+                            #{s.sort_order ?? 0}
+                          </span>
+                          <div className="skill-admin-actions">
                             <button
                               className="btn-icon"
                               onClick={() => setSkillModal({ open: true, data: { ...s } })}
-                              aria-label="Edit skill"
+                              title="Edit"
                             >
-                              <i className="fa-solid fa-pen-to-square" />
+                              <i className="fa-solid fa-pen" />
                             </button>
                             <button
                               className="btn-icon danger"
                               onClick={() => deleteSkill(s.id, s.name)}
-                              aria-label="Delete skill"
+                              title="Delete"
                             >
-                              <i className="fa-solid fa-trash-can" />
+                              <i className="fa-solid fa-trash" />
                             </button>
                           </div>
                         </div>
-                      ))}
-                  </div>
-                </section>
-              )}
+                      ))
+                  )}
+                </div>
+              </section>
 
               {/* SECTION: MESSAGES */}
-              {activeSection === 'messages' && (
-                <section className="section active">
-                  <div className="section-actions">
-                    <h3>
-                      <i className="fa-solid fa-tower-broadcast" /> INTERCEPTED TRANSMISSIONS
-                    </h3>
-                    <span className="count-chip">
-                      {messages.length} total | {stats.unread} unread
-                    </span>
-                  </div>
+              <section id="section-messages" className={`section ${activeSection === 'messages' ? 'active' : 'hidden'}`}>
+                <div className="section-actions">
+                  <h3>
+                    <i className="fa-solid fa-tower-broadcast" /> INTERCEPTED TRANSMISSIONS
+                  </h3>
+                  <span className="count-chip" id="messages-count">
+                    {messages.length} total | {stats.unread} unread
+                  </span>
+                </div>
 
-                  <div className="messages-list">
-                    {messages.length === 0 ? (
-                      <div className="empty-state">
-                        <i className="fa-solid fa-satellite-dish" />
-                        <p>No intercepted transmissions yet.</p>
-                      </div>
-                    ) : (
-                      messages.map((m) => {
-                        const isUnread = !m.read || m.read === 0;
-                        return (
-                          <div key={m.id} className={`message-card ${isUnread ? 'unread' : ''}`}>
-                            <div className="message-header">
-                              <div className="sender-info">
-                                <h4>{m.name}</h4>
-                                <span className="sender-email">{m.email}</span>
-                                {m.subject && <span className="sender-subject">• {m.subject}</span>}
-                              </div>
-                              <div className="message-meta">
-                                <span>{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
-                                {isUnread && (
-                                  <button
-                                    className="btn-ghost-sm"
-                                    onClick={() => markMessageRead(m.id)}
-                                    title="Mark as Read"
-                                  >
-                                    <i className="fa-solid fa-envelope-open" /> Read
-                                  </button>
-                                )}
-                                <button
-                                  className="btn-icon danger"
-                                  onClick={() => deleteMessage(m.id)}
-                                  title="Delete Message"
-                                >
-                                  <i className="fa-solid fa-trash-can" />
-                                </button>
-                              </div>
+                <div className="messages-list" id="messages-list">
+                  {messages.length === 0 ? (
+                    <div className="empty-state">
+                      <i className="fa-solid fa-satellite-dish" />
+                      <p>No intercepted transmissions yet.</p>
+                    </div>
+                  ) : (
+                    messages.map((m) => {
+                      const read = m.read === true || m.read === 1;
+                      const date = m.created_at
+                        ? new Date(m.created_at).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })
+                        : '';
+                      return (
+                        <div key={m.id} className={`msg-card ${read ? '' : 'msg-unread'}`} id={`msg-${m.id}`}>
+                          <div className="msg-header">
+                            <div>
+                              <div className="msg-sender">{m.name}</div>
+                              <div className="msg-email">{m.email}</div>
                             </div>
-                            <div className="message-body">{m.message}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '.55rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                              <span className="msg-date">{date}</span>
+                              {read ? (
+                                <span className="msg-badge read">READ</span>
+                              ) : (
+                                <button className="btn-icon" onClick={() => markMessageRead(m.id)} title="Mark read">
+                                  <i className="fa-solid fa-check" />
+                                </button>
+                              )}
+                              <button className="btn-icon danger" onClick={() => deleteMessage(m.id)} title="Delete">
+                                <i className="fa-solid fa-trash" />
+                              </button>
+                            </div>
                           </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </section>
-              )}
+                          <div className="msg-body">{m.message}</div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </section>
 
               {/* SECTION: CONTENT (PAYLOAD) */}
-              {activeSection === 'content' && (
-                <section className="section active">
-                  <div className="section-actions">
-                    <h3>
-                      <i className="fa-solid fa-file-code" /> PAYLOAD EDITOR
-                    </h3>
+              <section id="section-content" className={`section ${activeSection === 'content' ? 'active' : 'hidden'}`}>
+                <div className="section-actions">
+                  <h3>
+                    <i className="fa-solid fa-file-code" /> PAYLOAD EDITOR
+                  </h3>
+                </div>
+
+                <form onSubmit={handleContentSubmit} className="content-form" id="content-form">
+                  <div className="content-grid">
+                    <div className="field-group">
+                      <label>Status Pill Text</label>
+                      <input
+                        type="text"
+                        value={contentForm.status_pill}
+                        onChange={(e) => setContentForm({ ...contentForm, status_pill: e.target.value })}
+                        placeholder="Available for new opportunities"
+                      />
+                    </div>
+                    <div className="field-group">
+                      <label>Hero Tagline</label>
+                      <input
+                        type="text"
+                        value={contentForm.hero_tagline}
+                        onChange={(e) => setContentForm({ ...contentForm, hero_tagline: e.target.value })}
+                        placeholder="From Problem to Production-Ready."
+                      />
+                    </div>
+                    <div className="field-group full">
+                      <label>Hero Description</label>
+                      <textarea
+                        rows={3}
+                        value={contentForm.hero_description}
+                        onChange={(e) => setContentForm({ ...contentForm, hero_description: e.target.value })}
+                      />
+                    </div>
+                    <div className="field-group">
+                      <label>About Slogan</label>
+                      <input
+                        type="text"
+                        value={contentForm.about_slogan}
+                        onChange={(e) => setContentForm({ ...contentForm, about_slogan: e.target.value })}
+                        placeholder="Building Digital Ecosystems"
+                      />
+                    </div>
+                    <div className="field-group full">
+                      <label>About Description</label>
+                      <textarea
+                        rows={4}
+                        value={contentForm.about_description}
+                        onChange={(e) => setContentForm({ ...contentForm, about_description: e.target.value })}
+                      />
+                    </div>
+                    <div className="field-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        value={contentForm.email}
+                        onChange={(e) => setContentForm({ ...contentForm, email: e.target.value })}
+                      />
+                    </div>
+                    <div className="field-group">
+                      <label>Location</label>
+                      <input
+                        type="text"
+                        value={contentForm.location}
+                        onChange={(e) => setContentForm({ ...contentForm, location: e.target.value })}
+                      />
+                    </div>
                   </div>
 
-                  <form onSubmit={handleContentSubmit} className="content-form">
-                    <div className="content-grid">
-                      <div className="field-group">
-                        <label>Status Pill Text</label>
-                        <input
-                          type="text"
-                          value={contentForm.status_pill}
-                          onChange={(e) => setContentForm({ ...contentForm, status_pill: e.target.value })}
-                          placeholder="Available for new opportunities"
-                        />
-                      </div>
-                      <div className="field-group">
-                        <label>Hero Tagline</label>
-                        <input
-                          type="text"
-                          value={contentForm.hero_tagline}
-                          onChange={(e) => setContentForm({ ...contentForm, hero_tagline: e.target.value })}
-                          placeholder="From Problem to Production-Ready."
-                        />
-                      </div>
-                      <div className="field-group full">
-                        <label>Hero Description</label>
-                        <textarea
-                          rows={3}
-                          value={contentForm.hero_description}
-                          onChange={(e) => setContentForm({ ...contentForm, hero_description: e.target.value })}
-                        />
-                      </div>
-                      <div className="field-group">
-                        <label>About Slogan</label>
-                        <input
-                          type="text"
-                          value={contentForm.about_slogan}
-                          onChange={(e) => setContentForm({ ...contentForm, about_slogan: e.target.value })}
-                          placeholder="Building Digital Ecosystems"
-                        />
-                      </div>
-                      <div className="field-group full">
-                        <label>About Description</label>
-                        <textarea
-                          rows={4}
-                          value={contentForm.about_description}
-                          onChange={(e) => setContentForm({ ...contentForm, about_description: e.target.value })}
-                        />
-                      </div>
-                      <div className="field-group">
-                        <label>Email</label>
-                        <input
-                          type="email"
-                          value={contentForm.email}
-                          onChange={(e) => setContentForm({ ...contentForm, email: e.target.value })}
-                        />
-                      </div>
-                      <div className="field-group">
-                        <label>Location</label>
-                        <input
-                          type="text"
-                          value={contentForm.location}
-                          onChange={(e) => setContentForm({ ...contentForm, location: e.target.value })}
-                        />
-                      </div>
+                  {contentAlert && (
+                    <div className={`alert ${contentAlert.type === 'success' ? 'alert-success' : 'alert-error'}`}>
+                      {contentAlert.msg}
                     </div>
+                  )}
 
-                    {contentAlert && (
-                      <div className={`alert ${contentAlert.type === 'success' ? 'alert-success' : 'alert-error'}`}>
-                        {contentAlert.msg}
-                      </div>
-                    )}
-
-                    <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>
-                      <i className="fa-solid fa-upload" /> INJECT PAYLOAD
-                    </button>
-                  </form>
-                </section>
-              )}
+                  <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>
+                    <i className="fa-solid fa-upload" /> INJECT PAYLOAD
+                  </button>
+                </form>
+              </section>
 
               {/* SECTION: CERTIFICATES */}
-              {activeSection === 'certificates' && (
-                <section className="section active">
-                  <div className="section-actions">
-                    <h3>
-                      <i className="fa-solid fa-fingerprint" /> CERTIFICATES &amp; CREDENTIALS
-                    </h3>
-                    <button
-                      className="btn-primary"
-                      onClick={() => setCertModal({ open: true, data: { type: 'certificate', sort_order: 0 } })}
-                    >
-                      <i className="fa-solid fa-plus" /> ADD CERT
-                    </button>
-                  </div>
+              <section id="section-certificates" className={`section ${activeSection === 'certificates' ? 'active' : 'hidden'}`}>
+                <div className="section-actions">
+                  <h3>
+                    <i className="fa-solid fa-fingerprint" /> CERTIFICATES &amp; CREDENTIALS
+                  </h3>
+                  <button
+                    className="btn-primary"
+                    onClick={() => setCertModal({ open: true, data: { type: 'certificate', sort_order: 0 } })}
+                  >
+                    <i className="fa-solid fa-plus" /> ADD CERT
+                  </button>
+                </div>
 
-                  <div className="card-list">
-                    {certificates.length === 0 ? (
-                      <div className="empty-state">
-                        <i className="fa-solid fa-fingerprint" />
-                        <p>No verified credentials stored.</p>
-                      </div>
-                    ) : (
-                      certificates.map((c) => (
+                <div className="card-list" id="certificates-list">
+                  {certificates.length === 0 ? (
+                    <div className="empty-state">
+                      <i className="fa-solid fa-fingerprint" />
+                      <p>No credential chains archived yet.</p>
+                    </div>
+                  ) : (
+                    certificates.map((c) => {
+                      const isAward = c.type === 'award';
+                      const typeColor = isAward ? '#ffd35d' : '#57f7ff';
+                      const typeLabel = isAward ? 'AWARD' : 'CERT';
+                      const typeIcon = isAward ? 'fa-trophy' : 'fa-certificate';
+                      return (
                         <div key={c.id} className="admin-card">
-                          <div className="admin-card-header">
-                            <div>
-                              <h4 className="admin-card-title">{c.title}</h4>
-                              <span className="chip-badge">{c.type?.toUpperCase()}</span>
+                          <div
+                            className="admin-card-img"
+                            style={{
+                              background: `linear-gradient(135deg, ${typeColor}22, rgba(4, 13, 10, 0.95))`,
+                            }}
+                          >
+                            <i className={`fa-solid ${typeIcon}`} style={{ color: typeColor, fontSize: '1.5rem' }} />
+                          </div>
+                          <div className="admin-card-body">
+                            <div className="admin-card-title">{c.title}</div>
+                            <div className="admin-card-desc">
+                              {c.issuer || 'Unknown issuer'}
+                              {c.issue_date ? ` | ${c.issue_date}` : ''}
                             </div>
-                            <div className="card-actions">
-                              <button
-                                className="btn-icon"
-                                onClick={() => setCertModal({ open: true, data: { ...c } })}
-                                aria-label="Edit cert"
+                            <div className="admin-card-tags">
+                              <span
+                                className="tag"
+                                style={{
+                                  color: typeColor,
+                                  borderColor: `${typeColor}33`,
+                                  background: `${typeColor}12`,
+                                }}
                               >
-                                <i className="fa-solid fa-pen-to-square" />
-                              </button>
-                              <button
-                                className="btn-icon danger"
-                                onClick={() => deleteCert(c.id, c.title)}
-                                aria-label="Delete cert"
-                              >
-                                <i className="fa-solid fa-trash-can" />
-                              </button>
+                                {typeLabel}
+                              </span>
+                              <span className="visibility-badge vis-yes">ACTIVE</span>
+                              {c.credential_url && (
+                                <a
+                                  href={c.credential_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tag"
+                                  style={{
+                                    color: '#57f7ff',
+                                    borderColor: 'rgba(87, 247, 255, 0.3)',
+                                    textDecoration: 'none',
+                                  }}
+                                >
+                                  <i className="fa-solid fa-arrow-up-right-from-square" /> Verify
+                                </a>
+                              )}
                             </div>
                           </div>
-                          <p className="admin-card-desc">
-                            Issuer: <strong>{c.issuer || 'N/A'}</strong> | Date: {c.issue_date || 'N/A'}
-                          </p>
-                          {c.credential_url && (
-                            <a
-                              href={c.credential_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="cert-link"
-                              style={{ color: '#57f7ff', fontSize: '13px' }}
+                          <div className="admin-card-actions">
+                            <button
+                              className="btn-icon"
+                              onClick={() => setCertModal({ open: true, data: { ...c } })}
+                              title="Edit"
                             >
-                              <i className="fa-solid fa-arrow-up-right-from-square" /> Verify Credential
-                            </a>
-                          )}
+                              <i className="fa-solid fa-pen" />
+                            </button>
+                            <button
+                              className="btn-icon danger"
+                              onClick={() => deleteCert(c.id, c.title)}
+                              title="Delete"
+                            >
+                              <i className="fa-solid fa-trash" />
+                            </button>
+                          </div>
                         </div>
-                      ))
-                    )}
-                  </div>
-                </section>
-              )}
+                      );
+                    })
+                  )}
+                </div>
+              </section>
 
               {/* SECTION: SECURITY */}
-              {activeSection === 'security' && (
-                <section className="section active">
-                  <div className="section-actions">
-                    <h3>
-                      <i className="fa-solid fa-key" /> SYSTEM SECURITY CREDENTIALS
-                    </h3>
+              <section id="section-security" className={`section ${activeSection === 'security' ? 'active' : 'hidden'}`}>
+                <div className="section-actions">
+                  <h3>
+                    <i className="fa-solid fa-key" /> SYSTEM SECURITY CREDENTIALS
+                  </h3>
+                </div>
+
+                <form onSubmit={handleSecuritySubmit} className="content-form" id="password-change-form">
+                  <div className="content-grid" style={{ gridTemplateColumns: '1fr', maxWidth: '500px' }}>
+                    <div className="field-group">
+                      <label>
+                        <i className="fa-solid fa-lock" /> CURRENT PASSWORD
+                      </label>
+                      <input
+                        type="password"
+                        value={securityForm.current_password}
+                        onChange={(e) => setSecurityForm({ ...securityForm, current_password: e.target.value })}
+                        required
+                        placeholder="Enter current admin password..."
+                      />
+                    </div>
+                    <div className="field-group">
+                      <label>
+                        <i className="fa-solid fa-unlock-keyhole" /> NEW PASSWORD
+                      </label>
+                      <input
+                        type="password"
+                        value={securityForm.new_password}
+                        onChange={(e) => setSecurityForm({ ...securityForm, new_password: e.target.value })}
+                        required
+                        placeholder="Enter new admin password..."
+                      />
+                    </div>
+                    <div className="field-group">
+                      <label>
+                        <i className="fa-solid fa-check-double" /> CONFIRM NEW PASSWORD
+                      </label>
+                      <input
+                        type="password"
+                        value={securityForm.confirm_new_password}
+                        onChange={(e) =>
+                          setSecurityForm({ ...securityForm, confirm_new_password: e.target.value })
+                        }
+                        required
+                        placeholder="Confirm new admin password..."
+                      />
+                    </div>
                   </div>
 
-                  <form onSubmit={handleSecuritySubmit} className="content-form">
-                    <div className="content-grid" style={{ gridTemplateColumns: '1fr', maxWidth: '500px' }}>
-                      <div className="field-group">
-                        <label>
-                          <i className="fa-solid fa-lock" /> CURRENT PASSWORD
-                        </label>
-                        <input
-                          type="password"
-                          value={securityForm.current_password}
-                          onChange={(e) => setSecurityForm({ ...securityForm, current_password: e.target.value })}
-                          required
-                          placeholder="Enter current admin password..."
-                        />
-                      </div>
-                      <div className="field-group">
-                        <label>
-                          <i className="fa-solid fa-unlock-keyhole" /> NEW PASSWORD
-                        </label>
-                        <input
-                          type="password"
-                          value={securityForm.new_password}
-                          onChange={(e) => setSecurityForm({ ...securityForm, new_password: e.target.value })}
-                          required
-                          placeholder="Enter new admin password..."
-                        />
-                      </div>
-                      <div className="field-group">
-                        <label>
-                          <i className="fa-solid fa-check-double" /> CONFIRM NEW PASSWORD
-                        </label>
-                        <input
-                          type="password"
-                          value={securityForm.confirm_new_password}
-                          onChange={(e) =>
-                            setSecurityForm({ ...securityForm, confirm_new_password: e.target.value })
-                          }
-                          required
-                          placeholder="Confirm new admin password..."
-                        />
-                      </div>
+                  {securityAlert && (
+                    <div
+                      className={`alert ${securityAlert.type === 'success' ? 'alert-success' : 'alert-error'}`}
+                      style={{ marginTop: '15px' }}
+                    >
+                      {securityAlert.msg}
                     </div>
+                  )}
 
-                    {securityAlert && (
-                      <div
-                        className={`alert ${securityAlert.type === 'success' ? 'alert-success' : 'alert-error'}`}
-                        style={{ marginTop: '15px' }}
-                      >
-                        {securityAlert.msg}
-                      </div>
-                    )}
-
-                    <button type="submit" className="btn-primary" style={{ marginTop: '15px' }}>
-                      <i className="fa-solid fa-shield-halved" /> UPDATE ACCESS KEY
-                    </button>
-                  </form>
-                </section>
-              )}
+                  <button type="submit" className="btn-primary" style={{ marginTop: '15px' }}>
+                    <i className="fa-solid fa-shield-halved" /> UPDATE ACCESS KEY
+                  </button>
+                </form>
+              </section>
             </div>
           </main>
         </div>
@@ -1832,7 +1950,7 @@ export default function AdminPage() {
 
       {/* PROJECT MODAL */}
       {projectModal.open && projectModal.data && (
-        <div className="modal-overlay">
+        <div id="project-modal" className="modal-overlay">
           <div className="modal">
             <div className="terminal-bar">
               <span className="terminal-dot red" />
@@ -2022,7 +2140,7 @@ export default function AdminPage() {
 
       {/* SKILL MODAL */}
       {skillModal.open && skillModal.data && (
-        <div className="modal-overlay">
+        <div id="skill-modal" className="modal-overlay">
           <div className="modal" style={{ maxWidth: '520px' }}>
             <div className="terminal-bar">
               <span className="terminal-dot red" />
@@ -2143,7 +2261,7 @@ export default function AdminPage() {
 
       {/* CERTIFICATE MODAL */}
       {certModal.open && certModal.data && (
-        <div className="modal-overlay">
+        <div id="cert-modal" className="modal-overlay">
           <div className="modal" style={{ maxWidth: '560px' }}>
             <div className="terminal-bar">
               <span className="terminal-dot red" />
@@ -2281,7 +2399,7 @@ export default function AdminPage() {
 
       {/* CONFIRM TERMINATION MODAL */}
       {confirmModal.open && (
-        <div className="modal-overlay">
+        <div id="confirm-modal" className="modal-overlay">
           <div className="modal" style={{ maxWidth: '420px', textAlign: 'center' }}>
             <div className="terminal-bar">
               <span className="terminal-dot red" />
